@@ -421,30 +421,30 @@ int proc_misc_12V_output_write(struct file *file, const char __user *buf,
 	if (page) 
 	{
 		ret = -EFAULT;
-		if (copy_from_user(page, buf, count))
+		if (!buf || !count || copy_from_user(page, buf, count))
 			goto out;
 
-        page[count] = 0;
         //printk("%s", page);
 
 	    myString = (char *) kmalloc(count + 1, GFP_KERNEL);
+		if (!myString)
+			goto out;
+
 	    strncpy(myString, page, count);
-	    myString[count] = '\0';
+	    myString[count] = 0;
 
 	    if(!strncmp("on", myString, count))
 		   _12v_isON=1;
-	    
-        if(!strncmp("off", myString, count))
+        else if(!strncmp("off", myString, count))
 		   _12v_isON=0;
 
 	    kfree(myString);
 
         ret = count;
+out:
+		free_page((unsigned long)page);
 	}
 	
-	ret = count;
-out:
-	free_page((unsigned long)page);
 	return ret;
 }
 
@@ -620,7 +620,7 @@ struct ProcStructure_s e2Proc[] =
 	{cProcEntry, "stb/video/plane/psi_contrast"    , NULL, NULL, NULL, NULL, "psi_contrast"},
 	{cProcEntry, "stb/video/plane/psi_tint"        , NULL, NULL, NULL, NULL, "psi_tint"},
 	{cProcEntry, "stb/video/plane/psi_apply"        , NULL, NULL, NULL, NULL, "psi_apply"},
-#ifdef UFS912
+#if defined(UFS912) || defined(SPARK)
 	{cProcDir  , "stb/cec"   	                   , NULL, NULL, NULL, NULL, ""},
 	{cProcEntry, "stb/cec/state_activesource"   	               , NULL, NULL, NULL, NULL, ""},
 	{cProcEntry, "stb/cec/state_standby"   	               , NULL, NULL, NULL, NULL, ""},
@@ -1007,4 +1007,4 @@ module_exit(e2_proc_cleanup_module);
 MODULE_DESCRIPTION("procfs module with enigma2 support");
 MODULE_AUTHOR("Team Ducktales");
 MODULE_LICENSE("GPL");
-
+// vim:ts=4
