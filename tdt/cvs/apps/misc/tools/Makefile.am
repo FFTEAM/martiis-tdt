@@ -16,4 +16,5 @@ SUBDIRS = \
 	vfdctl \
 	libmme_host \
 	libmmeimage \
-	ipbox_eeprom
+	ipbox_eeprom \
+	mhwepg
