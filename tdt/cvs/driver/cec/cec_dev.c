@@ -265,6 +265,7 @@ int init_dev(void)
 int cleanup_dev(void)
 {
 	unregister_chrdev(CEC_MAJOR,"CEC");
+	return 0;
 }
 
 

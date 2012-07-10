@@ -52,19 +52,21 @@ static unsigned char isFirstKiss = 0;
 static unsigned char logicalDeviceTypeChoicesIndex = 0;
 
 
-static const unsigned char logicalDeviceTypeChoices[] =  { 
-DEVICE_TYPE_DVD1, 
-DEVICE_TYPE_DVD2, 
-DEVICE_TYPE_DVD3, 
-DEVICE_TYPE_STB1, 
-DEVICE_TYPE_STB2, 
-DEVICE_TYPE_STB3,
-DEVICE_TYPE_REC1, //PREV_KEY_WORKING
-DEVICE_TYPE_REC2, 
-DEVICE_TYPE_UNREG };
+static const unsigned char logicalDeviceTypeChoices[][2] =  { 
+  { 1 << DEVICE_TYPE_DVD, DEVICE_TYPE_DVD1 }, 
+  { 1 << DEVICE_TYPE_DVD, DEVICE_TYPE_DVD2 }, 
+  { 1 << DEVICE_TYPE_DVD, DEVICE_TYPE_DVD3 }, 
+  { 1 << DEVICE_TYPE_STB, DEVICE_TYPE_STB1 }, 
+  { 1 << DEVICE_TYPE_STB, DEVICE_TYPE_STB2 }, 
+  { 1 << DEVICE_TYPE_STB, DEVICE_TYPE_STB3 },
+  { 1 << DEVICE_TYPE_REC, DEVICE_TYPE_REC1 },
+  { 1 << DEVICE_TYPE_REC, DEVICE_TYPE_REC2 },
+  { 0xFF, DEVICE_TYPE_UNREG }
+ };
 
+extern char *deviceName;
 static unsigned char logicalDeviceType = DEVICE_TYPE_DVD1;
-static unsigned char deviceType = DEVICE_TYPE_DVD;
+extern unsigned char deviceType;
 
 static unsigned short ActiveSource = 0x0000;
 
@@ -279,6 +281,14 @@ void parseMessage(unsigned char src, unsigned char dst, unsigned int len, unsign
         case USER_CONTROL_CODE_FUNCTION_POWER_TOGGLE:       strcat(name, "POWER_TOGGLE");        break;
         case USER_CONTROL_CODE_FUNCTION_POWER_OFF:          strcat(name, "POWER_OFF");           break;
         case USER_CONTROL_CODE_FUNCTION_POWER_ON:           strcat(name, "POWER_ON");            break;
+	case USER_CONTROL_CODE_ROOT_MENU:	strcat(name, "ROOT_MENU");	break;
+	case USER_CONTROL_CODE_CONTENTS_MENU:	strcat(name, "CONTENTS_MENU");	break;
+	case USER_CONTROL_CODE_SETUP_MENU:	strcat(name, "SETUP_MENU");	break;
+	case USER_CONTROL_CODE_PAGEUP:		strcat(name, "PAGEUP");		break;
+	case USER_CONTROL_CODE_PAGEDOWN:	strcat(name, "PAGEDOWN");	break;
+	case USER_CONTROL_CODE_INFO:		strcat(name, "INFO");		break;
+	case USER_CONTROL_CODE_NEXT:		strcat(name, "NEXT");		break;
+	case USER_CONTROL_CODE_LAST:		strcat(name, "LAST");		break;
         default: break;
       }
 
@@ -303,16 +313,14 @@ void parseMessage(unsigned char src, unsigned char dst, unsigned int len, unsign
       strcpy(name, "GIVE_OSD_NAME");
       if (activemode)
       {
+	  int len;
       responseBuffer[0] = (getLogicalDeviceType() << 4) + (src & 0xF);
       responseBuffer[1] = SET_OSD_NAME;
-      responseBuffer[2] = 'D';
-      responseBuffer[3] = 'U';
-      responseBuffer[4] = 'C'; 
-      responseBuffer[5] = 'K'; 
-      responseBuffer[6] = 'B'; 
-      responseBuffer[7] = 'O'; 
-      responseBuffer[8] = 'X'; 
-      sendMessage(9, responseBuffer);
+      len = strlen(deviceName);
+      if (len > CEC_MAX_DATA_LEN - 2)
+	len = CEC_MAX_DATA_LEN - 2;
+      strncpy(responseBuffer + 2, deviceName, len);
+      sendMessage(len + 2, responseBuffer);
       }
       break;
 
@@ -637,14 +645,21 @@ void sendPingWithAutoIncrement(void)
 {
   unsigned char responseBuffer[1];
 
+  char ldt = 1 << deviceType;
+  // advance to the first matching device type
+  while (!(ldt & logicalDeviceTypeChoices[logicalDeviceTypeChoicesIndex][0]))
+    logicalDeviceTypeChoicesIndex++;
   printk("[CEC] sendPingWithAutoIncrement - 1\n");
   setIsFirstKiss(1);
 
-  logicalDeviceType = logicalDeviceTypeChoices[logicalDeviceTypeChoicesIndex++];
+  logicalDeviceType = logicalDeviceTypeChoices[logicalDeviceTypeChoicesIndex++][1];
   responseBuffer[0] = (logicalDeviceType << 4) + (logicalDeviceType & 0xF);
   printk("[CEC] sendPingWithAutoIncrement - 2\n");
   sendMessage(1, responseBuffer);
   printk("[CEC] sendPingWithAutoIncrement - 3\n");
+  // advance to the next matching device type
+  while (!(ldt & logicalDeviceTypeChoices[logicalDeviceTypeChoicesIndex][0]))
+    logicalDeviceTypeChoicesIndex++;
 }
 
 void sendOneTouchPlay(void)
