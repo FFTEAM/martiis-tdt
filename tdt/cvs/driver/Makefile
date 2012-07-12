@@ -154,10 +154,8 @@ obj-y	+= adb_box_fan/
 endif
 
 ifndef VIP2_V1
-ifndef SPARK
 ifndef SPARK7162
 obj-y	+= cic/
-endif
 endif
 endif
 

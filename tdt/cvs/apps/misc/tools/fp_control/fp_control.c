@@ -230,15 +230,17 @@ void processCommand (Context_t * context, int argc, char* argv[])
 	        {
 	        	time_t theGMTTime;
 
-	            if (argc == 4)
+	            if (argc == 2) // no arguments, assume current time
+					theGMTTime = time(NULL);
+		    else if (argc == 4)
 				{
 			   		getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
-
-					/* set the frontcontroller time */
-					if (((Model_t*)context->m)->SetTime)
-						((Model_t*)context->m)->SetTime(context, &theGMTTime);
-				} else
+				else
 					usage(context, argv[0], argv[1]);
+
+				/* set the frontcontroller time */
+				if (((Model_t*)context->m)->SetTime)
+					((Model_t*)context->m)->SetTime(context, &theGMTTime);
 
 				i += 2;
 		    }
@@ -318,7 +320,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-t") == 0) || (strcmp(argv[i], "--settext") == 0))
 			{
-		        if (i + 1 <= argc)
+		        if (i + 1 < argc)
 					/* set display text */
 					if (((Model_t*)context->m)->SetText)
 						((Model_t*)context->m)->SetText(context, argv[i+1]);
@@ -327,7 +329,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--setLed") == 0))
 		   	{
-		        if (i + 2 <= argc)
+		        if (i + 2 < argc)
 				{
 					int which, on;
 
@@ -343,7 +345,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--setIcon") == 0))
 	        {
-	        	if (i + 2 <= argc)
+	        	if (i + 2 < argc)
 				{
 					int which, on;
 
@@ -358,7 +360,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--setBrightness") == 0))
 	        {
-	        	if (i + 1 <= argc)
+	        	if (i + 1 < argc)
 				{
 					int brightness;
 
@@ -428,7 +430,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-led") == 0) || (strcmp(argv[i], "--setLedBrightness") == 0))
 	        {
-		        if (i + 1 <= argc)
+		        if (i + 1 < argc)
 				{
 					int brightness;
 
@@ -465,7 +467,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-sr") == 0) || (strcmp(argv[i], "--setRF") == 0))
 	        {
-	        	if (i + 1 <= argc)
+	        	if (i + 1 < argc)
 				{
 					int on;
 
@@ -493,7 +495,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    }
 			else if ((strcmp(argv[i], "-tm") == 0) || (strcmp(argv[i], "--time_mode") == 0))
 	        {
-	        	if (i + 1 <= argc)
+	        	if (i + 1 < argc)
 				{
 					int twentyFour;
 
@@ -527,6 +529,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+#ifndef SPARK
 int getKathreinUfs910BoxType() {
     char vType;
     int vFdBox = open("/proc/boxtype", O_RDONLY);
@@ -537,6 +540,7 @@ int getKathreinUfs910BoxType() {
 
     return vType=='0'?0:vType=='1'||vType=='3'?1:-1;
 }
+#endif
 
 int getModel()
 {
@@ -556,6 +560,9 @@ int getModel()
 
         printf("Model: %s\n", vName);
 
+#ifdef SPARK
+            vBoxType = Spark;
+#else
         if(!strncasecmp(vName,"ufs910", 6)) {
             switch(getKathreinUfs910BoxType())
             {
@@ -609,6 +616,7 @@ int getModel()
         {
     		vBoxType = Cuberevo;
         }
+#endif
         else
             vBoxType = Unknown;
     }
@@ -636,3 +644,4 @@ int main (int argc, char* argv[])
 
     return 0;
 }
+// vim:ts=4
