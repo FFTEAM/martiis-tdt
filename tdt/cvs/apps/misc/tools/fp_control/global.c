@@ -139,8 +139,9 @@ static time_t read_neutrino_timers(time_t curTime)
 
 	if (recordTime != LONG_MAX) {
 		int wakeupDecrement = 5*60;
-		int platzhalter;
-		checkConfig(&platzhalter, &platzhalter, &platzhalter, &wakeupDecrement);
+		int dummyInt;
+		char *dummyChar;
+		checkConfig(&dummyInt, &dummyInt, &dummyChar, &wakeupDecrement);
 		recordTime -= wakeupDecrement;
 	}
 
@@ -306,8 +307,6 @@ int checkConfig(int* display, int* display_custom, char** timeFormat, int* wakeu
 	if (fd_config == NULL)
 	{
 		printf("config file (%s) not found, use standard config", CONFIG);
-		printf("configs: DISPLAY = %d, DISPLAYCUSTOM = %d, CUSTOM = %s, WAKEUPDECREMENT  %d\n", 
-			*display, *display_custom, *timeFormat, *wakeup);
 		return -1;
 	}
 	

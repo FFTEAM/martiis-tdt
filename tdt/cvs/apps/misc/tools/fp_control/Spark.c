@@ -275,6 +275,7 @@ static int Spark_shutdown(Context_t* context, time_t* shutdownTimeGMT)
 
 static int Spark_reboot(Context_t* context, time_t* rebootTimeGMT)
 {
+#if 0
    time_t                  curTime;
    struct aotom_ioctl_data vData;
 
@@ -293,6 +294,7 @@ static int Spark_reboot(Context_t* context, time_t* rebootTimeGMT)
 
       usleep(100000);
    }
+#endif
    return 0;
 }
 

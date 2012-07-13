@@ -235,6 +235,7 @@ void processCommand (Context_t * context, int argc, char* argv[])
 		    else if (argc == 4)
 				{
 			   		getTimeFromArg(argv[i + 1], argv[i + 2], &theGMTTime);
+				}
 				else
 					usage(context, argv[0], argv[1]);
 
@@ -616,9 +617,9 @@ int getModel()
         {
     		vBoxType = Cuberevo;
         }
-#endif
         else
             vBoxType = Unknown;
+#endif
     }
 
     printf("vBoxType: %d\n", vBoxType);
