@@ -79,7 +79,7 @@ int input_inject(unsigned int key, unsigned int type)
 	case USER_CONTROL_CODE_DOWN: code = KEY_DOWN; break;
 	case USER_CONTROL_CODE_LEFT: code = KEY_LEFT; break;
 	case USER_CONTROL_CODE_RIGHT: code = KEY_RIGHT; break;
-	case USER_CONTROL_CODE_EXIT: code = KEY_HOME; break;
+	case USER_CONTROL_CODE_EXIT: code = KEY_EXIT; break;
 	case USER_CONTROL_CODE_PREV_CHANNEL: code = KEY_MEMO; break; //not perfect but also used on fortis boxes
 	case USER_CONTROL_CODE_EPG: code = KEY_INFO; break;
 	case USER_CONTROL_CODE_NUMBERS_0: code = KEY_0; break;
