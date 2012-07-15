@@ -33,7 +33,7 @@ endif
 
 ifdef SPARK
 EXTRA_CFLAGS	+= -DSTx7111
-#endif
+endif
 
 endif
 
