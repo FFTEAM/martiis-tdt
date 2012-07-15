@@ -11,8 +11,8 @@ ifdef UFS912
 EXTRA_CFLAGS	+= -DSTx7111
 endif
 
-ifdef SPARK
-EXTRA_CFLAGS	+= -DSTx7111
+ifdef UFS913
+EXTRA_CFLAGS	+= -DSTx7105
 endif
 
 ifdef HS7810A
@@ -30,6 +30,10 @@ endif
 ifdef ATEVIO7500
 EXTRA_CFLAGS	+= -DSTx7105
 endif
+
+ifdef SPARK
+EXTRA_CFLAGS	+= -DSTx7111
+#endif
 
 endif
 
