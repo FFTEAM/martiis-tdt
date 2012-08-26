@@ -70,6 +70,9 @@ include make/enigma2-nightly.mk
 # Include enigma2-pli-nightly gui targets
 include make/enigma2-pli-nightly.mk
 
+# Include xbmc-nightly gui targets
+include make/xbmc-nightly.mk
+
 # Include neutrino gui targets
 include make/neutrino.mk
 include make/neutrino_hd2.mk
@@ -115,6 +118,8 @@ include make/release_vdr.mk
 include make/release_vdrdev2.mk
 
 include make/release_enigma1_hd.mk
+
+include make/release_xbmc.mk
 
 # New static folder
 include make/release_neutrino_static.mk

@@ -537,6 +537,14 @@ $(DEPDIR)/libmng.do_compile: $(DEPDIR)/libmng.do_prepare
 		$(MAKE)
 	touch $@
 
+$(DEPDIR)/min-libmng $(DEPDIR)/std-libmng $(DEPDIR)/max-libmng \
+$(DEPDIR)/libmng: \
+$(DEPDIR)/%libmng: $(DEPDIR)/libmng.do_compile
+	cd @DIR_libmng@ && \
+		@INSTALL_libmng@
+#	@DISTCLEANUP_libmng@
+	[ "x$*" = "x" ] && touch $@ || true	
+
 #
 # lcms
 #
@@ -566,6 +574,8 @@ $(DEPDIR)/directfb.do_prepare: bootstrap freetype @DEPENDS_directfb@
 $(DEPDIR)/directfb.do_compile: $(DEPDIR)/directfb.do_prepare
 	export PATH=$(hostprefix)/bin:$(PATH) && \
 	cd @DIR_directfb@ && \
+		cp $(hostprefix)/share/libtool/config/ltmain.sh . && \
+		cp $(hostprefix)/share/libtool/config/ltmain.sh .. && \
 		libtoolize -f -c && \
 		autoreconf --verbose --force --install -I$(hostprefix)/share/aclocal && \
 		$(BUILDENV) \
@@ -620,6 +630,36 @@ $(DEPDIR)/%dfbpp: $(DEPDIR)/dfbpp.do_compile
 	cd @DIR_dfbpp@ && \
 		@INSTALL_dfbpp@
 #	@DISTCLEANUP_dfbpp@
+	[ "x$*" = "x" ] && touch $@ || true
+
+#
+# LIBSTGLES
+#
+$(DEPDIR)/libstgles.do_prepare: bootstrap directfb @DEPENDS_libstgles@
+	@PREPARE_libstgles@
+	touch $@
+
+$(DEPDIR)/libstgles.do_compile: $(DEPDIR)/libstgles.do_prepare
+	export PATH=$(hostprefix)/bin:$(PATH) && \
+	cd @DIR_libstgles@ && \
+	cp --remove-destination $(hostprefix)/share/libtool/config/ltmain.sh . && \
+	aclocal -I $(hostprefix)/share/aclocal && \
+	autoconf && \
+	automake --foreign --add-missing && \
+	libtoolize --force && \
+	$(BUILDENV) \
+	./configure \
+		--host=$(target) \
+		--prefix=/usr && \
+	$(MAKE)
+	touch $@
+
+$(DEPDIR)/min-libstgles $(DEPDIR)/std-libstgles $(DEPDIR)/max-libstgles \
+$(DEPDIR)/libstgles: \
+$(DEPDIR)/%libstgles: $(DEPDIR)/libstgles.do_compile
+	cd @DIR_libstgles@ && \
+		@INSTALL_libstgles@
+#	@DISTCLEANUP_libstgles@
 	[ "x$*" = "x" ] && touch $@ || true
 
 #
@@ -705,7 +745,7 @@ $(DEPDIR)/libxmlccwrap.do_compile: $(DEPDIR)/libxmlccwrap.do_prepare
 
 $(DEPDIR)/min-libxmlccwrap $(DEPDIR)/std-libxmlccwrap $(DEPDIR)/max-libxmlccwrap \
 $(DEPDIR)/libxmlccwrap: \
-$(DEPDIR)/%libxmlccwrap: libxmlccwrap.do_compile
+$(DEPDIR)/%libxmlccwrap: $(DEPDIR)/libxmlccwrap.do_compile
 	cd @DIR_libxmlccwrap@ && \
 		@INSTALL_libxmlccwrap@ && \
 		sed -e "/^dependency_libs/ s,-L/usr/lib,-L$(targetprefix)/usr/lib,g" -i $(targetprefix)/usr/lib/libxmlccwrap.la && \
@@ -732,7 +772,7 @@ $(DEPDIR)/a52dec.do_compile: $(DEPDIR)/a52dec.do_prepare
 
 $(DEPDIR)/min-a52dec $(DEPDIR)/std-a52dec $(DEPDIR)/max-a52dec \
 $(DEPDIR)/a52dec: \
-$(DEPDIR)/%a52dec: a52dec.do_compile
+$(DEPDIR)/%a52dec: $(DEPDIR)/a52dec.do_compile
 	cd @DIR_a52dec@ && \
 		@INSTALL_a52dec@
 #	@DISTCLEANUP_a52dec@
@@ -758,7 +798,7 @@ $(DEPDIR)/libdvdcss.do_compile: $(DEPDIR)/libdvdcss.do_prepare
 
 $(DEPDIR)/min-libdvdcss $(DEPDIR)/std-libdvdcss $(DEPDIR)/max-libdvdcss \
 $(DEPDIR)/libdvdcss: \
-$(DEPDIR)/%libdvdcss: libdvdcss.do_compile
+$(DEPDIR)/%libdvdcss: $(DEPDIR)/libdvdcss.do_compile
 	cd @DIR_libdvdcss@ && \
 		@INSTALL_libdvdcss@
 #	@DISTCLEANUP_libdvdcss@
@@ -790,7 +830,7 @@ $(DEPDIR)/libdvdnav.do_compile: $(DEPDIR)/libdvdnav.do_prepare
 
 $(DEPDIR)/min-libdvdnav $(DEPDIR)/std-libdvdnav $(DEPDIR)/max-libdvdnav \
 $(DEPDIR)/libdvdnav: \
-$(DEPDIR)/%libdvdnav: libdvdnav.do_compile
+$(DEPDIR)/%libdvdnav: $(DEPDIR)/libdvdnav.do_compile
 	cd @DIR_libdvdnav@ && \
 		sed -e "s,^prefix=,prefix=$(targetprefix)," < misc/dvdnav-config > $(crossprefix)/bin/dvdnav-config && \
 		chmod 755 $(crossprefix)/bin/dvdnav-config && \
@@ -825,7 +865,7 @@ $(DEPDIR)/libdvdread.do_compile: $(DEPDIR)/libdvdread.do_prepare
 
 $(DEPDIR)/min-libdvdread $(DEPDIR)/std-libdvdread $(DEPDIR)/max-libdvdread \
 $(DEPDIR)/libdvdread: \
-$(DEPDIR)/%libdvdread: libdvdread.do_compile
+$(DEPDIR)/%libdvdread: $(DEPDIR)/libdvdread.do_compile
 	cd @DIR_libdvdread@ && \
 		sed -e "s,^prefix=,prefix=$(targetprefix)," < misc/dvdread-config > $(crossprefix)/bin/dvdread-config && \
 		chmod 755 $(crossprefix)/bin/dvdread-config && \
@@ -907,6 +947,11 @@ $(DEPDIR)/ffmpeg.do_compile: $(DEPDIR)/ffmpeg.do_prepare
 		--enable-decoder=mjpeg \
 		--enable-decoder=vorbis \
 		--enable-decoder=flac \
+		--enable-protocol=file \
+		--enable-encoder=mpeg2video \
+		--enable-muxer=mpeg2video \
+		--enable-parser=mjpeg \
+		--enable-demuxer=mjpeg \
 		--enable-decoder=dvbsub \
 		--enable-decoder=iff_byterun1 \
 		--enable-small \
@@ -919,7 +964,8 @@ $(DEPDIR)/ffmpeg.do_compile: $(DEPDIR)/ffmpeg.do_prepare
 		--arch=sh4 \
 		--extra-cflags=-fno-strict-aliasing \
 		--enable-stripping \
-		--prefix=/usr
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-ffmpeg $(DEPDIR)/std-ffmpeg $(DEPDIR)/max-ffmpeg \
@@ -945,7 +991,8 @@ $(DEPDIR)/libass.do_compile: $(DEPDIR)/libass.do_prepare
 		--host=$(target) \
 		--disable-fontconfig \
 		--disable-enca \
-		--prefix=/usr
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-libass $(DEPDIR)/std-libass $(DEPDIR)/max-libass \
@@ -1044,7 +1091,7 @@ $(DEPDIR)/%icu4c: $(DEPDIR)/icu4c.do_compile
 #
 # enchant
 #
-$(DEPDIR)/enchant.do_prepare: bootstrap @DEPENDS_enchant@
+$(DEPDIR)/enchant.do_prepare: bootstrap glib2 @DEPENDS_enchant@
 	@PREPARE_enchant@
 	touch $@
 
@@ -1054,9 +1101,15 @@ $(DEPDIR)/enchant.do_compile: $(DEPDIR)/enchant.do_prepare
 	libtoolize -f -c && \
 	autoreconf --verbose --force --install -I$(hostprefix)/share/aclocal && \
 	$(BUILDENV) \
-	./configure --disable-aspell --disable-ispell --disable-myspell --disable-zemberek \
+	./configure \
+		--build=$(build) \
 		--host=$(target) \
-		--prefix=/usr && \
+		--prefix=/usr \
+		--with-gnu-ld \
+		--disable-aspell \
+		--disable-ispell \
+		--disable-myspell \
+		--disable-zemberek && \
 	$(MAKE) LD=$(target)-ld
 	touch $@
 
@@ -1111,9 +1164,8 @@ $(DEPDIR)/sqlite.do_compile: $(DEPDIR)/sqlite.do_prepare
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
-		--prefix=/usr \
-		--disable-tcl \
-		--disable-debug
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-sqlite $(DEPDIR)/std-sqlite $(DEPDIR)/max-sqlite \
@@ -1222,7 +1274,8 @@ $(DEPDIR)/libogg.do_compile: $(DEPDIR)/libogg.do_prepare
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
-		--prefix=/usr
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-libogg $(DEPDIR)/std-libogg $(DEPDIR)/max-libogg \
@@ -1258,7 +1311,8 @@ $(DEPDIR)/libflac.do_compile: $(DEPDIR)/libflac.do_prepare
 		--without-libiconv-prefix \
 		--without-id3lib \
 		--with-ogg-includes=. \
-		--disable-cpplibs
+		--disable-cpplibs && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-libflac $(DEPDIR)/std-libflac $(DEPDIR)/max-libflac \
@@ -1284,7 +1338,7 @@ $(DEPDIR)/elementtree.do_compile: $(DEPDIR)/elementtree.do_prepare
 
 $(DEPDIR)/min-elementtree $(DEPDIR)/std-elementtree $(DEPDIR)/max-elementtree \
 $(DEPDIR)/elementtree: \
-$(DEPDIR)/%elementtree: %python elementtree.do_compile
+$(DEPDIR)/%elementtree: %python $(DEPDIR)/elementtree.do_compile
 	cd @DIR_elementtree@ && \
 		CC='$(target)-gcc' LDSHARED='$(target)-gcc -shared' \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
@@ -1315,7 +1369,7 @@ $(DEPDIR)/libxml2.do_compile: $(DEPDIR)/libxml2.do_prepare
 
 $(DEPDIR)/min-libxml2 $(DEPDIR)/std-libxml2 $(DEPDIR)/max-libxml2 \
 $(DEPDIR)/libxml2: \
-$(DEPDIR)/%libxml2: libxml2.do_compile
+$(DEPDIR)/%libxml2: $(DEPDIR)/libxml2.do_compile
 	cd @DIR_libxml2@ && \
 		@INSTALL_libxml2@; \
 		[ -f "$(targetprefix)/usr/lib/python2.6/site-packages/libxml2mod.la" ] && \
@@ -1355,7 +1409,7 @@ $(DEPDIR)/libxslt.do_compile: $(DEPDIR)/libxslt.do_prepare
 
 $(DEPDIR)/min-libxslt $(DEPDIR)/std-libxslt $(DEPDIR)/max-libxslt \
 $(DEPDIR)/libxslt: \
-$(DEPDIR)/%libxslt: %libxml2 libxslt.do_compile
+$(DEPDIR)/%libxslt: %libxml2 $(DEPDIR)/libxslt.do_compile
 	cd @DIR_libxslt@ && \
 		@INSTALL_libxslt@ && \
 		sed -e "/^dependency_libs/ s,/usr/lib/libxslt.la,$(targetprefix)/usr/lib/libxslt.la,g" -i $(targetprefix)/usr/lib/python2.6/site-packages/libxsltmod.la && \
@@ -1386,7 +1440,7 @@ $(DEPDIR)/lxml.do_compile: $(DEPDIR)/lxml.do_prepare
 
 $(DEPDIR)/min-lxml $(DEPDIR)/std-lxml $(DEPDIR)/max-lxml \
 $(DEPDIR)/lxml: \
-$(DEPDIR)/%lxml: lxml.do_compile
+$(DEPDIR)/%lxml: $(DEPDIR)/lxml.do_compile
 	cd @DIR_lxml@ && \
 		CC='$(target)-gcc' LDSHARED='$(target)-gcc -shared' \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
@@ -1408,7 +1462,7 @@ $(DEPDIR)/setuptools.do_compile: $(DEPDIR)/setuptools.do_prepare
 
 $(DEPDIR)/min-setuptools $(DEPDIR)/std-setuptools $(DEPDIR)/max-setuptools \
 $(DEPDIR)/setuptools: \
-$(DEPDIR)/%setuptools: setuptools.do_compile
+$(DEPDIR)/%setuptools: $(DEPDIR)/setuptools.do_compile
 	cd @DIR_setuptools@ && \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
 #	@DISTCLEANUP_setuptools@
@@ -1430,7 +1484,7 @@ $(DEPDIR)/twisted.do_compile: $(DEPDIR)/twisted.do_prepare
 
 $(DEPDIR)/min-twisted $(DEPDIR)/std-twisted $(DEPDIR)/max-twisted \
 $(DEPDIR)/twisted: \
-$(DEPDIR)/%twisted: twisted.do_compile
+$(DEPDIR)/%twisted: $(DEPDIR)/twisted.do_compile
 	cd @DIR_twisted@ && \
 		CC='$(target)-gcc' LDSHARED='$(target)-gcc -shared' \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
@@ -1454,7 +1508,7 @@ $(DEPDIR)/twistedweb2.do_compile: $(DEPDIR)/twistedweb2.do_prepare
 
 $(DEPDIR)/min-twistedweb2 $(DEPDIR)/std-twistedweb2 $(DEPDIR)/max-twistedweb2 \
 $(DEPDIR)/twistedweb2: \
-$(DEPDIR)/%twistedweb2: twistedweb2.do_compile
+$(DEPDIR)/%twistedweb2: $(DEPDIR)/twistedweb2.do_compile
 	cd @DIR_twistedweb2@ && \
 		CC='$(target)-gcc' LDSHARED='$(target)-gcc -shared' \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
@@ -1496,7 +1550,7 @@ $(DEPDIR)/pyopenssl.do_compile: $(DEPDIR)/pyopenssl.do_prepare
 
 $(DEPDIR)/min-pyopenssl $(DEPDIR)/std-pyopenssl $(DEPDIR)/max-pyopenssl \
 $(DEPDIR)/pyopenssl: \
-$(DEPDIR)/%pyopenssl: pyopenssl.do_compile
+$(DEPDIR)/%pyopenssl: $(DEPDIR)/pyopenssl.do_compile
 	cd @DIR_pyopenssl@ && \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
@@ -1544,7 +1598,7 @@ $(DEPDIR)/python.do_compile: $(DEPDIR)/python.do_prepare
 
 $(DEPDIR)/min-python $(DEPDIR)/std-python $(DEPDIR)/max-python \
 $(DEPDIR)/python: \
-$(DEPDIR)/%python: python.do_compile
+$(DEPDIR)/%python: $(DEPDIR)/python.do_compile
 	( cd @DIR_python@ && \
 		$(MAKE) $(MAKE_ARGS) \
 			TARGET_OS=$(target) \
@@ -1571,7 +1625,7 @@ $(DEPDIR)/pythonwifi.do_compile: $(DEPDIR)/pythonwifi.do_prepare
 
 $(DEPDIR)/min-pythonwifi $(DEPDIR)/std-pythonwifi $(DEPDIR)/max-pythonwifi \
 $(DEPDIR)/pythonwifi: \
-$(DEPDIR)/%pythonwifi: pythonwifi.do_compile
+$(DEPDIR)/%pythonwifi: $(DEPDIR)/pythonwifi.do_compile
 	cd @DIR_pythonwifi@ && \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
@@ -1594,7 +1648,7 @@ $(DEPDIR)/pythoncheetah.do_compile: $(DEPDIR)/pythoncheetah.do_prepare
 
 $(DEPDIR)/min-pythoncheetah $(DEPDIR)/std-pythoncheetah $(DEPDIR)/max-pythoncheetah \
 $(DEPDIR)/pythoncheetah: \
-$(DEPDIR)/%pythoncheetah: pythoncheetah.do_compile
+$(DEPDIR)/%pythoncheetah: $(DEPDIR)/pythoncheetah.do_compile
 	cd @DIR_pythoncheetah@ && \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
@@ -1617,7 +1671,7 @@ $(DEPDIR)/zope_interface.do_compile: $(DEPDIR)/zope_interface.do_prepare
 
 $(DEPDIR)/min-zope_interface $(DEPDIR)/std-zope_interface $(DEPDIR)/max-zope_interface \
 $(DEPDIR)/zope_interface: \
-$(DEPDIR)/%zope_interface: zope_interface.do_compile
+$(DEPDIR)/%zope_interface: $(DEPDIR)/zope_interface.do_compile
 	cd @DIR_zope_interface@ && \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
 		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
@@ -1638,14 +1692,15 @@ $(DEPDIR)/gstreamer.do_prepare: bootstrap glib2 libxml2 @DEPENDS_gstreamer@
 $(DEPDIR)/gstreamer.do_compile: $(DEPDIR)/gstreamer.do_prepare
 	export PATH=$(hostprefix)/bin:$(PATH) && \
 	cd @DIR_gstreamer@ && \
+	autoreconf --verbose --force --install -I$(hostprefix)/share/aclocal && \
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
 		--prefix=/usr \
-		--disable-docs-build \
 		--disable-dependency-tracking \
-		--with-check=no \
-		ac_cv_func_register_printf_function=no
+		--disable-check \
+		ac_cv_func_register_printf_function=no && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gstreamer $(DEPDIR)/std-gstreamer $(DEPDIR)/max-gstreamer \
@@ -1655,7 +1710,6 @@ $(DEPDIR)/%gstreamer: $(DEPDIR)/gstreamer.do_compile
 		@INSTALL_gstreamer@
 #	@DISTCLEANUP_gstreamer@
 	[ "x$*" = "x" ] && touch $@ || true
-	@TUXBOX_YAUD_CUSTOMIZE@
 
 #
 # GST-PLUGINS-BASE
@@ -1667,16 +1721,19 @@ $(DEPDIR)/gst_plugins_base.do_prepare: bootstrap glib2 gstreamer libogg libalsa 
 $(DEPDIR)/gst_plugins_base.do_compile: $(DEPDIR)/gst_plugins_base.do_prepare
 	export PATH=$(hostprefix)/bin:$(PATH) && \
 	cd @DIR_gst_plugins_base@ && \
+	autoreconf --verbose --force --install -I$(hostprefix)/share/aclocal && \
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
 		--prefix=/usr \
 		--disable-theora \
+		--disable-gnome_vfs \
 		--disable-pango \
 		--disable-vorbis \
 		--disable-x \
-		--with-audioresample-format=int \
-		--with-check=no
+		--disable-examples \
+		--with-audioresample-format=int && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_base $(DEPDIR)/std-gst_plugins_base $(DEPDIR)/max-gst_plugins_base \
@@ -1703,10 +1760,12 @@ $(DEPDIR)/gst_plugins_good.do_compile: $(DEPDIR)/gst_plugins_good.do_prepare
 		--prefix=/usr \
 		--disable-esd \
 		--disable-esdtest \
+		--disable-aalib \
 		--disable-shout2 \
 		--disable-shout2test \
 		--disable-x \
-		--with-check=no
+		--with-check=no && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_good $(DEPDIR)/std-gst_plugins_good $(DEPDIR)/max-gst_plugins_good \
@@ -1720,7 +1779,7 @@ $(DEPDIR)/%gst_plugins_good: $(DEPDIR)/gst_plugins_good.do_compile
 #
 # GST-PLUGINS-BAD
 #
-$(DEPDIR)/gst_plugins_bad.do_prepare: bootstrap gstreamer gst_plugins_base @DEPENDS_gst_plugins_bad@
+$(DEPDIR)/gst_plugins_bad.do_prepare: bootstrap gstreamer gst_plugins_base libmodplug @DEPENDS_gst_plugins_bad@
 	@PREPARE_gst_plugins_bad@
 	touch $@
 
@@ -1731,9 +1790,10 @@ $(DEPDIR)/gst_plugins_bad.do_compile: $(DEPDIR)/gst_plugins_bad.do_prepare
 	./configure \
 		--host=$(target) \
 		--prefix=/usr \
-		ac_cv_openssldir=no \
-		--with-check=no \
-		--disable-sdl
+		--disable-sdl \
+		--disable-modplug \
+		ac_cv_openssldir=no && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_bad $(DEPDIR)/std-gst_plugins_bad $(DEPDIR)/max-gst_plugins_bad \
@@ -1758,7 +1818,8 @@ $(DEPDIR)/gst_plugins_ugly.do_compile: $(DEPDIR)/gst_plugins_ugly.do_prepare
 	./configure \
 		--host=$(target) \
 		--prefix=/usr \
-		--with-check=no
+		--disable-mpeg2dec && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_ugly $(DEPDIR)/std-gst_plugins_ugly $(DEPDIR)/max-gst_plugins_ugly \
@@ -1844,7 +1905,9 @@ $(DEPDIR)/gst_plugins_fluendo_mpegdemux.do_compile: $(DEPDIR)/gst_plugins_fluend
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
-		--prefix=/usr --with-check=no
+		--prefix=/usr \
+		--with-check=no && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_fluendo_mpegdemux $(DEPDIR)/std-gst_plugins_fluendo_mpegdemux $(DEPDIR)/max-gst_plugins_fluendo_mpegdemux \
@@ -1873,7 +1936,8 @@ $(DEPDIR)/gst_plugin_subsink.do_compile: $(DEPDIR)/gst_plugin_subsink.do_prepare
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
-		--prefix=/usr
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugin_subsink $(DEPDIR)/std-gst_plugin_subsink $(DEPDIR)/max-gst_plugin_subsink \
@@ -1902,7 +1966,8 @@ $(DEPDIR)/gst_plugins_dvbmediasink.do_compile: $(DEPDIR)/gst_plugins_dvbmediasin
 	$(BUILDENV) \
 	./configure \
 		--host=$(target) \
-		--prefix=/usr
+		--prefix=/usr && \
+	$(MAKE)
 	touch $@
 
 $(DEPDIR)/min-gst_plugins_dvbmediasink $(DEPDIR)/std-gst_plugins_dvbmediasink $(DEPDIR)/max-gst_plugins_dvbmediasink \
@@ -1986,6 +2051,7 @@ $(DEPDIR)/libgd2.do_compile: $(DEPDIR)/libgd2.do_prepare
 		--host=$(target) \
 		--prefix=/usr && \
 		$(MAKE)
+	touch $@
 
 $(DEPDIR)/min-libgd2 $(DEPDIR)/std-libgd2 $(DEPDIR)/max-libgd2 \
 $(DEPDIR)/libgd2: \
@@ -2011,6 +2077,7 @@ $(DEPDIR)/libusb2.do_compile: $(DEPDIR)/libusb2.do_prepare
 		--host=$(target) \
 		--prefix=/usr && \
 		$(MAKE) all
+	touch $@
 
 $(DEPDIR)/min-libusb2 $(DEPDIR)/std-libusb2 $(DEPDIR)/max-libusb2 \
 $(DEPDIR)/libusb2: \
@@ -2035,6 +2102,7 @@ $(DEPDIR)/libusbcompat.do_compile: $(DEPDIR)/libusbcompat.do_prepare
 		--host=$(target) \
 		--prefix=/usr && \
 		$(MAKE)
+	touch $@
 
 $(DEPDIR)/min-libusbcompat $(DEPDIR)/std-libusbcompat $(DEPDIR)/max-libusbcompat \
 $(DEPDIR)/libusbcompat: \
@@ -2544,7 +2612,7 @@ $(DEPDIR)/yajl.do_prepare: bootstrap @DEPENDS_yajl@
 $(DEPDIR)/yajl.do_compile: $(DEPDIR)/yajl.do_prepare
 	export PATH=$(hostprefix)/bin:$(PATH) && \
 	cd @DIR_yajl@ && \
-	sed -i "s/install: all/install: distro/g" Makefile && \
+	sed -i "s/install: all/install: distro/g" configure && \
 	$(BUILDENV) \
 	./configure \
 		--prefix=/usr && \
@@ -2567,6 +2635,7 @@ $(DEPDIR)/libpcre.do_prepare: bootstrap @DEPENDS_libpcre@
 	touch $@
 
 $(DEPDIR)/libpcre.do_compile: $(DEPDIR)/libpcre.do_prepare
+	export PATH=$(hostprefix)/bin:$(PATH) && \
 	cd @DIR_libpcre@ && \
 	$(BUILDENV) \
 	./configure \
@@ -2847,9 +2916,11 @@ $(DEPDIR)/rarfs.do_compile: $(DEPDIR)/rarfs.do_prepare
 	cd @DIR_rarfs@ && \
 	export PKG_CONFIG_PATH=$(targetprefix)/usr/lib/pkgconfig && \
 	$(BUILDENV) \
-	CFLAGS="$(TARGET_CFLAGS) -Os" \
+	CFLAGS="$(TARGET_CFLAGS) -Os -D_FILE_OFFSET_BITS=64" \
 	./configure \
 		--host=$(target) \
+		--disable-option-checking \
+		--includedir=/usr/include/fuse \
 		--prefix=/usr && \
 	$(MAKE) all
 	touch $@
@@ -2971,4 +3042,3 @@ $(DEPDIR)/%tinyxml: $(DEPDIR)/tinyxml.do_compile
 		@INSTALL_tinyxml@
 #	@DISTCLEANUP_tinyxml@
 	[ "x$*" = "x" ] && touch $@ || true
-

@@ -154,6 +154,14 @@ AC_ARG_ENABLE(p0210,
 AM_CONDITIONAL(ENABLE_P0210,test "$enable_p0210" = "yes")
 AC_SUBST(P0210)
 
+AC_ARG_ENABLE(p0211,
+	AS_HELP_STRING(--enable-p0211,  set up the CDK to use the STLinux 2.4 with patchlevel 0211),
+	[case "${enableval}" in
+		yes) P0211=p0211 ;;
+	esac], [enable_p0211=no])
+AM_CONDITIONAL(ENABLE_P0211,test "$enable_p0211" = "yes")
+AC_SUBST(P0211)
+
 AC_ARG_ENABLE(havana_p0207_5,
 	AS_HELP_STRING(enable-havana-p0207_5,  set up the CDK to use the STLinux 2.4 with Havana patchlevel 0207_5),
 	[case "${enableval}" in
@@ -187,6 +195,12 @@ AC_ARG_ENABLE(mediafwgstreamer,
 	,[enable_mediafwgstreamer=no])
 AM_CONDITIONAL(ENABLE_MEDIAFWGSTREAMER,test "$enable_mediafwgstreamer" = "yes")
 AC_SUBST(MEDIAFWGSTREAMER)
+
+AC_ARG_ENABLE(graphicfwdirectfb,
+	AS_HELP_STRING(--enable-graphicfwdirectfb,	set up the CDK to use graphicfw directfb),
+	,[enable_graphicfwdirectfb=no])
+AM_CONDITIONAL(ENABLE_GRAPHICFWDIRECTFB,test "$enable_graphicfwdirectfb" = "yes")
+AC_SUBST(GRAPHICFWDIRECTFB)
 
 AC_ARG_ENABLE(externallcd,
 	AS_HELP_STRING(--enable-externallcd,	set up the CDK to use graphlcd),
@@ -753,6 +767,7 @@ TUXBOX_RULES_MAKE(linuxp0206)
 TUXBOX_RULES_MAKE(linuxp0207)
 TUXBOX_RULES_MAKE(linuxp0209)
 TUXBOX_RULES_MAKE(linuxp0210)
+TUXBOX_RULES_MAKE(linuxp0211)
 
 if test "$enable_stm22" = "yes"; then
 	if test "$enable_p0040" == "yes"; then
@@ -789,6 +804,10 @@ else
 		KERNELVERSION=${VERSION_linuxp0210}
 		KERNELSTMLABEL="_${VERSION_linuxp0210#*_}"
 		KERNELLABEL="210"
+	elif test "$enable_p0211" == "yes"; then
+		KERNELVERSION=${VERSION_linuxp0211}
+		KERNELSTMLABEL="_${VERSION_linuxp0211#*_}"
+		KERNELLABEL="211"
 	elif test "$enable_p0207" == "yes"; then
 		KERNELVERSION=${VERSION_linuxp0207}
 		KERNELSTMLABEL="_${VERSION_linuxp0207#*_}"
@@ -827,6 +846,19 @@ else
 	MEDIAFW="eplayer3"
 	MEDIAFW_DEP="ffmpeg"
 fi
+
+AC_SUBST(GRAPHICFW)
+AC_SUBST(GRAPHICFW_DEP)
+
+if test "$enable_graphicfwdirectfb" == "yes"; then
+	GRAPHICFW="directfb"
+	GRAPHICFW_DEP="directfb"
+else
+	GRAPHICFW="framebuffer"
+	GRAPHICFW_DEP=""
+fi
+
+
 
 #TUXBOX_RULES_MAKE_EXDIR(binutils)
 #TUXBOX_RULES_MAKE_EXDIR(bootstrap_gcc)
@@ -923,6 +955,7 @@ TUXBOX_RULES_MAKE(lcms)
 TUXBOX_RULES_MAKE(openssl)
 TUXBOX_RULES_MAKE(directfb)
 TUXBOX_RULES_MAKE(dfbpp)
+TUXBOX_RULES_MAKE(libstgles)
 TUXBOX_RULES_MAKE(expat)
 TUXBOX_RULES_MAKE(fontconfig)
 TUXBOX_RULES_MAKE(libxmlccwrap)
@@ -1123,6 +1156,7 @@ Patchlevel P0206            : $enable_p0206
 Patchlevel P0207            : $enable_p0207
 Patchlevel P0209            : $enable_p0209
 Patchlevel P0210            : $enable_p0210
+Patchlevel P0211            : $enable_p0211
 HAVANA Patchlevel P0207_5   : $enable_havana_p0207_5
 vdr VDR 1.7.11              : $enable_vdr1711
 vdr VDR 1.7.22              : $enable_vdr1722
@@ -1185,6 +1219,9 @@ Multicom324                 : $enable_multicom324
 MediaFw Gstreamer           : $enable_mediafwgstreamer
 MediaFw                     : $MEDIAFW
 MediaFw Dep                 : $MEDIAFW_DEP
+GraphicFw DirectFB          : $enable_graphicfwdirectfb
+GraphicFw                   : $GRAPHICFW
+GraphicFw Dep               : $GRAPHICFW_DEP
 EXTERNALLCD                 : $enable_externallcd
 EXTERNALLCD_DEP             : $EXTERNALLCD_DEP
 ])

@@ -157,8 +157,10 @@ obj-y	+= adb_box_fan/
 endif
 
 ifndef VIP2_V1
+ifndef SPARK
 ifndef SPARK7162
 obj-y	+= cic/
+endif
 endif
 endif
 
@@ -224,6 +226,7 @@ endif
 
 ifdef SPARK7162
 obj-y	+= cec/
+obj-y	+= smartcard/
 obj-y	+= i2c_spi/
 endif
 
@@ -239,15 +242,18 @@ ifdef IPBOX9900
 obj-y    += siinfo/
 obj-y    += rmu/
 obj-y	 += ipbox99xx_fan/
+obj-y	 += smartcard/
 endif
 
 ifdef IPBOX99
 obj-y    += siinfo/
 obj-y	 += ipbox99xx_fan/
+obj-y	 += smartcard/
 endif
 
 ifdef IPBOX55
 obj-y    += siinfo/
+obj-y	 += smartcard/
 endif
 
 ifdef CUBEREVO
