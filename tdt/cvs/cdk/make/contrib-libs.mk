@@ -564,6 +564,14 @@ $(DEPDIR)/lcms.do_compile: $(DEPDIR)/lcms.do_prepare
 		$(MAKE)
 	touch $@
 
+$(DEPDIR)/min-lcms $(DEPDIR)/std-lcms $(DEPDIR)/max-lcms \
+$(DEPDIR)/lcms: \
+$(DEPDIR)/%lcms: $(DEPDIR)/lcms.do_compile
+	cd @DIR_lcms@ && \
+		@INSTALL_lcms@
+#	@DISTCLEANUP_lcms@
+	[ "x$*" = "x" ] && touch $@ || true
+
 #
 # directfb
 #
@@ -691,7 +699,7 @@ $(DEPDIR)/%expat: $(DEPDIR)/expat.do_compile
 #
 # fontconfig
 #
-$(DEPDIR)/fontconfig.do_prepare: bootstrap libz libxml2 @DEPENDS_fontconfig@
+$(DEPDIR)/fontconfig.do_prepare: bootstrap libz expat freetype @DEPENDS_fontconfig@
 	@PREPARE_fontconfig@
 	touch $@
 
@@ -701,7 +709,7 @@ $(DEPDIR)/fontconfig.do_compile: $(DEPDIR)/fontconfig.do_prepare
 		libtoolize -f -c && \
 		autoreconf --verbose --force --install -I$(hostprefix)/share/aclocal && \
 		$(BUILDENV) \
-		CFLAGS="$(TARGET_CFLAGS) -Os -I$(targetprefix)/usr/include/libxml2" \
+		CFLAGS="$(TARGET_CFLAGS) -Os" \
 		./configure \
 			--build=$(build) \
 			--host=$(target) \
@@ -1519,20 +1527,28 @@ $(DEPDIR)/%twistedweb2: $(DEPDIR)/twistedweb2.do_compile
 #
 # pilimaging
 #
-$(DEPDIR)/pilimaging: bootstrap python @DEPENDS_pilimaging@
+$(DEPDIR)/pilimaging.do_prepare: bootstrap python @DEPENDS_pilimaging@
 	@PREPARE_pilimaging@
+	touch $@
+
+$(DEPDIR)/pilimaging.do_compile: $(DEPDIR)/pilimaging.do_prepare
 	cd @DIR_pilimaging@ && \
 		echo 'JPEG_ROOT = "$(targetprefix)/usr/lib", "$(targetprefix)/usr/include"' > setup_site.py && \
 		echo 'ZLIB_ROOT = "$(targetprefix)/usr/lib", "$(targetprefix)/usr/include"' >> setup_site.py && \
 		echo 'FREETYPE_ROOT = "$(targetprefix)/usr/lib", "$(targetprefix)/usr/include"' >> setup_site.py && \
 		CC='$(target)-gcc' LDSHARED='$(target)-gcc -shared' \
 		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
-		$(crossprefix)/bin/python ./setup.py build && \
-		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr && \
-		@DISTCLEANUP_pilimaging@
-	@DISTCLEANUP_pilimaging@
-	@touch $@
-	@TUXBOX_YAUD_CUSTOMIZE@
+		$(crossprefix)/bin/python ./setup.py build
+	touch $@
+
+$(DEPDIR)/min-pilimaging $(DEPDIR)/std-pilimaging $(DEPDIR)/max-pilimaging \
+$(DEPDIR)/pilimaging: \
+$(DEPDIR)/%pilimaging: $(DEPDIR)/pilimaging.do_compile
+	cd @DIR_pilimaging@ && \
+		PYTHONPATH=$(targetprefix)/usr/lib/python2.6/site-packages \
+		$(crossprefix)/bin/python ./setup.py install --root=$(targetprefix) --prefix=/usr
+#	@DISTCLEANUP_pilimaging@
+	[ "x$*" = "x" ] && touch $@ || true
 
 #
 # pyopenssl
@@ -1565,10 +1581,12 @@ $(DEPDIR)/python.do_prepare: bootstrap host_python openssl openssl-dev sqlite @D
 	touch $@
 
 $(DEPDIR)/python.do_compile: $(DEPDIR)/python.do_prepare
+	export PATH=$(hostprefix)/bin:$(PATH) && \
 	( cd @DIR_python@ && \
-		autoconf && \
 		CONFIG_SITE= \
 		$(BUILDENV) \
+		autoreconf -Wcross --verbose --install --force Modules/_ctypes/libffi && \
+		autoconf && \
 		./configure \
 			--build=$(build) \
 			--host=$(target) \
@@ -2010,7 +2028,7 @@ $(DEPDIR)/%libusb: $(DEPDIR)/libusb.do_compile
 #
 # graphlcd
 #
-$(DEPDIR)/graphlcd.do_prepare: bootstrap libusb @DEPENDS_graphlcd@
+$(DEPDIR)/graphlcd.do_prepare: bootstrap fontconfig libusb @DEPENDS_graphlcd@
 	@PREPARE_graphlcd@
 	touch $@
 
