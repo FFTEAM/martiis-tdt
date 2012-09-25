@@ -14,7 +14,17 @@ extern u64 __xdiv64_32(u64 n, u32 d);
 u64 __udivdi3(u64 n, u64 d)
 {
 	if (unlikely(d & 0xffffffff00000000ULL))
+#if 1 // MARTII
+	{
+		// this lacks precision, but might be better than a panic that requires weird workarounds
+		int shift = fls(d >> 32);
+		d >>= shift;
+		n >>= shift;
+		printk(KERN_WARNING "Need true 64-bit/64-bit division");
+	}
+#else
 		panic("Need true 64-bit/64-bit division");
+#endif
 	return __xdiv64_32(n, (u32)d);
 }
 
