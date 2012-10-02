@@ -1,8 +1,7 @@
-# tuxbox/enigma2
+# tuxbox/xbmc-nightly
 
 $(DEPDIR)/xbmc-nightly.do_prepare:
 	REVISION=""; \
-	HEAD="master"; \
 	DIFF="0"; \
 	REPO="git://github.com/xbmc/xbmc.git"; \
 	rm -rf $(appsdir)/xbmc-nightly; \
@@ -15,19 +14,24 @@ $(DEPDIR)/xbmc-nightly.do_prepare:
 	echo "---- REVISIONS ----"; \
 	echo "1) Sat, 14 Apr 2012 12:36 - 460e79416c5cb13010456794f36f89d49d25da75"; \
 	echo "2) Sun, 10 Jun 2012 13:53 - 327710767d2257dad27e3885effba1d49d4557f0"; \
-	echo "3) current inactive... comming soon, here is the next stable (case 3 == DIFF=3)"; \
+	echo "3) Fr,  31 Aug 2012 22:34 - Frodo_alpha5 - 12840c28d8fbfd71c26be798ff6b13828b05b168"; \
+	echo "4) current inactive... comming soon, here is the next stable (case 4 == DIFF=4)"; \
 	read -p "Select: "; \
 	echo "Selection: " $$REPLY; \
 	[ "$$REPLY" == "0" ] && DIFF="2"; \
 	[ "$$REPLY" == "1" ] && DIFF="1" && REVISION="460e79416c5cb13010456794f36f89d49d25da75"; \
 	[ "$$REPLY" == "2" ] && DIFF="2" && REVISION="327710767d2257dad27e3885effba1d49d4557f0"; \
+	[ "$$REPLY" == "3" ] && DIFF="3" && REVISION="12840c28d8fbfd71c26be798ff6b13828b05b168"; \
 	echo "Revision: " $$REVISION; \
-	[ -d "$(appsdir)/xbmc-nightly" ] && \
-	git pull $(appsdir)/xbmc-nightly $$HEAD;\
-	[ -d "$(appsdir)/xbmc-nightly" ] || \
-	git clone -b $$HEAD $$REPO $(appsdir)/xbmc-nightly; \
-	cp -ra $(appsdir)/xbmc-nightly $(appsdir)/xbmc-nightly.newest; \
+	[ -d "$(archivedir)/xbmc.git" ] && \
+	(cd $(archivedir)/xbmc.git; git pull ; git checkout HEAD; cd "$(buildprefix)";); \
+	[ -d "$(archivedir)/xbmc.git" ] || \
+	git clone $$REPO $(archivedir)/xbmc.git; \
+	cp -ra $(archivedir)/xbmc.git $(appsdir)/xbmc-nightly.newest; \
+	rm -rf $(appsdir)/xbmc-nightly.newest/.git; \
+	cp -ra $(archivedir)/xbmc.git $(appsdir)/xbmc-nightly; \
 	[ "$$REVISION" == "" ] || (cd $(appsdir)/xbmc-nightly; git checkout "$$REVISION"; cd "$(buildprefix)";); \
+	rm -rf $(appsdir)/xbmc-nightly/.git; \
 	cp -ra $(appsdir)/xbmc-nightly $(appsdir)/xbmc-nightly.org; \
 	cd $(appsdir)/xbmc-nightly && patch -p1 < "../../cdk/Patches/xbmc-nightly.$$DIFF.diff"; \
 	cp -ra $(appsdir)/xbmc-nightly $(appsdir)/xbmc-nightly.patched
@@ -36,7 +40,7 @@ $(DEPDIR)/xbmc-nightly.do_prepare:
 #			PYTHON_LDFLAGS='-L$(targetprefix)/usr/include/python2.6 -lpython2.6' \
 #			PYTHON_VERSION='2.6' \
 #endable webserver else httpapihandler will fail
-$(appsdir)/xbmc-nightly/config.status: bootstrap libboost directfb libstgles libass libmpeg2 libmad jpeg libsamplerate libogg libvorbis libmodplug curl libflac bzip2 tiff lzo libz fontconfig libfribidi freetype sqlite libpng libpcre libcdio jasper yajl libmicrohttpd tinyxml python gstreamer gst_plugins_dvbmediasink expat
+$(appsdir)/xbmc-nightly/config.status: bootstrap libboost directfb libstgles libass libmpeg2 libmad jpeg libsamplerate libogg libvorbis libmodplug curl libflac bzip2 tiff lzo libz fontconfig libfribidi freetype sqlite libpng libpcre libcdio jasper yajl libmicrohttpd tinyxml python gstreamer gst_plugins_dvbmediasink expat libnfs
 	cd $(appsdir)/xbmc-nightly && \
 		$(BUILDENV) \
 		./bootstrap && \
@@ -53,6 +57,7 @@ $(appsdir)/xbmc-nightly/config.status: bootstrap libboost directfb libstgles lib
 			--disable-gles \
 			--disable-sdl \
 			--enable-webserver \
+			--enable-nfs \
 			--disable-x11 \
 			--disable-samba \
 			--disable-mysql \
@@ -60,7 +65,6 @@ $(appsdir)/xbmc-nightly/config.status: bootstrap libboost directfb libstgles lib
 			--disable-rsxs \
 			--disable-projectm \
 			--disable-goom \
-			--disable-nfs \
 			--disable-afpclient \
 			--disable-airplay \
 			--disable-airtunes \
