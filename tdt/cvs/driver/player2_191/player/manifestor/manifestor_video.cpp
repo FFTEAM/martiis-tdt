@@ -1346,7 +1346,8 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
     
     // Hm why is here not the decimate value used from havana_stream ?
     // Lets set it depending on the value from havana_stream
-    if(OutputWindow.Height > 576 || OutputWindow.Height < 425)
+#if !defined(ADB_BOX)
+	if(OutputWindow.Height > 576 || OutputWindow.Height < 425)
     {
         int decimate = Player->PolicyValue (Playback, Stream, PolicyDecimateDecoderOutput);
         if (decimate == PolicyValueDecimateDecoderOutputDisabled)
@@ -1354,6 +1355,14 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
         else
             DecimateIfAvailable = true;
     }
+#endif
+#if defined(ADB_BOX)
+#if 0	//1== bardzo zly obraz na SD 0== obraz ok
+	int decimate = Player->PolicyValue (Playback, Stream, PolicyDecimateDecoderOutput);
+    if (decimate == PolicyValueDecimateDecoderOutputDisabled) DecimateIfAvailable = false;
+    else DecimateIfAvailable = true;
+#endif
+#endif
 
 #if defined (CROP_INPUT_WHEN_DECIMATION_NEEDED_BUT_NOT_AVAILABLE)
     if ((Player->PolicyValue (Playback, Stream, PolicyDecimateDecoderOutput) != PolicyValueDecimateDecoderOutputDisabled) &&

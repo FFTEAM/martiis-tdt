@@ -1,7 +1,7 @@
 ﻿Left base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc-nightly.org
 Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc-nightly
---- m4/ax_python_devel.m4	2012-09-17 22:32:14.000000000 
-+++ m4/ax_python_devel.m4	2012-09-21 19:46:50.000000000 
+--- a/m4/ax_python_devel.m4	2012-09-17 22:32:14.000000000 
++++ b/m4/ax_python_devel.m4	2012-09-21 19:46:50.000000000 
 @@ -240,13 +240,13 @@
  		else
  			# old way: use libpython from python_configdir
@@ -17,8 +17,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  			AC_MSG_ERROR([
    Cannot determine location of your Python DSO. Please check it was installed with
    dynamic libraries enabled, or try setting PYTHON_LDFLAGS by hand.
---- xbmc/cores/AudioEngine/AEFactory.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/AudioEngine/AEFactory.cpp	2012-09-21 17:44:42.000000000 
+--- a/xbmc/cores/AudioEngine/AEFactory.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/AudioEngine/AEFactory.cpp	2012-09-21 17:44:42.000000000 
 @@ -115,22 +115,25 @@
  
  bool CAEFactory::StartEngine()
@@ -46,8 +46,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  IAESound *CAEFactory::MakeSound(const std::string &file)
  {
    if(AE)
---- xbmc/cores/DllLoader/DllLoaderContainer.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/DllLoader/DllLoaderContainer.cpp	2012-09-21 17:45:13.000000000 
+--- a/xbmc/cores/DllLoader/DllLoaderContainer.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/DllLoader/DllLoaderContainer.cpp	2012-09-21 17:45:13.000000000 
 @@ -40,12 +40,13 @@
                   "special://xbmcbin/system/players/paplayer/;" \
                   "special://xbmcbin/system/python/;" \
@@ -62,8 +62,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #define ENV_PATH ENV_PARTIAL_PATH \
                   ";special://frameworks/"
  #else
---- xbmc/cores/DllLoader/DllLoader.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/DllLoader/DllLoader.h	2012-09-21 17:45:21.000000000 
+--- a/xbmc/cores/DllLoader/DllLoader.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/DllLoader/DllLoader.h	2012-09-21 17:45:21.000000000 
 @@ -21,13 +21,13 @@
   *
   */
@@ -79,8 +79,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  
  #ifndef NULL
  #define NULL 0
---- xbmc/cores/DllLoader/ldt_keeper.c	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/DllLoader/ldt_keeper.c	2012-09-21 17:45:32.000000000 
+--- a/xbmc/cores/DllLoader/ldt_keeper.c	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/DllLoader/ldt_keeper.c	2012-09-21 17:45:32.000000000 
 @@ -16,13 +16,13 @@
   * Modified for use with MPlayer, detailed changelog at
   * http://svn.mplayerhq.hu/mplayer/trunk/
@@ -96,9 +96,9 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #include <string.h>
  #include <stdlib.h>
  #include <errno.h>
---- 
-+++ xbmc/cores/gstplayer/GSTPlayer.cpp	2012-09-21 20:43:11.000000000 
-@@ -0,0 +1,632 @@
+--- a/
++++ b/xbmc/cores/gstplayer/GSTPlayer.cpp	2012-09-21 20:43:11.000000000 
+@@ -0,0 +1,800 @@
 +/*
 + *      Copyright (C) 2005-2008 Team XBMC
 + *      http://www.xbmc.org
@@ -144,7 +144,7 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  IPlayer            (callback),
 +  CThread            ("GSTPlayer")
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  int argc = 0;
 +  char**argv = NULL;
 +
@@ -164,11 +164,12 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE (m_pGstPlaybin));
 +  gst_bus_set_sync_handler(bus, gstBusSyncHandler, this);
 +  gst_object_unref(bus);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +GSTPlayer::~GSTPlayer()
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +
 +  CloseFile();
 +
@@ -197,16 +198,19 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +
 +  if (m_pGstPlaybin)
 +    gst_object_unref (GST_OBJECT (m_pGstPlaybin));
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +void GSTPlayer::OnExit()
 +{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +
 +}
 +
 +bool GSTPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  gchar *uri;
 +  int flags;
 +
@@ -302,13 +306,14 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +    //g_renderManager.Configure(m_iVideoWidth, m_iVideoHeight, 1280, 720, m_iVideoFramerate/1000.0, 0, RENDER_FMT_NONE, 0);
 +#endif
 +
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +  return true;
 +}
 +
 +//Finished
 +bool GSTPlayer::QueueNextFile(const CFileItem &file)
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  if (IsPaused())
 +    Pause();
 +
@@ -325,20 +330,22 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +
 +  *m_nextFile = file;
 +
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +  return true;
 +}
 +
 +//Finished
 +void GSTPlayer::OnNothingToQueueNotify()
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  //nothing to queue, stop playing
 +  m_bQueueFailed = true;
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +bool GSTPlayer::CloseFile()
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  if (IsPaused())
 +    Pause();
 +
@@ -355,44 +362,42 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +#if defined(HAS_VIDEO_PLAYBACK)
 +  g_renderManager.UnInit();
 +#endif
-+  printf ("umount /tmp/nfs\n");
++  printf ("umount /tmp/nfs ->\n");
 +  system("umount /tmp/nfs");
++  printf ("umount /tmp/nfs <-\n");
 +  return true;
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +//Finished
 +void GSTPlayer::Pause()
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  CLog::Log(LOGDEBUG,"GSTPlayer: pause m_bplaying: %d", m_bIsPlaying);
-+  if (!m_bIsPlaying || !m_pGstPlaybin)
-+  return ;
++  if (!m_bIsPlaying || !m_pGstPlaybin) {
++    printf("%s:%s[%d] <<-\n", __FILE__, __func__, __LINE__);
++    return;
++  }
 +
-+  m_bPaused = !m_bPaused;
 +
 +  if (m_bPaused)
-+  {
-+    gst_element_set_state (m_pGstPlaybin, GST_STATE_PAUSED);
-+
-+    m_callback.OnPlayBackPaused();
-+    CLog::Log(LOGDEBUG, "GSTPlayer: Playback paused");
-+  }
-+  else
-+  {
 +    gst_element_set_state (m_pGstPlaybin, GST_STATE_PLAYING);
-+
-+    m_callback.OnPlayBackResumed();
-+    CLog::Log(LOGDEBUG, "GSTPlayer: Playback resumed");
-+  }
++  else
++    gst_element_set_state (m_pGstPlaybin, GST_STATE_PAUSED);
++  
++  m_bPaused = !m_bPaused;
++  
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +__int64 GSTPlayer::GetTotalTime()
 +{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  __int64 total;
 +  gint64 len;
 +  GstFormat fmt = GST_FORMAT_TIME; //Returns time in nanosecs
 +  gst_element_query_duration(m_pGstPlaybin, &fmt, &len);
-+  total = len / 1000000000;
++  total = len / 1000000;
 +
 +
 +  if (m_currentFile->m_lEndOffset)
@@ -400,20 +405,24 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  if (m_currentFile->m_lStartOffset)
 +    total -= m_currentFile->m_lStartOffset * 1000 / 75;
 +
-+  //printf("%s:%s[%d] len %lld\n", __FILE__, __func__, __LINE__, total);
++  m_duration_ms = total;
++
++  //d1printf("%s:%s[%d] <- len=%lld\n", __FILE__, __func__, __LINE__, total);
 +  return total;
 +}
 +
 +
 +float GSTPlayer::GetPercentage()
 +{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  float percent = (GetTime() * 100.0f) / GetTotalTime();
-+  //printf("%s:%s[%d] percent %f%%\n", __FILE__, __func__, __LINE__, percent);
++  //d1printf("%s:%s[%d] <- percent=%f%%\n", __FILE__, __func__, __LINE__, percent);
 +  return percent;
 +}
 +
 +__int64 GSTPlayer::GetTime()
 +{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  __int64 ret;
 +  __int64 timeplus;
 +  gint64 pos;
@@ -423,8 +432,110 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +
 +  ret = m_timeOffset + timeplus - m_currentFile->m_lStartOffset * 1000 / 75;
 +
-+  //printf("%s:%s[%d] pos %lld\n", __FILE__, __func__, __LINE__, ret);
++  m_elapsed_ms = ret;
++
++  //d1printf("%s:%s[%d] <- pos=%lld\n", __FILE__, __func__, __LINE__, ret);
 +  return ret;
++}
++
++bool GSTPlayer::CanSeek()
++{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] <- %d\n", __FILE__, __func__, __LINE__, GetTotalTime() > 0);
++  return GetTotalTime() > 0;
++}
++
++void GSTPlayer::Seek(bool bPlus, bool bLargeStep)
++{
++  printf("%s:%s[%d] -> bPlus=%d bLargeStep=%d\n", __FILE__, __func__, __LINE__, bPlus, bLargeStep);
++
++#if 0
++  // try chapter seeking first, chapter_index is ones based.
++  int chapter_index = GetChapter();
++  if (bLargeStep)
++  {
++    // seek to next chapter
++    if (bPlus && (chapter_index < GetChapterCount()))
++    {
++      SeekChapter(chapter_index + 1);
++      return;
++    }
++    // seek to previous chapter
++    if (!bPlus && chapter_index)
++    {
++      SeekChapter(chapter_index - 1);
++      return;
++    }
++  }
++#endif
++
++  int64_t seek_ms;
++  if (g_advancedSettings.m_videoUseTimeSeeking)
++  {
++    if (bLargeStep && (GetTotalTime() > (2000 * g_advancedSettings.m_videoTimeSeekForwardBig)))
++      seek_ms = bPlus ? g_advancedSettings.m_videoTimeSeekForwardBig : g_advancedSettings.m_videoTimeSeekBackwardBig;
++    else
++      seek_ms = bPlus ? g_advancedSettings.m_videoTimeSeekForward    : g_advancedSettings.m_videoTimeSeekBackward;
++    // convert to milliseconds
++    seek_ms *= 1000;
++    seek_ms += m_elapsed_ms;
++  }
++  else
++  {
++    float percent;
++    if (bLargeStep)
++      percent = bPlus ? g_advancedSettings.m_videoPercentSeekForwardBig : g_advancedSettings.m_videoPercentSeekBackwardBig;
++    else
++      percent = bPlus ? g_advancedSettings.m_videoPercentSeekForward    : g_advancedSettings.m_videoPercentSeekBackward;
++    percent /= 100.0f;
++    percent += (float)m_elapsed_ms/(float)m_duration_ms;
++    // convert to milliseconds
++    seek_ms = m_duration_ms * percent;
++  }
++
++  // handle stacked videos, dvdplayer does it so we do it too.
++  if (g_application.CurrentFileItem().IsStack() &&
++    (seek_ms > m_duration_ms || seek_ms < 0))
++  {
++    CLog::Log(LOGDEBUG, "CAMLPlayer::Seek: In mystery code, what did I do");
++    g_application.SeekTime((seek_ms - m_elapsed_ms) * 0.001 + g_application.GetTime());
++    // warning, don't access any object variables here as
++    // the object may have been destroyed
++    return;
++  }
++
++  if (seek_ms <= 1000)
++    seek_ms = 1000;
++
++  if (seek_ms > m_duration_ms)
++    seek_ms = m_duration_ms;
++
++  // do seek here
++  g_infoManager.SetDisplayAfterSeek(100000);
++  SeekTime(seek_ms);
++  m_callback.OnPlayBackSeek((int)seek_ms, (int)(seek_ms - m_elapsed_ms));
++  g_infoManager.SetDisplayAfterSeek();
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
++}
++
++void GSTPlayer::SeekTime(__int64 seek_ms)
++{
++  printf("%s:%s[%d] -> seek_ms=%ld\n", __FILE__, __func__, __LINE__, seek_ms);
++  // we cannot seek if paused
++  if (m_bPaused)
++    return;
++
++  if (seek_ms <= 0)
++    seek_ms = 100;
++
++  // seek here
++    // player_timesearch is nanoseconds (int64).
++    gst_element_seek (m_pGstPlaybin, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
++        GST_SEEK_TYPE_SET, seek_ms*1000000,
++        GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
++    //WaitForSearchOK(5000);
++    //WaitForPlaying(5000);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +void GSTPlayer::Process()
@@ -435,9 +546,6 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  if (m_startEvent.WaitMSec(100))
 +  {
 +    m_startEvent.Reset();
-+
-+
-+
 +    do
 +    {
 +      if (!m_bPaused)
@@ -463,19 +571,61 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +
 +void GSTPlayer::SetVolume(long nVolume)
 +{
-+  printf("%s:%s[%d] %ld\n", __FILE__, __func__, __LINE__, nVolume);
++  printf("%s:%s[%d] -> nVolume=%ld\n", __FILE__, __func__, __LINE__, nVolume);
 +  //-6000 = mute, 0 is max
 +  //64 = mute, 0 is max
 +  FILE* fp = fopen("/proc/stb/avs/0/volume", "w");
 +  fprintf(fp, "%d", (int)((nVolume*-64)/6000.0));
 +  fclose(fp);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
++}
++
++float GSTPlayer::GetActualFPS()
++{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  FILE* fp = fopen("/proc/stb/vmpeg/0/framerate", "r");
++  int video_fps_tmp = 0;
++  float video_fps = 0.0f;
++  fscanf(fp, "%x", &video_fps_tmp);
++  fclose(fp);
++  video_fps = video_fps_tmp / 1000.0f;
 +  
++  //d1printf("%s:%s[%d] <- video_fps=%f\n", __FILE__, __func__, __LINE__, video_fps);
++  return video_fps;
++}
++
++int GSTPlayer::GetPictureWidth()
++{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  FILE* fp = fopen("/proc/stb/vmpeg/0/xres", "r");
++  int video_width = 0;
++  fscanf(fp, "%x", &video_width);
++  fclose(fp);
++  //d1printf("%s:%s[%d] <- video_width=%d\n", __FILE__, __func__, __LINE__, video_width);
++  return video_width;
++}
++
++int GSTPlayer::GetPictureHeight()
++{
++  //d1printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  FILE* fp = fopen("/proc/stb/vmpeg/0/yres", "r");
++  int video_height = 0;
++  fscanf(fp, "%x", &video_height);
++  fclose(fp);
++  //d1printf("%s:%s[%d] <- video_height=%d\n", __FILE__, __func__, __LINE__, video_height);
++  return video_height;
 +}
 +
 +void GSTPlayer::gstBusCall(GstMessage *msg)
 +{
-+  //printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
-+  if (!msg) return;
++  //d2printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  if (!msg) {
++    //d2printf("%s:%s[%d] <<-\n", __FILE__, __func__, __LINE__);
++    return;
++  }
++  
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  
 +  gchar *sourceName;
 +  GstObject *source;
 +  source = GST_MESSAGE_SRC(msg);
@@ -495,7 +645,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +      gst_message_parse_state_changed(msg, &old_state, &new_state, NULL);
 +      if(old_state == new_state)
 +        break;
-+      printf("%s:%s[%d] state transition %s -> %s", __FILE__, __func__, __LINE__, gst_element_state_get_name(old_state), gst_element_state_get_name(new_state));
++      printf("%s:%s[%d] state transition %s -> %s\n", __FILE__, __func__, __LINE__, 
++        gst_element_state_get_name(old_state), gst_element_state_get_name(new_state));
 +      
 +      GstStateChange transition = (GstStateChange)GST_STATE_TRANSITION(old_state, new_state);
 +      switch(transition)
@@ -666,43 +817,55 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +    default:
 +      break;
 +  }
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +void GSTPlayer::handleMessage(GstMessage *msg)
 +{
-+  printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  //d2printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_STATE_CHANGED && GST_MESSAGE_SRC(msg) != GST_OBJECT(m_pGstPlaybin))
 +  {
 +    gst_message_unref(msg);
++    //d2printf("%s:%s[%d] <<-\n", __FILE__, __func__, __LINE__);
 +    return;
 +  }
 +  gstBusCall(msg);
++  //d2printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +GstBusSyncReply GSTPlayer::gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data)
 +{
-+  //printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
++  //d2printf("%s:%s[%d]\n", __FILE__, __func__, __LINE__);
 +  GSTPlayer *_this = (GSTPlayer*)user_data;
 +  if (_this) _this->handleMessage(message);
++  
++  //d2printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +  return GST_BUS_DROP;
 +}
 +
 +int GSTPlayer::GetAudioStreamCount()
 +{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +  return m_AudioStreams.size();
 +}
 +
 +int GSTPlayer::GetAudioStream()
 +{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  if (m_iCurrentAudioStream == -1)
 +    g_object_get (G_OBJECT (m_pGstPlaybin), "current-audio", &m_iCurrentAudioStream, NULL);
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +  return m_iCurrentAudioStream;
 +}
 +
 +void GSTPlayer::SetAudioStream(int iStream)
 +{
-+  if (iStream >= m_AudioStreams.size())
++  printf("%s:%s[%d] -> iStream=%d\n", __FILE__, __func__, __LINE__, iStream);
++  if (iStream >= m_AudioStreams.size()) {
++    printf("%s:%s[%d] <<-\n", __FILE__, __func__, __LINE__);
 +    return;
++  }
 +
 +  int current_audio;
 +  g_object_set (G_OBJECT (m_pGstPlaybin), "current-audio", iStream, NULL);
@@ -711,29 +874,34 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  {
 +    m_iCurrentAudioStream = iStream;
 +  }
++  printf("%s:%s[%d] <-\n", __FILE__, __func__, __LINE__);
 +}
 +
 +void GSTPlayer::GetAudioStreamLanguage(int iStream, CStdString &strLanguage)
 +{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  strLanguage = "";
 +  if (iStream >= m_AudioStreams.size())
 +    return;
 +
 +  strLanguage = m_AudioStreams[iStream].m_sLanguageCode;
++  printf("%s:%s[%d] <- lng=%s\n", __FILE__, __func__, __LINE__, strLanguage.c_str());
 +}
 +
 +void GSTPlayer::GetAudioStreamName(int iStream, CStdString& strStreamName)
 +{
++  printf("%s:%s[%d] ->\n", __FILE__, __func__, __LINE__);
 +  strStreamName = "Unknown";
 +  if (iStream >= m_AudioStreams.size())
 +    return;
 +
 +  strStreamName = m_AudioStreams[iStream].m_sCodec;
++  printf("%s:%s[%d] <- name=%s\n", __FILE__, __func__, __LINE__, strStreamName.c_str());
 +}
 +
---- 
-+++ xbmc/cores/gstplayer/GSTPlayer.h	2012-09-21 19:54:52.000000000 
-@@ -0,0 +1,136 @@
+--- a/
++++ b/xbmc/cores/gstplayer/GSTPlayer.h	2012-09-21 19:54:52.000000000 
+@@ -0,0 +1,142 @@
 +#pragma once
 +
 +/*
@@ -799,8 +967,9 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  virtual bool HasVideo() const { return m_bHasVideo; }
 +  virtual bool HasAudio() const { return m_bHasAudio; }
 +
-+  virtual bool CanSeek() { return false; }
-+  virtual void Seek(bool bPlus = true, bool bLargeStep = false) {}
++  virtual bool CanSeek();
++  virtual void Seek(bool bPlus = true, bool bLargeStep = false);
++  virtual void SeekTime(__int64 iTime = 0);
 +  
 +  virtual void SetVolume(long nVolume);
 +
@@ -813,12 +982,15 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  virtual __int64 GetTime();
 +  virtual float GetPercentage();
 +
-+  virtual int GetAudioStreamCount();
-+  virtual int GetAudioStream();
++  virtual int  GetAudioStreamCount();
++  virtual int  GetAudioStream();
 +  virtual void GetAudioStreamName(int iStream, CStdString &strStreamName);
 +  virtual void SetAudioStream(int iStream);
 +  virtual void GetAudioStreamLanguage(int iStream, CStdString &strLanguage);
 +
++  virtual float GetActualFPS();
++  virtual int   GetPictureWidth();
++  virtual int   GetPictureHeight();
 +protected:
 +  virtual void OnStartup() {}
 +  virtual void Process();
@@ -864,14 +1036,16 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  static GstBusSyncReply gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data);
 +
 +  __int64 m_timeOffset;
++  int64_t                 m_elapsed_ms;
++  int64_t                 m_duration_ms;
 +
 +  // our file
 +  CFileItem*        m_currentFile;
 +  CFileItem*        m_nextFile;
 +};
 +
---- 
-+++ xbmc/cores/gstplayer/Makefile.in	2012-09-18 20:13:37.000000000 
+--- a/
++++ b/xbmc/cores/gstplayer/Makefile.in	2012-09-18 20:13:37.000000000 
 @@ -0,0 +1,10 @@
 +ARCH=@ARCH@
 +
@@ -883,10 +1057,10 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +
 +include @abs_top_srcdir@/Makefile.include
 +-include $(patsubst %.cpp,%.P,$(patsubst %.c,%.P,$(SRCS)))
---- xbmc/cores/paplayer/DVDPlayerCodec.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/paplayer/DVDPlayerCodec.cpp	2012-09-23 11:16:42.000000000 
---- xbmc/cores/paplayer/ICodec.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/paplayer/ICodec.h	2012-09-23 11:17:31.000000000 
+--- a/xbmc/cores/paplayer/DVDPlayerCodec.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/paplayer/DVDPlayerCodec.cpp	2012-09-23 11:16:42.000000000 
+--- a/xbmc/cores/paplayer/ICodec.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/paplayer/ICodec.h	2012-09-23 11:17:31.000000000 
 @@ -23,12 +23,13 @@
  
  #include "ReplayGain.h"
@@ -917,8 +1091,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    int m_EncodedSampleRate;
    int m_BitsPerSample;
    enum AEDataFormat m_DataFormat;
---- xbmc/cores/paplayer/Makefile.in	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/paplayer/Makefile.in	2012-09-23 11:12:41.000000000 
+--- a/xbmc/cores/paplayer/Makefile.in	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/paplayer/Makefile.in	2012-09-23 11:12:41.000000000 
 @@ -1,32 +1,35 @@
  ARCH=@ARCH@
  
@@ -962,8 +1136,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  endif
  
  ifneq ($(findstring osx,$(ARCH)), osx)
---- xbmc/cores/playercorefactory/PlayerCoreConfig.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/playercorefactory/PlayerCoreConfig.h	2012-09-21 19:55:34.000000000 
+--- a/xbmc/cores/playercorefactory/PlayerCoreConfig.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/playercorefactory/PlayerCoreConfig.h	2012-09-21 19:55:34.000000000 
 @@ -17,21 +17,29 @@
   *  along with XBMC; see the file COPYING.  If not, write to
   *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -1018,8 +1192,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
        default: return NULL;
      }
  
---- xbmc/cores/playercorefactory/PlayerCoreFactory.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/playercorefactory/PlayerCoreFactory.cpp	2012-09-21 17:49:03.000000000 
+--- a/xbmc/cores/playercorefactory/PlayerCoreFactory.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/playercorefactory/PlayerCoreFactory.cpp	2012-09-21 17:49:03.000000000 
 @@ -16,18 +16,26 @@
   *  along with XBMC; see the file COPYING.  If not, write to
   *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -1132,8 +1306,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
        {
          s_vecCoreConfigs.push_back(new CPlayerCoreConfig(name, eCore, pPlayer));
        }
---- xbmc/cores/playercorefactory/PlayerCoreFactory.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/playercorefactory/PlayerCoreFactory.h	2012-09-21 17:50:18.000000000 
+--- a/xbmc/cores/playercorefactory/PlayerCoreFactory.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/playercorefactory/PlayerCoreFactory.h	2012-09-21 17:50:18.000000000 
 @@ -31,30 +31,31 @@
  class CPlayerSelectionRule;
  
@@ -1172,8 +1346,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  public:
    CPlayerCoreFactory();
    virtual ~CPlayerCoreFactory();
---- xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp	2012-09-21 19:52:42.000000000 
+--- a/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/LinuxRendererGLES.cpp	2012-09-21 19:52:42.000000000 
 @@ -21,108 +21,135 @@
  
  #include "system.h"
@@ -1988,8 +2162,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif
  
 +#endif
---- xbmc/cores/VideoRenderers/LinuxRendererGLES.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/LinuxRendererGLES.h	2012-09-21 19:21:49.000000000 
+--- a/xbmc/cores/VideoRenderers/LinuxRendererGLES.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/LinuxRendererGLES.h	2012-09-21 19:21:49.000000000 
 @@ -19,30 +19,34 @@
   *  along with XBMC; see the file COPYING.  If not, write to
   *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -2198,8 +2372,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  };
  
  
---- xbmc/cores/VideoRenderers/Makefile.in	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/Makefile.in	2012-09-21 19:22:00.000000000 
+--- a/xbmc/cores/VideoRenderers/Makefile.in	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/Makefile.in	2012-09-21 19:22:00.000000000 
 @@ -18,10 +18,15 @@
  ifeq (@USE_OPENGLES@,1)
  SRCS+= LinuxRendererGLES.cpp \
@@ -2216,8 +2390,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  
  include @abs_top_srcdir@/Makefile.include
  -include $(patsubst %.cpp,%.P,$(patsubst %.c,%.P,$(patsubst %.S,,$(SRCS)))) 
---- xbmc/cores/VideoRenderers/OverlayRenderer.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/OverlayRenderer.cpp	2012-09-21 19:22:14.000000000 
+--- a/xbmc/cores/VideoRenderers/OverlayRenderer.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/OverlayRenderer.cpp	2012-09-21 19:22:14.000000000 
 @@ -297,13 +297,13 @@
    if(o->m_overlay)
    {
@@ -2248,8 +2422,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
      r = new COverlayTextureGL((CDVDOverlaySpu*)o);
  #elif defined(HAS_DX)
    if     (o->IsOverlayType(DVDOVERLAY_TYPE_IMAGE))
---- xbmc/cores/VideoRenderers/OverlayRendererGL.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/OverlayRendererGL.cpp	2012-09-21 19:22:36.000000000 
+--- a/xbmc/cores/VideoRenderers/OverlayRendererGL.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/OverlayRendererGL.cpp	2012-09-21 19:22:36.000000000 
 @@ -23,13 +23,13 @@
  #include "system.h"
  #include "OverlayRenderer.h"
@@ -2341,8 +2515,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  }
  
  #endif // HAS_GL
---- xbmc/cores/VideoRenderers/OverlayRendererGL.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/OverlayRendererGL.h	2012-09-21 19:22:44.000000000 
+--- a/xbmc/cores/VideoRenderers/OverlayRendererGL.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/OverlayRendererGL.h	2012-09-21 19:22:44.000000000 
 @@ -28,13 +28,13 @@
  class CDVDOverlay;
  class CDVDOverlayImage;
@@ -2358,8 +2532,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    class COverlayTextureGL
        : public COverlayMainThread
    {
---- xbmc/cores/VideoRenderers/RenderManager.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/RenderManager.cpp	2012-09-21 19:23:12.000000000 
+--- a/xbmc/cores/VideoRenderers/RenderManager.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/RenderManager.cpp	2012-09-21 19:23:12.000000000 
 @@ -35,13 +35,13 @@
  #include "settings/Settings.h"
  #include "settings/GUISettings.h"
@@ -2390,8 +2564,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #elif defined(HAS_SDL)
      m_pRenderer = new CLinuxRenderer();
  #endif
---- xbmc/cores/VideoRenderers/RenderManager.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/cores/VideoRenderers/RenderManager.h	2012-09-21 19:23:21.000000000 
+--- a/xbmc/cores/VideoRenderers/RenderManager.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/cores/VideoRenderers/RenderManager.h	2012-09-21 19:23:21.000000000 
 @@ -110,13 +110,13 @@
    CStdString GetVSyncState();
  
@@ -2407,8 +2581,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #elif defined(HAS_SDL)
    CLinuxRenderer      *m_pRenderer;
  #endif
---- xbmc/guilib/GUIFontTTFGL.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/guilib/GUIFontTTFGL.cpp	2012-09-21 17:06:13.000000000 
+--- a/xbmc/guilib/GUIFontTTFGL.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/guilib/GUIFontTTFGL.cpp	2012-09-21 17:06:13.000000000 
 @@ -25,13 +25,13 @@
  #include "GUIFontManager.h"
  #include "Texture.h"
@@ -2581,8 +2755,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    // THE SOURCE VALUES ARE THE SAME IN BOTH SITUATIONS.
  
    // Since we have a new texture, we need to delete the old one
---- xbmc/guilib/GUITextureGLES.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/guilib/GUITextureGLES.cpp	2012-09-21 17:17:01.000000000 
+--- a/xbmc/guilib/GUITextureGLES.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/guilib/GUITextureGLES.cpp	2012-09-21 17:17:01.000000000 
 @@ -55,12 +55,13 @@
      m_col[i][2] = (GLubyte)GET_B(color);
      m_col[i][3] = (GLubyte)GET_A(color);
@@ -2761,8 +2935,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  }
  
  #endif
---- xbmc/guilib/Makefile.in	2012-09-20 13:01:11.000000000 
-+++ xbmc/guilib/Makefile.in	2012-09-22 18:28:29.000000000 
+--- a/xbmc/guilib/Makefile.in	2012-09-20 13:01:11.000000000 
++++ b/xbmc/guilib/Makefile.in	2012-09-22 18:28:29.000000000 
 @@ -1,12 +1,11 @@
  SRCS=AnimatedGif.cpp \
       DDSImage.cpp \
@@ -2816,8 +2990,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  	g++ -o try try.o TextureBundle.o DirectXGraphics.o GraphicContext.o GUIIncludes.o ../utils/CriticalSection.o ../XBVideoConfig.o SkinInfo.o ../linux/CriticalSection.o GUIFontTTF.o GUIFontBase.o GUIFontManager.o GUIFont.o ../utils/XMLUtils.o GUIImage.o GUIControl.o TextureManager.o GUIMessage.o ../utils/SingleLock.o VisibleEffect.o GUIWindowManager.o AnimatedGif.o -lSDL_image -lSDL_gfx -lSDL -llzo -lfreetype
  
  
---- xbmc/guilib/MatrixGLES.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/guilib/MatrixGLES.cpp	2012-09-21 17:18:28.000000000 
+--- a/xbmc/guilib/MatrixGLES.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/guilib/MatrixGLES.cpp	2012-09-21 17:18:28.000000000 
 @@ -19,13 +19,13 @@
  *
  */
@@ -2833,8 +3007,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #include "MatrixGLES.h"
  #include "utils/log.h"
  #if defined(__ARM_NEON__)
---- xbmc/guilib/TextureGL.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/guilib/TextureGL.cpp	2012-09-21 17:29:18.000000000 
+--- a/xbmc/guilib/TextureGL.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/guilib/TextureGL.cpp	2012-09-21 17:29:18.000000000 
 @@ -191,10 +191,13 @@
    glActiveTexture((unit == 1) ? GL_TEXTURE1_ARB : GL_TEXTURE0_ARB);
    glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -2849,8 +3023,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  }
  
  #endif // HAS_GL
---- xbmc/input/linux/LinuxInputDevices.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/input/linux/LinuxInputDevices.cpp	2012-09-22 21:45:56.000000000 
+--- a/xbmc/input/linux/LinuxInputDevices.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/input/linux/LinuxInputDevices.cpp	2012-09-22 21:45:56.000000000 
 @@ -182,13 +182,13 @@
      XBMCK_UNKNOWN, XBMCK_UNKNOWN, XBMCK_UNKNOWN, XBMCK_UNKNOWN, XBMCK_UNKNOWN,
      XBMCK_UNKNOWN, XBMCK_UNKNOWN, XBMCK_UNKNOWN, XBMCK_UNKNOWN,
@@ -2951,8 +3125,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  {
    unsigned char type = KTYP(value);
    unsigned char index = KVAL(value);
---- xbmc/input/linux/LinuxInputDevices.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/input/linux/LinuxInputDevices.h	2012-09-22 21:46:20.000000000 
+--- a/xbmc/input/linux/LinuxInputDevices.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/input/linux/LinuxInputDevices.h	2012-09-22 21:46:20.000000000 
 @@ -41,12 +41,13 @@
  public:
    CLinuxInputDevice(const std::string fileName, int index);
@@ -2967,8 +3141,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    bool AbsEvent(const struct input_event& levt, XBMC_Event& devt);
    bool TranslateEvent(const struct input_event& levt, XBMC_Event& devt);
    void SetLed(int led, int state);
---- xbmc/interfaces/python/xbmcmodule/player.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/interfaces/python/xbmcmodule/player.cpp	2012-09-20 21:25:29.000000000 
+--- a/xbmc/interfaces/python/xbmcmodule/player.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/interfaces/python/xbmcmodule/player.cpp	2012-09-20 21:25:29.000000000 
 @@ -16,12 +16,13 @@
   *  along with XBMC; see the file COPYING.  If not, write to
   *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -3035,8 +3209,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    PyTypeObject Player_Type;
  
    void initPlayer_Type()
---- xbmc/interfaces/python/xbmcmodule/xbmcmodule.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/interfaces/python/xbmcmodule/xbmcmodule.cpp	2012-09-20 21:25:15.000000000 
+--- a/xbmc/interfaces/python/xbmcmodule/xbmcmodule.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/interfaces/python/xbmcmodule/xbmcmodule.cpp	2012-09-20 21:25:15.000000000 
 @@ -18,12 +18,13 @@
   *  http://www.gnu.org/copyleft/gpl.html
   *
@@ -3074,8 +3248,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
      PyModule_AddIntConstant(pXbmcModule, (char*)"SERVER_AIRPLAYSERVER", CApplication::ES_AIRPLAYSERVER);
      PyModule_AddIntConstant(pXbmcModule, (char*)"SERVER_UPNPSERVER", CApplication::ES_UPNPSERVER);
      PyModule_AddIntConstant(pXbmcModule, (char*)"SERVER_UPNPRENDERER", CApplication::ES_UPNPRENDERER);
---- xbmc/interfaces/python/XBPython.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/interfaces/python/XBPython.cpp	2012-09-20 21:23:51.000000000 
+--- a/xbmc/interfaces/python/XBPython.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/interfaces/python/XBPython.cpp	2012-09-20 21:23:51.000000000 
 @@ -21,12 +21,13 @@
  
  #if (defined HAVE_CONFIG_H) && (!defined WIN32)
@@ -3090,8 +3264,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #include "cores/DllLoader/DllLoaderContainer.h"
  #include "GUIPassword.h"
  
---- xbmc/linux/PlatformDefs.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/linux/PlatformDefs.h	2012-09-20 20:55:55.000000000 
+--- a/xbmc/linux/PlatformDefs.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/linux/PlatformDefs.h	2012-09-20 20:55:55.000000000 
 @@ -160,13 +160,13 @@
  #define __int8    char
  #define __int16   short
@@ -3107,8 +3281,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif /* __x86_64__ */
  #define __cdecl
  #define WINBASEAPI
---- xbmc/pictures/SlideShowPicture.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/pictures/SlideShowPicture.cpp	2012-09-20 20:56:35.000000000 
+--- a/xbmc/pictures/SlideShowPicture.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/pictures/SlideShowPicture.cpp	2012-09-20 20:56:35.000000000 
 @@ -762,13 +762,13 @@
    glColor4ub((GLubyte)GET_R(color), (GLubyte)GET_G(color), (GLubyte)GET_B(color), (GLubyte)GET_A(color));
    glTexCoord2f(u1, v2);
@@ -3137,8 +3311,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    g_Windowing.BlitToScreen(m_pImage, NULL, NULL);
  #endif
  }
---- xbmc/rendering/gles/RenderSystemGLES.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/rendering/gles/RenderSystemGLES.cpp	2012-09-20 21:01:36.000000000 
+--- a/xbmc/rendering/gles/RenderSystemGLES.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/rendering/gles/RenderSystemGLES.cpp	2012-09-20 21:01:36.000000000 
 @@ -19,39 +19,43 @@
  *
  */
@@ -3301,8 +3475,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 -
 +#endif
  #endif
---- xbmc/rendering/gles/RenderSystemGLES.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/rendering/gles/RenderSystemGLES.h	2012-09-20 21:01:47.000000000 
+--- a/xbmc/rendering/gles/RenderSystemGLES.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/rendering/gles/RenderSystemGLES.h	2012-09-20 21:01:47.000000000 
 @@ -24,12 +24,13 @@
  
  #pragma once
@@ -3372,8 +3546,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  };
  
  #endif // RENDER_SYSTEM_H
---- xbmc/settings/AdvancedSettings.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/settings/AdvancedSettings.cpp	2012-09-20 21:06:22.000000000 
+--- a/xbmc/settings/AdvancedSettings.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/settings/AdvancedSettings.cpp	2012-09-20 21:06:22.000000000 
 @@ -66,13 +66,17 @@
    m_karaokeChangeGenreForKaraokeSongs = false;
    m_karaokeKeepDelay = true;
@@ -3478,8 +3652,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    XMLUtils::GetBoolean(pRootElement, "detectasudf", m_detectAsUdf);
  
    // music thumbs
---- xbmc/settings/GUISettings.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/settings/GUISettings.cpp	2012-09-20 21:07:31.000000000 
+--- a/xbmc/settings/GUISettings.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/settings/GUISettings.cpp	2012-09-20 21:07:31.000000000 
 @@ -36,16 +36,20 @@
  #include "utils/log.h"
  #include "utils/XBMCTinyXML.h"
@@ -3589,8 +3763,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    AddString(loc, "locale.language",248,"english", SPIN_CONTROL_TEXT);
    AddString(loc, "locale.country", 20026, "USA", SPIN_CONTROL_TEXT);
    AddString(loc, "locale.charset", 14091, "DEFAULT", SPIN_CONTROL_TEXT); // charset is set by the language file
---- xbmc/settings/GUIWindowSettingsCategory.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/settings/GUIWindowSettingsCategory.cpp	2012-09-20 21:12:29.000000000 
+--- a/xbmc/settings/GUIWindowSettingsCategory.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/settings/GUIWindowSettingsCategory.cpp	2012-09-20 21:12:29.000000000 
 @@ -724,13 +724,16 @@
          else
            pControl->SetEnabled(g_guiSettings.GetInt("audiooutput.mode") == AUDIO_HDMI);
@@ -3640,8 +3814,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
      pControl->AddLabel("Error - no devices found", 0);
      numberSinks = 1;
      selectedValue = 0;
---- xbmc/threads/Atomics.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/threads/Atomics.cpp	2012-09-20 21:16:20.000000000 
+--- a/xbmc/threads/Atomics.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/threads/Atomics.cpp	2012-09-20 21:16:20.000000000 
 @@ -76,13 +76,27 @@
  
  #elif defined(__mips__)
@@ -3786,8 +3960,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    {
      mov eax, amount;
      mov ebx, pAddr;
---- xbmc/threads/Atomics.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/threads/Atomics.h	2012-09-20 21:16:30.000000000 
+--- a/xbmc/threads/Atomics.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/threads/Atomics.h	2012-09-20 21:16:30.000000000 
 @@ -21,13 +21,13 @@
  
  #ifndef __ATOMICS_H__
@@ -3803,8 +3977,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  long AtomicDecrement(volatile long* pAddr);
  long AtomicAdd(volatile long* pAddr, long amount);
  long AtomicSubtract(volatile long* pAddr, long amount);
---- xbmc/threads/LockFree.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/threads/LockFree.cpp	2012-09-20 21:16:59.000000000 
+--- a/xbmc/threads/LockFree.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/threads/LockFree.cpp	2012-09-20 21:16:59.000000000 
 @@ -41,13 +41,13 @@
    atomic_ptr top, newTop;
    do
@@ -3922,8 +4096,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
          if (cas2((long long*)&pQueue->head, atomic_ptr_to_long_long(head), atomic_ptr_to_long_long(node)) == atomic_ptr_to_long_long(head))
  #endif
            break; // Dequeue is done
---- xbmc/threads/LockFree.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/threads/LockFree.h	2012-09-20 21:17:11.000000000 
+--- a/xbmc/threads/LockFree.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/threads/LockFree.h	2012-09-20 21:17:11.000000000 
 @@ -28,13 +28,13 @@
  #define SPINLOCK_ACQUIRE(l) while(cas(&l, 0, 1)) {}
  #define SPINLOCK_RELEASE(l) l = 0
@@ -3954,8 +4128,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    #define atomic_ptr_to_long_long(p) (long long) *((long long*)&p)
  #endif
  
---- xbmc/utils/CPUInfo.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/utils/CPUInfo.cpp	2012-09-20 21:18:35.000000000 
+--- a/xbmc/utils/CPUInfo.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/utils/CPUInfo.cpp	2012-09-20 21:18:35.000000000 
 @@ -196,13 +196,17 @@
          {
            needle+=2;
@@ -4007,8 +4181,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif
  }
  
---- xbmc/utils/fastmemcpy.c	2012-09-17 22:32:14.000000000 
-+++ xbmc/utils/fastmemcpy.c	2012-09-20 21:18:52.000000000 
+--- a/xbmc/utils/fastmemcpy.c	2012-09-17 22:32:14.000000000 
++++ b/xbmc/utils/fastmemcpy.c	2012-09-20 21:18:52.000000000 
 @@ -18,13 +18,13 @@
   * GNU General Public License for more details.
   *
@@ -4024,8 +4198,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  /*
    aclib - advanced C library ;)
    This file contains functions which improve and expand standard C-library
---- xbmc/utils/fastmemcpy.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/utils/fastmemcpy.h	2012-09-20 21:19:06.000000000 
+--- a/xbmc/utils/fastmemcpy.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/utils/fastmemcpy.h	2012-09-20 21:19:06.000000000 
 @@ -19,16 +19,16 @@
   *
   */
@@ -4044,8 +4218,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #ifdef __cplusplus
  }
  #endif
---- xbmc/utils/GLUtils.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/utils/GLUtils.cpp	2012-09-20 21:19:22.000000000 
+--- a/xbmc/utils/GLUtils.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/utils/GLUtils.cpp	2012-09-20 21:19:22.000000000 
 @@ -83,17 +83,19 @@
    s = glGetString(GL_VERSION);
    if (s)
@@ -4066,8 +4240,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #define GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX    0x9048
  #define GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX  0x9049
  #define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX            0x904A
---- xbmc/utils/MathUtils.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/utils/MathUtils.h	2012-09-20 21:19:40.000000000 
+--- a/xbmc/utils/MathUtils.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/utils/MathUtils.h	2012-09-20 21:19:40.000000000 
 @@ -32,19 +32,21 @@
  // use real compiler defines in here as we want to
  // avoid including system.h or other magic includes.
@@ -4090,8 +4264,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif
  
  /*! \brief Math utility class.
---- xbmc/video/windows/GUIWindowFullScreen.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/video/windows/GUIWindowFullScreen.cpp	2012-09-20 21:20:21.000000000 
+--- a/xbmc/video/windows/GUIWindowFullScreen.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/video/windows/GUIWindowFullScreen.cpp	2012-09-20 21:20:21.000000000 
 @@ -630,13 +630,13 @@
  }
  
@@ -4107,8 +4281,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    {
      if( pProgress->GetInfo() == 0 || pProgress->GetVisibleCondition() == 0)
      {
---- xbmc/windowing/egl/WinEGLPlatformAndroid.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/windowing/egl/WinEGLPlatformAndroid.cpp	2012-09-21 21:05:11.000000000 
+--- a/xbmc/windowing/egl/WinEGLPlatformAndroid.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/windowing/egl/WinEGLPlatformAndroid.cpp	2012-09-21 21:05:11.000000000 
 @@ -16,12 +16,16 @@
   *  along with XBMC; see the file COPYING.  If not, write to
   *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -4135,8 +4309,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  }
 +
 +#endif
---- xbmc/windowing/egl/WinEGLPlatformGeneric.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/windowing/egl/WinEGLPlatformGeneric.cpp	2012-09-21 20:57:49.000000000 
+--- a/xbmc/windowing/egl/WinEGLPlatformGeneric.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/windowing/egl/WinEGLPlatformGeneric.cpp	2012-09-21 20:57:49.000000000 
 @@ -89,13 +89,13 @@
      return true;
  
@@ -4172,8 +4346,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    eglStatus = eglChooseConfig(m_display, configAttrs, NULL, 0, &configCount);
    if (!eglStatus || !configCount) 
    {
---- xbmc/windowing/egl/WinSystemGLES.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/windowing/egl/WinSystemGLES.cpp	2012-09-21 20:50:38.000000000 
+--- a/xbmc/windowing/egl/WinSystemGLES.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/windowing/egl/WinSystemGLES.cpp	2012-09-21 20:50:38.000000000 
 @@ -43,14 +43,14 @@
    DestroyWindowSystem();
    delete m_eglplatform;
@@ -4191,8 +4365,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    // (at least for Android)
    if (!m_eglplatform->InitializeDisplay())
      return false;
---- xbmc/windowing/egl/WinSystemGLES.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/windowing/egl/WinSystemGLES.h	2012-09-21 20:48:11.000000000 
+--- a/xbmc/windowing/egl/WinSystemGLES.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/windowing/egl/WinSystemGLES.h	2012-09-21 20:48:11.000000000 
 @@ -39,12 +39,13 @@
    virtual bool  DestroyWindowSystem();
    virtual bool  CreateNewWindow(const CStdString& name, bool fullScreen, RESOLUTION_INFO& res, PHANDLE_EVENT_FUNC userFunction);
@@ -4207,8 +4381,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
    virtual bool  HasCursor();
  
    virtual void  NotifyAppActiveChange(bool bActivated);
---- xbmc/Application.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/Application.cpp	2012-09-21 20:09:40.000000000 
+--- a/xbmc/Application.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/Application.cpp	2012-09-21 20:09:40.000000000 
 @@ -4093,13 +4093,23 @@
    m_bPlaybackStarting = true;
  
@@ -4234,8 +4408,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
      }
    }
  
---- xbmc/system_gl.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/system_gl.h	2012-09-20 20:51:16.000000000 
+--- a/xbmc/system_gl.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/system_gl.h	2012-09-20 20:51:16.000000000 
 @@ -49,7 +49,10 @@
      #include <OpenGLES/ES2/gl.h>
      #include <OpenGLES/ES2/glext.h>
@@ -4247,8 +4421,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
 +  #include <GLES/gl.h>
 +  #include <GLES/glext.h>
  #endif
---- xbmc/system.h	2012-09-20 13:01:11.000000000 
-+++ xbmc/system.h	2012-09-20 20:51:06.000000000 
+--- a/xbmc/system.h	2012-09-20 13:01:11.000000000 
++++ b/xbmc/system.h	2012-09-20 20:51:06.000000000 
 @@ -81,12 +81,24 @@
  #endif
  
@@ -4288,8 +4462,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif
  #define HAS_LCD
  #ifdef HAVE_DBUS
---- xbmc/Util.cpp	2012-09-20 13:01:11.000000000 
-+++ xbmc/Util.cpp	2012-09-20 20:50:00.000000000 
+--- a/xbmc/Util.cpp	2012-09-20 13:01:11.000000000 
++++ b/xbmc/Util.cpp	2012-09-20 20:50:00.000000000 
 @@ -897,13 +897,13 @@
    width  = viewport[2] - viewport[0];
    height = viewport[3] - viewport[1];
@@ -4305,8 +4479,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  #endif
    g_graphicsContext.EndPaint();
  
---- configure.in	2012-09-20 13:01:11.000000000 
-+++ configure.in	2012-09-21 19:39:54.000000000 
+--- a/configure.in	2012-09-20 13:01:11.000000000 
++++ b/configure.in	2012-09-21 19:39:54.000000000 
 @@ -152,12 +152,14 @@
  libusb_not_found="== Could not find libusb. Plug and play USB device support will not be available. =="
  libusb_disabled="== libusb disabled. Plug and play USB device support will not be available. =="
@@ -4630,8 +4804,8 @@ Right base folder: /home/ubuntu/repos/ufs913_xbmc_frodo_alpha5/tdt/cvs/apps/xbmc
  
  # pushd and popd are not available in other shells besides bash, so implement
  # our own pushd/popd functions
---- Makefile.in	2012-09-20 13:01:11.000000000 
-+++ Makefile.in	2012-09-21 19:27:35.000000000 
+--- a/Makefile.in	2012-09-20 13:01:11.000000000 
++++ b/Makefile.in	2012-09-21 19:27:35.000000000 
 @@ -16,31 +16,28 @@
                     xbmc/cores/dvdplayer/DVDCodecs/Overlay/Overlay.a \
                     xbmc/cores/dvdplayer/DVDCodecs/Video/Video.a \
