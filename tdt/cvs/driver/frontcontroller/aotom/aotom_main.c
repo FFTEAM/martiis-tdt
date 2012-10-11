@@ -103,6 +103,8 @@ static struct semaphore 	   write_sem;
 static struct semaphore 	   receive_sem;
 static struct semaphore 	   draw_thread_sem;
 
+extern YWPANEL_Version_t panel_version;
+
 unsigned char ASCII[48][2] =
 {
 	{0xF1, 0x38},	//A
@@ -588,43 +590,41 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		res = YWPANEL_VFD_SetBrightness(aotom_data.u.brightness.level);
 		break;
 	case VFDICONDISPLAYONOFF:
-	{
-#if defined(SPARK)
-		switch (aotom_data.u.icon.icon_nr) {
-		case 0:
-			res = YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
-			led_state[LED_RED].state = aotom_data.u.icon.on;
-			break;
-		case 35:
-			res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
-			led_state[LED_GREEN].state = aotom_data.u.icon.on;
+#if defined(SPARK) || defined(SPARK7162)
+		switch (panel_version.DisplayInfo) {
+		case YWPANEL_FP_DISPTYPE_LED:
+			switch (aotom_data.u.icon.icon_nr) {
+			case 0:
+				res = YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
+				led_state[LED_RED].state = aotom_data.u.icon.on;
+				break;
+			case 35:
+				res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
+				led_state[LED_GREEN].state = aotom_data.u.icon.on;
+				break;
+			}
 			break;
 		default:
-			break;
-		}
-#endif
-#if defined(SPARK7162)
-		icon_nr = aotom_data.u.icon.icon_nr;
-		if (icon_nr > 0 && icon_nr <= 45 )
-			res = aotomSetIcon(icon_nr, aotom_data.u.icon.on);
-		if (icon_nr == 46){
-			switch (aotom_data.u.icon.on){
-			case 1:
-				VFD_set_all_icons();
-				res = 0;
+			switch (aotom_data.u.icon.icon_nr) {
+			case 46:
+				switch (aotom_data.u.icon.on){
+				case 1:
+					VFD_set_all_icons();
+					res = 0;
 				break;
-			case 0:
-				VFD_clear_all_icons();
-				res = 0;
+				case 0:
+					VFD_clear_all_icons();
+					res = 0;
+					break;
+				}
 				break;
 			default:
-				break;
+				res = aotomSetIcon(aotom_data.u.icon.icon_nr, aotom_data.u.icon.on);
 			}
 		}
 #endif		
 		mode = 0;
 		break;
-	}
 	case VFDSTANDBY:
 	{
 #if defined(SPARK) || defined(SPARK7162)

@@ -2771,11 +2771,12 @@ int (*YWPANEL_VFD_ShowString)(char *);
 
 int YWPANEL_width = 8;
 
+YWPANEL_Version_t panel_version;
+
 int YWPANEL_VFD_Init(void)
 {
 	int ErrorCode = -ENODEV;
 
-	YWPANEL_Version_t panel_version;
 	YWPANEL_VFD_Initialize = YWPANEL_VFD_Init_Unknown;
 	YWPANEL_VFD_Term = YWPANEL_VFD_Term_Unknown;
 	YWPANEL_VFD_ShowIco = YWPANEL_VFD_ShowIco_Unknown;
