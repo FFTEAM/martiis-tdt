@@ -578,6 +578,7 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				break;
 			default: // toggle (for aotom_data.u.led.on * 10) ms
 				flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
+				res = 0;
 			}
 		}
 #endif
