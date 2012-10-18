@@ -230,6 +230,8 @@ ifdef SPARK7162
 obj-y	+= cec/
 obj-y	+= smartcard/
 obj-y	+= i2c_spi/
+obj-y	+= cpu_frequ/
+obj-y	+= cec/
 endif
 
 ifdef OCTAGON1008
@@ -260,6 +262,7 @@ endif
 
 ifdef CUBEREVO
 obj-y    += smartcard/
+obj-y	 += cpu_frequ/
 endif
 ifdef CUBEREVO_MINI2
 obj-y    += smartcard/

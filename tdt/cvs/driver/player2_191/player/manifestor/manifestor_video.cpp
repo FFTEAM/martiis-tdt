@@ -1006,7 +1006,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
 
     //MANIFESTOR_DEBUG("\n");
 
-    // Before checking if the display parameters have changed, we copy over 
+    // Before checking if the display parameters have changed, we copy over
     // the content frame rate to avoid excess message generation.
     if (VideoParameters->FrameRate != StreamDisplayParameters.FrameRate)
         DisplayEventRequested          |= EventSourceFrameRateChangeManifest;
@@ -1097,9 +1097,9 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
 
     if (!Stepping)
     {
-        // Prints have been changed to reduce time taken to do them and lock interrupts for shorter periods as 
+        // Prints have been changed to reduce time taken to do them and lock interrupts for shorter periods as
         // on occasion this has effected our AV sync calculations on startup.
-      
+
         report(severity_info,"Incoming Source %dx%d @ %d,%d\n",
              VideoParameters->Width, VideoParameters->Height,
              SourceX, SourceY);
@@ -1321,9 +1321,9 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
     // Nick added signalling of changes in the output window
     //
 
-    if ((OutputWindow.X      != (unsigned int)DestX) || 
-        (OutputWindow.Y      != (unsigned int)DestY) || 
-        (OutputWindow.Width  != (unsigned int)DestWidth) || 
+    if ((OutputWindow.X      != (unsigned int)DestX) ||
+        (OutputWindow.Y      != (unsigned int)DestY) ||
+        (OutputWindow.Width  != (unsigned int)DestWidth) ||
         (OutputWindow.Height != (unsigned int)DestHeight))
     {
         DisplayEventRequested              |= EventOutputSizeChangeManifest;
@@ -1343,7 +1343,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
 
     // Decide whether the display requires scaling/cropping or not
     DecimateIfAvailable                 = false;
-    
+
     // Hm why is here not the decimate value used from havana_stream ?
     // Lets set it depending on the value from havana_stream
 #if !defined(ADB_BOX)
@@ -1644,7 +1644,7 @@ ManifestorStatus_t   Manifestor_Video_c::FillOutBufferStructure( BufferStructure
 
                RequestedStructure->Size                += RequestedStructure->DecimatedSize;
 
-            }       
+            }
             break;
 
         case FormatVideo420_Planar:
@@ -1730,7 +1730,7 @@ ManifestorStatus_t   Manifestor_Video_c::FillOutBufferStructure( BufferStructure
             RequestedStructure->Strides[0][0]           = RequestedStructure->Dimension[0] * 2;
 
             RequestedStructure->Size                    = (RequestedStructure->Dimension[0] * RequestedStructure->Dimension[1] * 2);
-            break;       
+            break;
 
         case FormatVideo422_YUYV:
 
@@ -1743,7 +1743,7 @@ ManifestorStatus_t   Manifestor_Video_c::FillOutBufferStructure( BufferStructure
             RequestedStructure->Strides[0][0]           = RequestedStructure->Dimension[0] * 2;
 
             RequestedStructure->Size                    = (RequestedStructure->Dimension[0] * RequestedStructure->Dimension[1] * 2);
-            break;       
+            break;
 
         default: MANIFESTOR_ERROR("Unsupported buffer format (%d)\n", RequestedStructure->Format );
     }
