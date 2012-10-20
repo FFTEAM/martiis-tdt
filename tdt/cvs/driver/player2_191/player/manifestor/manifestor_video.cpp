@@ -1167,7 +1167,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                 {
                     // Picture is wider than display surface so must shrink height
                     Rational_t   NewHeight       = (DestHeight * WindowAspectRatio) / PictureAspectRatio;
-#ifdef __TDT__NOTYET //MARTII
+#ifdef __TDT__NOTNEEDED //MARTII
                     //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
                     if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
 		     || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
@@ -1192,7 +1192,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                 {
                     // Picture is taller than display surface so must shrink width
                     Rational_t   NewWidth        = (DestWidth * PictureAspectRatio) / WindowAspectRatio;
-#ifdef __TDT__NOTYET //MARTII
+#ifdef __TDT__NOTNEEDED //MARTII
                     //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
                     if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
 		     || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
@@ -1221,7 +1221,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                    // Picture is wider than display surface so must chop off edges
                    int          OldWidth        = SourceWidth;
                    Rational_t   NewWidth        = (SourceWidth * WindowAspectRatio) / PictureAspectRatio;
-#ifdef __TDT__NOTYET //MARTII
+#ifdef __TDT__NOTNEEDED //MARTII
                    //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
                    if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
 		    || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
@@ -1247,7 +1247,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                    // Picture is taller than display surface so must chop off top and bottom
                    int          OldHeight       = SourceHeight;
                    Rational_t   NewHeight       = (SourceHeight * PictureAspectRatio) / WindowAspectRatio;
-#ifdef __TDT__NOTYET //MARTII
+#ifdef __TDT__NOTNEEDED //MARTII
                    //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
                    if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
 		    || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
