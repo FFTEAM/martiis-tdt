@@ -1167,50 +1167,14 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                 {
                     // Picture is wider than display surface so must shrink height
                     Rational_t   NewHeight       = (DestHeight * WindowAspectRatio) / PictureAspectRatio;
-#ifdef __TDT__NOTNEEDED //MARTII
-                    //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
-                    if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 704 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 1280 && (VideoParameters->Height == 720 || VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1440 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1920 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1366 && VideoParameters->Height == 768) )
-                    {
-                        DestHeight                   = NewHeight.IntegerPart();
-                    }
-                    else
-                    {
-                        DestHeight = (DestHeight * 3) / 4;
-                    }
-#else
                     DestHeight                   = NewHeight.IntegerPart();
-#endif
                     DestY                        = DestY + ((SurfaceWindow.Height - DestHeight) >> 1);
                 }
                 else
                 {
                     // Picture is taller than display surface so must shrink width
                     Rational_t   NewWidth        = (DestWidth * PictureAspectRatio) / WindowAspectRatio;
-#ifdef __TDT__NOTNEEDED //MARTII
-                    //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
-                    if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 704 && VideoParameters->Height == 576)
-		     || (VideoParameters->Width == 1280 && (VideoParameters->Height == 720 || VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1440 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1920 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		     || (VideoParameters->Width == 1366 && VideoParameters->Height == 768) )
-                    {
-                        DestWidth                    = NewWidth.IntegerPart();
-                    }
-                    else
-                    {
-                        DestWidth = (DestWidth  * 3) / 4;
-                    }
-#else
                     DestWidth                    = NewWidth.IntegerPart();
-#endif
                     DestX                        = DestX + ((SurfaceWindow.Width - DestWidth) >> 1);
                 }
             }
@@ -1221,25 +1185,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                    // Picture is wider than display surface so must chop off edges
                    int          OldWidth        = SourceWidth;
                    Rational_t   NewWidth        = (SourceWidth * WindowAspectRatio) / PictureAspectRatio;
-#ifdef __TDT__NOTNEEDED //MARTII
-                   //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
-                   if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 704 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 1280 && (VideoParameters->Height == 720 || VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1440 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1920 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1366 && VideoParameters->Height == 768) )
-                   {
-                       SourceWidth                  = NewWidth.IntegerPart();
-                   }
-                   else
-                   {
-                       SourceWidth = (SourceWidth * 4) / 3;
-                   }
-#else
                    SourceWidth                  = NewWidth.IntegerPart();
-#endif
                    SourceX                      = SourceX + ((OldWidth - SourceWidth) >> 1);
                }
                else
@@ -1247,25 +1193,7 @@ ManifestorStatus_t Manifestor_Video_c::SetDisplayWindows (struct VideoDisplayPar
                    // Picture is taller than display surface so must chop off top and bottom
                    int          OldHeight       = SourceHeight;
                    Rational_t   NewHeight       = (SourceHeight * PictureAspectRatio) / WindowAspectRatio;
-#ifdef __TDT__NOTNEEDED //MARTII
-                   //player crash if incoming source width/height not standard (Kernel panic - not syncing: Need true 64-bit/64-bit division)
-                   if( (VideoParameters->Width == 720 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 544 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 704 && VideoParameters->Height == 576)
-		    || (VideoParameters->Width == 1280 && (VideoParameters->Height == 720 || VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1440 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1920 && (VideoParameters->Height == 1080 || VideoParameters->Height == 1088))
-		    || (VideoParameters->Width == 1366 && VideoParameters->Height == 768) )
-                   {
-                       SourceHeight                 = NewHeight.IntegerPart();
-                   }
-                   else
-                   {
-                       SourceHeight = (SourceHeight * 4) / 3;
-                   }
-#else
                    SourceHeight                 = NewHeight.IntegerPart();
-#endif
                    SourceY                      = SourceY + ((OldHeight - SourceHeight) >> 1);
                }
             }
