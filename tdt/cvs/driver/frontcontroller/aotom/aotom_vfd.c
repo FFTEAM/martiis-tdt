@@ -1981,7 +1981,7 @@ void YWPANEL_VFD_DrawChar(char c, u8 position)
 		PANEL_PRINT((TRACE_ERROR, "char position error! %d\n", position));
 		return;
 	}
-	if (c & 0x80)
+	if (c & ~0x7F)
 		u = 47;
 	else
 		u = ywpanel_vfd_map[(int)c];
@@ -2406,24 +2406,17 @@ static u8  YWPANEL_LedDisplayData[YWPANEL_MAX_LED_LENGTH];
 
 static void YWPANEL_LEDSetString(char *LEDStrBuf)
 {
-	int i, c, len = strlen(LEDStrBuf);
-	int a = 0;
+	int i, j, c, len = strlen(LEDStrBuf);
 
-	for(i = 0; i < YWPANEL_MAX_LED_LENGTH; i++) {
-		if(i < len) {
-			c = (int) LEDStrBuf[i + a];
-			if(i == 2 && c == 0x2e ) { //save one segment displaying dot e.g. 23.59  
-				YWPANEL_LedDisplayData[i - 1]++;
-				a = 1;
-				c = (int) LEDStrBuf[i + a];
-			}
-			if (!(c & 0x80)) {
-				YWPANEL_LedDisplayData[i] = ywpanel_led_map[c];
-				continue;
-			}
-		}
-		YWPANEL_LedDisplayData[i] = 0;
-    }
+	for(i = 0, j = 0; i < YWPANEL_MAX_LED_LENGTH; i++, j++) {
+		if (j < len) {
+			c = (int) LEDStrBuf[j];
+			YWPANEL_LedDisplayData[i] = (c & ~0x7f) ? 0 : ywpanel_led_map[c];
+			if((i == 1) && (LEDStrBuf[j + 1] == '.') && !(YWPANEL_LedDisplayData[i] & 1))
+					YWPANEL_LedDisplayData[i] |= 1, j++;
+		} else
+			YWPANEL_LedDisplayData[i] = 0;
+	}
 }
 
 static int YWPANEL_LEDDisplayString(void)

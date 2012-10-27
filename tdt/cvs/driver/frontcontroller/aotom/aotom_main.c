@@ -214,10 +214,15 @@ static int draw_thread(void *arg)
 {
   struct vfd_ioctl_data *data = (struct vfd_ioctl_data *) arg;
   char buf[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
+  char buf2[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
   int len = data->length;
   int off = 0;
+  int saved = 0;
 
-  if (len > YWPANEL_width) {
+  if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED && len > 2 && data->data[2] == '.')
+	saved = 1;
+
+  if (len - saved > YWPANEL_width) {
   	memset(buf, ' ', sizeof(buf));
 	off = YWPANEL_width - 1;
   	memcpy(buf + off, data->data, len);
@@ -230,16 +235,24 @@ static int draw_thread(void *arg)
 
   draw_thread_stop = 0;
 
-  if(len > YWPANEL_width) {
+  if (saved) {
+	int i;
+	for (i = 0; i < len; i++)
+		buf2[i] = (buf[i] == '.') ? ' ' : buf[i];
+	buf2[i] = 0;
+  }
+
+  if(len - saved > YWPANEL_width) {
+    char *b = saved ? buf2 : buf;
     int pos;
     for(pos = 0; pos < len; pos++) {
-       int i;
-       if(kthread_should_stop()) {
+	int i;
+	if(kthread_should_stop()) {
     	   draw_thread_stop = 1;
     	   return 0;
-       }
+	}
 
-       YWPANEL_VFD_ShowString(buf + pos);
+	YWPANEL_VFD_ShowString(b + pos);
 
 	// sleep 200 ms
 	for (i = 0; i < 5; i++) {
