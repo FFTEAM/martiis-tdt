@@ -390,9 +390,7 @@ int aotomSetTime(char* time)
 	dprintk(5, "%s time: %02d:%02d\n", __func__, time[2], time[3]);
 
 	res = VFD_Show_Time(time[2], time[3]);
-#if defined(SPARK) || defined(SPARK7162)
 	YWPANEL_FP_ControlTimer(true);
-#endif
 	dprintk(5, "%s <\n", __func__);
 	return res;
 }
@@ -556,9 +554,7 @@ static struct vfd_ioctl_data vfd_data;
 
 static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int cmd, unsigned long arg)
 {
-#if defined(SPARK7162)
    int icon_nr = 0;
-#endif
    static int mode = 0;
    int res = -EINVAL;
    dprintk(5, "%s > 0x%.8x\n", __func__, cmd);
@@ -581,7 +577,6 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		mode = aotom_data.u.mode.compat;
 		break;
 	case VFDSETLED:
-#if defined(SPARK) || defined(SPARK7162)
 		if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < LED_MAX) {
 			switch (aotom_data.u.led.on) {
 			case LOG_OFF:
@@ -594,7 +589,6 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				res = 0;
 			}
 		}
-#endif
 		break;
 	case VFDBRIGHTNESS:
 		if (aotom_data.u.brightness.level < 0)
@@ -604,7 +598,6 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		res = YWPANEL_VFD_SetBrightness(aotom_data.u.brightness.level);
 		break;
 	case VFDICONDISPLAYONOFF:
-#if defined(SPARK) || defined(SPARK7162)
 		switch (panel_version.DisplayInfo) {
 		case YWPANEL_FP_DISPTYPE_LED:
 			switch (aotom_data.u.icon.icon_nr) {
@@ -636,12 +629,10 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				res = aotomSetIcon(aotom_data.u.icon.icon_nr, aotom_data.u.icon.on);
 			}
 		}
-#endif		
 		mode = 0;
 		break;
 	case VFDSTANDBY:
 	{
-#if defined(SPARK) || defined(SPARK7162)
 		u32 uTime = 0;
 		//u32 uStandByKey = 0;
 		//u32 uPowerOnTime = 0;
@@ -671,7 +662,6 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		YWPANEL_FP_ControlTimer(true);
 		YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
 		res = 0;
-#endif
 	   break;
 	}
 	case VFDSETTIME2:
@@ -690,12 +680,10 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		break;
 	case VFDGETTIME:
 	{
-#if defined(SPARK) || defined(SPARK7162)
 		u32 uTime = 0;
 		uTime = YWPANEL_FP_GetTime();
 		//printk("uTime = %d\n", uTime);
 		res = put_user(uTime, (int *) arg);
-#endif
 		break;
 	}
 	case VFDGETWAKEUPMODE:
@@ -719,11 +707,9 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		vfd_data.length = 0;
 	   	res = run_draw_thread(&vfd_data);
 		break;
-#if defined(SPARK)
 	case 0x5305:
 		res = 0;
 		break;
-#endif
 	case 0x5401:
 		res = 0;
 		break;
