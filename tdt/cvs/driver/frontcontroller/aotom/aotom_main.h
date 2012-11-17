@@ -32,6 +32,8 @@ typedef unsigned int u32;
 #define VFDSETLED             0xc0425afe
 #define VFDSETMODE            0xc0425aff
 #define VFDDISPLAYCLR		  0xc0425b00
+#define VFDGETLOOPSTATE		  0xc0425b01
+#define VFDSETLOOPSTATE		  0xc0425b02
 
 #define	REMOTE_SLAVE_ADDRESS			0x40bd0000	/* slave address is 5 */
 #define	REMOTE_SLAVE_ADDRESS_NEW		0xc03f0000	/* sz 2008-06-26 add new remote*/
@@ -120,6 +122,7 @@ enum
 	KEY_DIGIT9 = 10
 };
 
+#if 0
 enum
 {
 	POWER_KEY 		 = 88,
@@ -172,6 +175,7 @@ enum
 	YELLOW_KEY 		 = 46,	// C
 	BLUE_KEY 		 = 47	// V
 };
+#endif
 
 typedef enum LogNum_e
 {
@@ -227,6 +231,7 @@ typedef enum LogNum_e
     LogNum_Max
 } LogNum_T;
 
+#if 0
 typedef enum
 {
 	REMOTE_OLD,
@@ -237,6 +242,7 @@ typedef enum
 	REMOTE_GOLDEN,
 	REMOTE_UNKNOWN
 } REMOTE_TYPE;
+#endif
 
 typedef enum VFDMode_e
 {
@@ -656,7 +662,7 @@ typedef struct YWPANEL_FPData_s
 int YWPANEL_VFD_Init(void);
 extern int (*YWPANEL_VFD_Term)(void);
 extern int (*YWPANEL_VFD_Initialize)(void);
-extern int (*YWPANEL_VFD_ShowIco)(LogNum_T, int);
+extern int (*YWPANEL_VFD_ShowIcon)(LogNum_T, int);
 extern int (*YWPANEL_VFD_ShowTime)(u8 hh,u8 mm);
 extern int (*YWPANEL_VFD_ShowTimeOff)(void);
 extern int (*YWPANEL_VFD_SetBrightness)(int);
@@ -675,13 +681,16 @@ YWPANEL_POWERONSTATE_t YWPANEL_FP_GetPowerOnStatus(void);
 int  YWPANEL_FP_SetPowerOnStatus(YWPANEL_POWERONSTATE_t state);
 u32  YWPANEL_FP_GetTime(void);
 int  YWPANEL_FP_SetTime(u32 value);
-u32  YWPANEL_FP_GetStandByKey(u8 index);
-int  YWPANEL_FP_SetStandByKey(u8 index,u8 key);
-u32  YWPANEL_FP_GetBlueKey(u8 index);
-int  YWPANEL_FP_SetBlueKey(u8 index,u8 key);
-int YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus );
-int YWPANEL_FP_GetStartUpState(YWPANEL_STARTUPSTATE_t *State);
+//u32  YWPANEL_FP_GetStandByKey(u8 index);
+//int  YWPANEL_FP_SetStandByKey(u8 index,u8 key);
+//u32  YWPANEL_FP_GetBlueKey(u8 index);
+//int  YWPANEL_FP_SetBlueKey(u8 index,u8 key);
+int  YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus );
+int  YWPANEL_FP_GetStartUpState(YWPANEL_STARTUPSTATE_t *State);
 int  YWPANEL_FP_GetVersion(YWPANEL_Version_t *version);
+int  YWPANEL_FP_GetLoopState(YWPANEL_LOOPSTATE_t *state);
+int  YWPANEL_FP_SetLoopState(YWPANEL_LOOPSTATE_t state);
+
 
 //u32  YWPANEL_FP_GetIRKey(void);
 int YWPANEL_FP_SetPowerOnTime(u32 Value);

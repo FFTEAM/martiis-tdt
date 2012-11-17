@@ -32,6 +32,7 @@
 #include <linux/delay.h>
 #include <linux/i2c.h>
 #include <linux/stm/pio.h>
+#include <linux/input.h>
 
 #include "aotom_ywdefs.h"
 #include "aotom_i2csoft.h"
@@ -53,160 +54,6 @@ static u8 lbdValue = 0;
 static struct stpio_pin *pio_scl;
 static struct stpio_pin *pio_sda;
 static struct stpio_pin *pio_cs;
-
-#define KEN_NUM_NEW		50
-static const u8	key_table_new[KEN_NUM_NEW][2] = {
-							  {POWER_KEY, 	0x08},
-							  {TIME_SET_KEY,0x48},
-							  {UHF_KEY, 	0x28},
-							  {VFormat_KEY, 0x18},
-							  {MUTE_KEY, 	0x88},
-							  {TVSAT_KEY, 	0xc8},
-							  {MUSIC_KEY, 	0xd0},
-							  {FIND_KEY, 	0xe8},
-							  {FAV_KEY, 	0x7a},
-							  {KEY_DIGIT1, 	0x80},
-							  {KEY_DIGIT2, 	0x40},
-							  {KEY_DIGIT3, 	0xc0},
-							  {KEY_DIGIT4, 	0x20},
-							  {KEY_DIGIT5, 	0xa0},
-							  {KEY_DIGIT6, 	0x60},
-							  {KEY_DIGIT7, 	0xe0},
-							  {KEY_DIGIT8, 	0x10},
-							  {KEY_DIGIT9, 	0x90},
-							  {KEY_DIGIT0, 	0x00},
-							  {MENU_KEY, 	0x50},
-							  {i_KEY, 		0xda},
-							  {EPG_KEY, 	0xb0},
-							  {EXIT_KEY, 	0x30},
-							  {RECALL_KEY, 	0xf0},
-							  {RECORD_KEY, 	0x70},
-							  {UP_KEY, 		0x98},
-							  {DOWN_KEY, 	0x58},
-							  {LEFT_KEY, 	0xd8},
-							  {RIGHT_KEY, 	0x38},
-							  {SELECT_KEY, 	0xb8},
-							  {PLAY_KEY, 	0xa8},
-							  {PAGE_UP_KEY, 0x68},
-							  {PAUSE_KEY, 	0x78},
-							  {PAGE_DOWN_KEY, 	0x62},
-							  {STOP_KEY, 		0x2a},
-							  {SLOW_MOTION_KEY, 0x32},
-							  {FAST_REWIND_KEY, 0x6a},
-							  {FAST_FORWARD_KEY,0xaa},
-							  {DOCMENT_KEY, 	0xea},
-							  {SWITCH_PIC_KEY,  0x1a},
-							  {PALY_MODE_KEY, 	0x9a},
-							  {USB_KEY, 	0x5a},
-							  {RADIO_KEY, 	0xca},
-							  {SAT_KEY, 	0x4a},
-							  {F1_KEY, 		0xf8},
-							  {F2_KEY, 		0xd2},
-							  {RED_KEY, 	0xc2},
-							  {GREEN_KEY, 	0x2},
-							  {YELLOW_KEY, 	0x92},
-							  {BLUE_KEY, 	0x72}	};
-
-#define KEY_NUM_TOP			48
-static const u8	key_table_top[KEY_NUM_TOP][2] = {
-							  {POWER_KEY, 	0x50},
-							  {MUTE_KEY,	0x30},
-							  {VFormat_KEY, 0x42},
-							  {UHF_KEY, 	0xc2},
-							  {TVSAT_KEY, 	0x10},
-							  {KEY_DIGIT1, 	0x88},
-							  {KEY_DIGIT2, 	0x48},
-							  {KEY_DIGIT3, 	0xc8},
-							  {KEY_DIGIT4, 	0x28},
-							  {KEY_DIGIT5, 	0xa8},
-							  {KEY_DIGIT6, 	0x68},
-							  {KEY_DIGIT7, 	0xe8},
-							  {KEY_DIGIT8, 	0x18},
-							  {KEY_DIGIT9, 	0x98},
-							  {KEY_DIGIT0, 	0x08},
-							  {RECALL_KEY, 	0x78},
-							  {i_KEY, 		0xb8},
-							  {RADIO_KEY, 	0xa0},
-							  {FIND_KEY, 	0xe0},
-							  {EPG_KEY, 	0xe2},
-							  {MENU_KEY, 	0x58},
-							  {RECORD_KEY, 	0xd8},
-							  {EXIT_KEY, 	0x38},
-							  {FAV_KEY, 	0x90},
-							  {UP_KEY, 		0x0},
-							  {DOWN_KEY, 	0x80},
-							  {LEFT_KEY, 	0xc0},
-							  {RIGHT_KEY, 	0x40},
-							  {SELECT_KEY, 	0xf8},
-							  {RED_KEY, 	0xb2},
-							  {GREEN_KEY, 	0xb0},
-							  {YELLOW_KEY, 	0x70},
-							  {BLUE_KEY, 	0xf0},
-							  {PAGE_UP_KEY, 0xa2},
-							  {PAUSE_KEY, 	0x60},
-							  {PLAY_KEY, 	0x62},
-							  {PAGE_DOWN_KEY, 	0x12},
-							  {SWITCH_PIC_KEY,  0xd2},
-							  {STOP_KEY, 		0x52},
-							  {SLOW_MOTION_KEY, 0x92},
-							  {DOCMENT_KEY, 	0x8a},
-							  {SAT_KEY, 		0x7a},
-							  {FAST_REWIND_KEY, 0xa},
-							  {FAST_FORWARD_KEY,0x4a},
-							  {PALY_MODE_KEY, 	0x32},
-							  {MUSIC_KEY, 		0x20},
-							  {USB_KEY, 		0x2},
-							  {TIME_SET_KEY,	0x22}	};
-
-#define KEY_NUM_EDI		47
-static const u8	key_table_edi[KEY_NUM_EDI][2] = {
-							  {POWER_KEY, 	0x08},
-							  {MUTE_KEY, 	0xc2},
-							  {VFormat_KEY, 0xa2},
-							  {TVSAT_KEY, 	0xca},
-							  {KEY_DIGIT1, 	0xd0},
-							  {KEY_DIGIT2, 	0x30},
-							  {KEY_DIGIT3, 	0xb0},
-							  {KEY_DIGIT4, 	0x70},
-							  {KEY_DIGIT5, 	0xf0},
-							  {KEY_DIGIT6, 	0x80},
-							  {KEY_DIGIT7, 	0x88},
-							  {KEY_DIGIT8, 	0x48},
-							  {KEY_DIGIT9, 	0xc8},
-							  {KEY_DIGIT0, 	0x50},
-							  {RECALL_KEY, 	0xa0},
-							  {i_KEY, 		0xe0},
-							  {RADIO_KEY, 	0x62},
-							  {FIND_KEY, 	0x40},
-							  {EPG_KEY, 	0x8a},
-							  {MENU_KEY, 	0x0a},
-							  {RECORD_KEY, 	0xe2},
-							  {F1_KEY, 		0x60},
-							  {EXIT_KEY, 	0x20},
-							  {FAV_KEY, 	0xc0},
-							  {UP_KEY, 		0xa8},
-							  {DOWN_KEY, 	0x68},
-							  {LEFT_KEY, 	0xe8},
-							  {RIGHT_KEY, 	0x18},
-							  {SELECT_KEY, 	0x28},
-							  {RED_KEY, 	0xf8},
-							  {GREEN_KEY, 	0x04},
-							  {YELLOW_KEY, 	0x82},
-							  {BLUE_KEY, 	0x02},
-							  {PAGE_DOWN_KEY,	0xd8},
-							  {PAUSE_KEY, 		0x92},
-							  {PLAY_KEY, 		0xb8},
-							  {PAGE_UP_KEY, 	0x38},
-							  {SWITCH_PIC_KEY,  0xf2},
-							  {STOP_KEY, 		0x78},
-							  {SLOW_MOTION_KEY, 0x12},
-							  {DOCMENT_KEY, 	0x42},
-							  {SAT_KEY, 		0x72},
-							  {FAST_FORWARD_KEY,0x58},
-							  {FAST_REWIND_KEY, 0x98},
-							  {PALY_MODE_KEY, 	0x32},
-							  {USB_KEY, 		0xd2},
-							  {TIME_SET_KEY, 	0x22}	};
 
 typedef enum PIO_Mode_e
 {
@@ -326,7 +173,7 @@ enum
 	YWPANEL_INIT_INSTR_SETSTBYKEY4 ,
 	YWPANEL_INIT_INSTR_SETSTBYKEY5 ,
 
-	YWPANEL_INIT_INSTR_GETIRCODE , 			/* 0x5e */
+	YWPANEL_INIT_INSTR_GETIRCODE, 			/* 0x5e */
 	YWPANEL_INIT_INSTR_SETIRCODE,
 
 
@@ -340,7 +187,7 @@ enum
 	YWPANEL_INIT_INSTR_GETVERIFYSTATE , 	/* 0x64 */
 	YWPANEL_INIT_INSTR_SETVERIFYSTATE,
 
-	YWPANEL_INIT_INSTR_GETTIME, 			/* 0x66 */
+	YWPANEL_INIT_INSTR_GETTIME = 0x66, 			/* 0x66 */
 	YWPANEL_INIT_INSTR_SETTIME, 			/* 0x67 */
 	YWPANEL_INIT_INSTR_CONTROLTIMER,		/* 0x68 */
 	YWPANEL_INIT_INSTR_POWERONTIME, 		/* 0x69 */
@@ -361,10 +208,12 @@ enum
 	YWPANEL_INIT_INSTR_SETBLUEKEY4 ,
 	YWPANEL_INIT_INSTR_SETBLUEKEY5 ,		/* 0x76 */
 
-	YWPANEL_INIT_INSTR_GETPOWERONSTATE, 	/* 0x77 */
+	YWPANEL_INIT_INSTR_GETPOWERONSTATE = 0x77, 	/* 0x77 */
 	YWPANEL_INIT_INSTR_SETPOWERONSTATE, 	/* 0x78 */
 
-	YWPANEL_INIT_INSTR_GETSTARTUPSTATE 	/* 0x79 */
+	YWPANEL_INIT_INSTR_GETSTARTUPSTATE, 	/* 0x79 */
+	YWPANEL_INIT_INSTR_GETLOOPSTATE = 0x7a,	/* 0x80 */ // FIXME. Neither 0x7a nor 0x80 seem to work. Lacks documentation.
+	YWPANEL_INIT_INSTR_SETLOOPSTATE,		/* 0x81 */
 
 };
 enum YWPANL_READ_INSTR_e
@@ -385,13 +234,11 @@ enum YWPANL_WRITE_INSTR_e
 
 };
 
-#define YWPANEL_FP_I2C_TIMEOUT			200
 #define VFD_CS_CLR() {udelay(10);stpio_set_pin(pio_cs, 0);}
 #define VFD_CS_SET() {udelay(10);stpio_set_pin(pio_cs, 1);}
 
 static SegAddrVal_T VfdSegAddr[15];
 static struct i2c_adapter*	panel_i2c_adapter;
-static REMOTE_TYPE		Remote_type_use = REMOTE_NEW;
 
 const u16 cnCRC_16 = 0x8005;
 // CRC-16 = X16 + X15 + X2 + X0
@@ -399,111 +246,6 @@ const u16 cnCRC_CCITT = 0x1021;
 // CRC-CCITT = X16 + X12 + X5 + X0
 
 u32 Table_CRC[256]; // CRC
-
-int  YWPANEL_TranslateKeyCode(u8  KeyPress)
-{
-	int 					iUSIF_Key = INVALID_KEY;
-	int i;
-
-	if((Remote_type_use == REMOTE_NEW) || (Remote_type_use == REMOTE_GOLDEN))
-	{
-		for(i=0; i<KEN_NUM_NEW; ++i)
-		{
-			if(KeyPress== key_table_new[i][1])
-			{
-				iUSIF_Key = key_table_new[i][0];
-				break;
-			}
-		}
-	}
-	else if(Remote_type_use == REMOTE_TOPFIELD)
-	{
-		for(i=0; i<KEY_NUM_TOP; ++i)
-		{
-			if(KeyPress== key_table_top[i][1])
-			{
-				iUSIF_Key = key_table_top[i][0];
-				break;
-			}
-		}
-	}
-	else if((Remote_type_use == REMOTE_EDISION1) || (Remote_type_use == REMOTE_EDISION2))
-	{
-		for(i=0; i<KEY_NUM_EDI; ++i)
-		{
-			if(KeyPress== key_table_edi[i][1])
-			{
-				iUSIF_Key = key_table_edi[i][0];
-				break;
-			}
-		}
-	}
-	if(iUSIF_Key == INVALID_KEY)
-		PANEL_DEBUG("YWPANEL_TranslateKeyCode invalid key!!\n");
-
-	return iUSIF_Key;
-}
-
-int to_primitive_key(u8 key,	u32 *prim_key_p)
-{
-	int ret = false;
-	int i;
-	u32 tmp = 0;
-
-	if((Remote_type_use == REMOTE_NEW) || (Remote_type_use == REMOTE_GOLDEN))
-	{
-		for(i=0; i<KEN_NUM_NEW; ++i)
-		{
-			if(key== key_table_new[i][0])
-			{
-				tmp = key_table_new[i][1];
-				tmp <<= 8;
-				tmp |= (~key_table_new[i][1])&0x000000FF;
-				if(Remote_type_use == REMOTE_GOLDEN)
-					tmp |= REMOTE_SLAVE_ADDRESS_GOLDEN;
-				else
-					tmp |= REMOTE_SLAVE_ADDRESS_NEW;
-				*prim_key_p = tmp;
-				ret = true;
-			}
-		}
-	}
-	else if(Remote_type_use == REMOTE_TOPFIELD)
-	{
-		for(i=0; i<KEY_NUM_TOP; ++i)
-		{
-			if(key== key_table_top[i][0])
-			{
-				tmp = key_table_top[i][1];
-				tmp <<= 8;
-				tmp |= (~key_table_top[i][1])&0x000000FF;
-				tmp |= REMOTE_TOPFIELD_MASK;
-				*prim_key_p = tmp;
-				ret = true;
-			}
-		}
-	}
-	else if((Remote_type_use == REMOTE_EDISION1) || (Remote_type_use == REMOTE_EDISION2))
-	{
-		for(i=0; i<KEY_NUM_EDI; ++i)
-		{
-			if(key== key_table_edi[i][0])
-			{
-				tmp = key_table_edi[i][1];
-				tmp <<= 8;
-				tmp |= (~key_table_new[i][1])&0x000000FF;
-				if(Remote_type_use == REMOTE_EDISION1)
-					tmp |= REMOTE_SLAVE_ADDRESS_EDISION1;
-				else
-					tmp |= REMOTE_SLAVE_ADDRESS_EDISION2;
-				*prim_key_p = tmp;
-				ret = true;
-			}
-		}
-	}
-
-	return ret;
-}
 
 void YWPANEL_BuildTable16( u16 aPoly )
 {
@@ -535,6 +277,7 @@ u16 YWPANEL_GenerateCRC16( u8 * buffer, u32 bufLength )
 		nAccum = ( nAccum << 8 ) ^ ( u16 )Table_CRC[( nAccum >> 8 ) ^ *buffer++];
 	return nAccum;
 }
+
 int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 {
 	u16 			usCRC16 = 0;
@@ -551,280 +294,116 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 	switch(data->dataType)
 	{
 		case YWPANEL_DATATYPE_LBD:
-		{
 			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LBD;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_LCD:
-		{
-            //I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LED;
-            I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LCD;	//d48zm modify
-		}
-		break;
-
+			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LCD;
+			break;
 		case YWPANEL_DATATYPE_LED:
-		{
-            //I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LCD;
-            I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LED;	//d48zm modify
-		}
-		break;
-
+            I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LED;
+			break;
 		case YWPANEL_DATATYPE_VFD:
-		{
 			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_VFD;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SCANKEY:
-		{
 			I2CData->writeBuff[0] = YWPANEL_READ_INSTR_SCANKEY;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_IRKEY:
-		{
-			I2CData->writeBuff[0] = YWPANEL_READ_INSTR_IRKEY;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_GETVERSION:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETVERSION:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETVERSION;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_GETCPUSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETCPUSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETCPUSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_SETCPUSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETCPUSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETCPUSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_GETSTARTUPSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETSTARTUPSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETSTARTUPSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_GETVFDSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETVFDSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETVFDSTANDBYSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_SETVFDSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETVFDSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETVFDSTANDBYSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_GETPOWERONSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETPOWERONSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETPOWERONSTATE;
-		}
-		break;
-
-		case  YWPANEL_DATATYPE_SETPOWERONSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETPOWERONSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETPOWERONSTATE;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_GETSTBYKEY1:
-		case YWPANEL_DATATYPE_GETSTBYKEY2:
-		case YWPANEL_DATATYPE_GETSTBYKEY3:
-		case YWPANEL_DATATYPE_GETSTBYKEY4:
-		case YWPANEL_DATATYPE_GETSTBYKEY5:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETSTBYKEY1 + (data->dataType - YWPANEL_DATATYPE_GETSTBYKEY1);
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETSTBYKEY1:
-		case	YWPANEL_DATATYPE_SETSTBYKEY2:
-		case	YWPANEL_DATATYPE_SETSTBYKEY3:
-		case	YWPANEL_DATATYPE_SETSTBYKEY4:
-		case	YWPANEL_DATATYPE_SETSTBYKEY5:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETSTBYKEY1+data->dataType - YWPANEL_DATATYPE_SETSTBYKEY1;
-		}
-		break;
- //add for blue key
-		case YWPANEL_DATATYPE_GETBLUEKEY1:
-		case YWPANEL_DATATYPE_GETBLUEKEY2:
-		case YWPANEL_DATATYPE_GETBLUEKEY3:
-		case YWPANEL_DATATYPE_GETBLUEKEY4:
-		case YWPANEL_DATATYPE_GETBLUEKEY5:
-		{
-		  I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETBLUEKEY1 + (data->dataType - YWPANEL_DATATYPE_GETBLUEKEY1);
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETBLUEKEY1:
-		case	YWPANEL_DATATYPE_SETBLUEKEY2:
-		case	YWPANEL_DATATYPE_SETBLUEKEY3:
-		case	YWPANEL_DATATYPE_SETBLUEKEY4:
-		case	YWPANEL_DATATYPE_SETBLUEKEY5:
-		{
-		  I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETBLUEKEY1+data->dataType - YWPANEL_DATATYPE_SETBLUEKEY1;
-		}
-		break;
-//add end
-		case	YWPANEL_DATATYPE_GETIRCODE:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETIRCODE;
-		}
-		break;
-
-
-		case	YWPANEL_DATATYPE_SETIRCODE:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETIRCODE;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_GETENCRYPTMODE:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETENCRYPTMODE;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETENCRYPTMODE:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETENCRYPTMODE;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_GETENCRYPTKEY:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETENCRYPTKEY;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETENCRYPTKEY:
-		{
-			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETENCRYPTKEY;
-		}
-		break;
-
-		case   YWPANEL_DATATYPE_GETVERIFYSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETVERIFYSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETVERIFYSTATE;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETVERIFYSTATE:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETVERIFYSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETVERIFYSTATE;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_GETTIME:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETTIME:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETTIME;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETTIME:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETTIME:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETTIME;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_CONTROLTIMER:
-		{
+			break;
+		case YWPANEL_DATATYPE_CONTROLTIMER:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_CONTROLTIMER;
-		}
-		break;
-
-		case	YWPANEL_DATATYPE_SETPOWERONTIME:
-		{
+			break;
+		case YWPANEL_DATATYPE_SETPOWERONTIME:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_POWERONTIME;
-		}
-		break;
-		case	YWPANEL_DATATYPE_GETPOWERONTIME:
-		{
+			break;
+		case YWPANEL_DATATYPE_GETPOWERONTIME:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETPOWERONTIME;
-		}
-		break;
+			break;
+		case YWPANEL_DATATYPE_SETLOOPSTATE:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETLOOPSTATE;
+			break;
+		case YWPANEL_DATATYPE_GETLOOPSTATE:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETLOOPSTATE;
+			break;
 		default:
-		break;
-
+			break;
 	}
 
 	switch(data->dataType)
 	{
 		case YWPANEL_DATATYPE_VFD:
-		{
-
 			if(data->data.vfdData.type == YWPANEL_VFD_DISPLAYSTRING)
-			{
 				I2CData->writeBuff[1] = 0x22;
-			}
 			else
-			{
 				I2CData->writeBuff[1] = 0x4;
-			}
-		}
-		break;
-
+			break;
 		default:
-		{
 			I2CData->writeBuff[1] = 0x4;
-		}
-		break;
+			break;
 	}
 
 	switch(data->dataType)
 	{
 		case YWPANEL_DATATYPE_LBD:
-		{
 			I2CData->writeBuff[2] = data->data.lbdData.value;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_LCD:
-		{
 			I2CData->writeBuff[2] = data->data.lcdData.value;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_LED:
-		{
 			I2CData->writeBuff[2] = data->data.ledData.led1;
 			I2CData->writeBuff[3] = data->data.ledData.led2;
 			I2CData->writeBuff[4] = data->data.ledData.led3;
 			I2CData->writeBuff[5] = data->data.ledData.led4;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_VFD:
-		{
 			I2CData->writeBuff[2] = data->data.vfdData.type;
 			switch(data->data.vfdData.type)
 			{
 				case YWPANEL_VFD_SETTING:
-				{
 					I2CData->writeBuff[3] = data->data.vfdData.setValue;
-				}
-				break;
+					break;
 				case YWPANEL_VFD_DISPLAY:
-				{
 					I2CData->writeBuff[3] = data->data.vfdData.address[0];
 					I2CData->writeBuff[4] = data->data.vfdData.DisplayValue[0];
-				}
-				break;
+					break;
 				case YWPANEL_VFD_READKEY:
-				{
 					I2CData->writeBuff[3] = data->data.vfdData.key;
-				}
-				break;
+					break;
 				case YWPANEL_VFD_DISPLAYSTRING:
 				{
 					int i;
@@ -833,146 +412,55 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 						I2CData->writeBuff[4+2*i] = data->data.vfdData.address[i];
 						I2CData->writeBuff[4+2*i+1] = data->data.vfdData.DisplayValue[i];
 					}
+					break;
 				}
-				break;
 			}
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SETCPUSTATE:
-		{
 			I2CData->writeBuff[2] = data->data.CpuState.state;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_GETSTARTUPSTATE:
-		{
 			I2CData->writeBuff[2] = data->data.StartUpState.State;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SETVFDSTATE:
-		{
 		   I2CData->writeBuff[2] = data->data.VfdStandbyState.On;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SETPOWERONSTATE:
-		{
 			I2CData->writeBuff[2] = data->data.PowerOnState.state;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_SETSTBYKEY1:
-		case YWPANEL_DATATYPE_SETSTBYKEY2:
-		case YWPANEL_DATATYPE_SETSTBYKEY3:
-		case YWPANEL_DATATYPE_SETSTBYKEY4:
-		case YWPANEL_DATATYPE_SETSTBYKEY5:
-		{
-			I2CData->writeBuff[2] = (u8) ((data->data.stbyKey.key>>24)&0xff);
-			I2CData->writeBuff[3] = (u8) ((data->data.stbyKey.key >>16)&0xff);
-			I2CData->writeBuff[4] = (u8) ((data->data.stbyKey.key >>8)&0xff);
-			I2CData->writeBuff[5] = (u8) (data->data.stbyKey.key&0xff);
-		}
-		break;
-//add for blue key
-		case YWPANEL_DATATYPE_SETBLUEKEY1:
-		case YWPANEL_DATATYPE_SETBLUEKEY2:
-		case YWPANEL_DATATYPE_SETBLUEKEY3:
-		case YWPANEL_DATATYPE_SETBLUEKEY4:
-		case YWPANEL_DATATYPE_SETBLUEKEY5:
-		{
-			I2CData->writeBuff[2] = (u8) ((data->data.BlueKey.key>>24)&0xff);
-			I2CData->writeBuff[3] = (u8) ((data->data.BlueKey.key >>16)&0xff);
-			I2CData->writeBuff[4] = (u8) ((data->data.BlueKey.key >>8)&0xff);
-			I2CData->writeBuff[5] = (u8) (data->data.BlueKey.key&0xff);
-		}
-		break;
-//add end
-		case YWPANEL_DATATYPE_SETIRCODE:
-		{
-			I2CData->writeBuff[2] =  data->data.irCode.code;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_SETENCRYPTMODE:
-		{
-			I2CData->writeBuff[2] =  data->data.EncryptMode.mode;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_SETENCRYPTKEY:
-		{
-			I2CData->writeBuff[2] = (u8) ((data->data.EncryptKey.key>>24)&0xff);
-			I2CData->writeBuff[3] = (u8) ((data->data.EncryptKey.key >>16)&0xff);
-			I2CData->writeBuff[4] = (u8) ((data->data.EncryptKey.key >>8)&0xff);
-			I2CData->writeBuff[5] = (u8) (data->data.EncryptKey.key&0xff);
-		}
-		break;
-
+			break;
+		case YWPANEL_DATATYPE_SETLOOPSTATE:
+			I2CData->writeBuff[2] = data->data.LoopState.state;
+			break;
 		case YWPANEL_DATATYPE_SETVERIFYSTATE:
-		{
 			I2CData->writeBuff[2] = data->data.verifyState.state;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SETTIME:
-		{
-			I2CData->writeBuff[2] = (u8) ((data->data.time.second>>24)&0xff);
-			I2CData->writeBuff[3] = (u8) ((data->data.time.second >>16)&0xff);
-			I2CData->writeBuff[4] = (u8) ((data->data.time.second >>8)&0xff);
-			I2CData->writeBuff[5] = (u8) (data->data.time.second&0xff);
-		}
-		break;
-
-		case YWPANEL_DATATYPE_CONTROLTIMER:
-		{
-			I2CData->writeBuff[2] = data->data.TimeState.startFlag;
-		}
-		break;
-
 		case YWPANEL_DATATYPE_SETPOWERONTIME:
-		{
 			I2CData->writeBuff[2] = (u8) ((data->data.time.second>>24)&0xff);
 			I2CData->writeBuff[3] = (u8) ((data->data.time.second >>16)&0xff);
 			I2CData->writeBuff[4] = (u8) ((data->data.time.second >>8)&0xff);
 			I2CData->writeBuff[5] = (u8) (data->data.time.second&0xff);
-		}
-		break;
-
+			break;
+		case YWPANEL_DATATYPE_CONTROLTIMER:
+			I2CData->writeBuff[2] = data->data.TimeState.startFlag;
+			break;
 		default:
-		break;
+			break;
 	}
 
-	switch(data->dataType)
+	if(data->dataType == YWPANEL_DATATYPE_VFD && data->data.vfdData.type == YWPANEL_VFD_DISPLAYSTRING)
 	{
-		case YWPANEL_DATATYPE_VFD:
-		{
-			if(data->data.vfdData.type == YWPANEL_VFD_DISPLAYSTRING)
-			{
-				usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 36);
-				I2CData->writeBuff[36] =  (usCRC16 &0xff);
-				I2CData->writeBuff[37] =  ((usCRC16>>8) &0xff);
-				I2CData->writeBuffLen = 38;
-			}
-			else
-			{
-				usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 6);
-				I2CData->writeBuff[6] =  (usCRC16 &0xff);
-				I2CData->writeBuff[7] =  ((usCRC16>>8) &0xff);
-				I2CData->writeBuffLen = 8;
-			}
-		}
-		break;
-
-		default:
-		{
-			usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 6);
-			I2CData->writeBuff[6] =  (usCRC16 &0xff);
-			I2CData->writeBuff[7] =  ((usCRC16>>8) &0xff);
-			I2CData->writeBuffLen = 8;
-		}
-		break;
+		usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 36);
+		I2CData->writeBuff[36] =  (usCRC16 &0xff);
+		I2CData->writeBuff[37] =  ((usCRC16>>8) &0xff);
+		I2CData->writeBuffLen = 38;
+	}
+	else
+	{
+		usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 6);
+		I2CData->writeBuff[6] =  (usCRC16 &0xff);
+		I2CData->writeBuff[7] =  ((usCRC16>>8) &0xff);
+		I2CData->writeBuffLen = 8;
 	}
 
 	return true;
@@ -1011,48 +499,27 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 		case YWPANEL_DATATYPE_LCD:
 		case YWPANEL_DATATYPE_LED:
 		case YWPANEL_DATATYPE_SETCPUSTATE:
-		case YWPANEL_DATATYPE_SETSTBYKEY1:
-		case YWPANEL_DATATYPE_SETSTBYKEY2:
-		case YWPANEL_DATATYPE_SETSTBYKEY3:
-		case YWPANEL_DATATYPE_SETSTBYKEY4:
-		case YWPANEL_DATATYPE_SETSTBYKEY5:
-		case YWPANEL_DATATYPE_SETIRCODE:
-		case YWPANEL_DATATYPE_SETENCRYPTMODE:
-		case YWPANEL_DATATYPE_SETENCRYPTKEY:
 		case YWPANEL_DATATYPE_SETVERIFYSTATE:
 		case YWPANEL_DATATYPE_SETTIME:
 		case YWPANEL_DATATYPE_CONTROLTIMER:
 		case YWPANEL_DATATYPE_SETPOWERONTIME:
 		case YWPANEL_DATATYPE_SETVFDSTANDBYSTATE:
-		case YWPANEL_DATATYPE_SETBLUEKEY1:
-		case YWPANEL_DATATYPE_SETBLUEKEY2:
-		case YWPANEL_DATATYPE_SETBLUEKEY3:
-		case YWPANEL_DATATYPE_SETBLUEKEY4:
-		case YWPANEL_DATATYPE_SETBLUEKEY5:
 		case YWPANEL_DATATYPE_SETPOWERONSTATE:
 		case YWPANEL_DATATYPE_SETLOOPSTATE:
-		{
 			if(dataType != YWPANEL_READ_INSTR_ACK)
 			{
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
 				return false;
 			}
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_SCANKEY:
-		{
-			if(dataType != 0x11)
+			if(dataType != YWPANEL_READ_INSTR_SCANKEY)
 			{
 				ywtrace_print(TRACE_ERROR,"%s::error @%d dataType = %d\n",__FUNCTION__,__LINE__, dataType);
 				return false;
 			}
-		}
-		break;
-
-
+			break;
 		case YWPANEL_DATATYPE_VFD:
-		{
 			if(data->data.vfdData.type == YWPANEL_VFD_READKEY)
 			{
 				if(dataType != YWPANEL_READ_INSTR_VFDKEY)
@@ -1069,66 +536,29 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 					return false;
 				}
 			}
-		}
-		break;
-
-		case YWPANEL_DATATYPE_GETSTBYKEY1:
-		case YWPANEL_DATATYPE_GETSTBYKEY2:
-		case YWPANEL_DATATYPE_GETSTBYKEY3:
-		case YWPANEL_DATATYPE_GETSTBYKEY4:
-		case YWPANEL_DATATYPE_GETSTBYKEY5:
-		{
-			if(dataType != (YWPANEL_INIT_INSTR_GETSTBYKEY1+ data->dataType -YWPANEL_DATATYPE_GETSTBYKEY1))
-			{
-				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
-				return false;
-			}
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_GETPOWERONTIME:
-		{
 			if(dataType != YWPANEL_INIT_INSTR_GETPOWERONTIME)
 				return false;
-		}
-		break;
-
-		case YWPANEL_DATATYPE_GETBLUEKEY1:
-		case YWPANEL_DATATYPE_GETBLUEKEY2:
-		case YWPANEL_DATATYPE_GETBLUEKEY3:
-		case YWPANEL_DATATYPE_GETBLUEKEY4:
-		case YWPANEL_DATATYPE_GETBLUEKEY5:
-		{
-			if(dataType != (YWPANEL_INIT_INSTR_GETBLUEKEY1+ data->dataType -YWPANEL_DATATYPE_GETBLUEKEY1))
-			{
-				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
-				return false;
-			}
-		}
-		break;
+			break;
 		case YWPANEL_DATATYPE_GETPOWERONSTATE:
-		{
-			if(dataType != 0x77)
+			if(dataType != YWPANEL_INIT_INSTR_GETPOWERONSTATE)
 				return false;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_GETSTARTUPSTATE:
-		{
-			if(dataType != 0x79)
+			if(dataType != YWPANEL_INIT_INSTR_GETSTARTUPSTATE)
 				return false;
-		}
-		break;
-
+			break;
 		case YWPANEL_DATATYPE_GETLOOPSTATE:
 		{
-			if(dataType != 0x7a)
+	printk("%s:%d: dataType == %d\n", __FUNCTION__, __LINE__, dataType);
+			if(dataType != YWPANEL_INIT_INSTR_GETLOOPSTATE)
 				return false;
 		}
 		break;
 
 		case YWPANEL_DATATYPE_GETTIME:
-		{
+	{
 			if(dataType != YWPANEL_INIT_INSTR_GETTIME)
 			{
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
@@ -1137,18 +567,11 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 		}
 		break;
 
-		case YWPANEL_DATATYPE_IRKEY:
 		case YWPANEL_DATATYPE_GETVERSION:
 		case YWPANEL_DATATYPE_GETCPUSTATE:
-		case YWPANEL_DATATYPE_GETIRCODE:
-		case YWPANEL_DATATYPE_GETENCRYPTKEY:
-		case YWPANEL_DATATYPE_GETENCRYPTMODE:
 		case YWPANEL_DATATYPE_GETVERIFYSTATE:
 		default:
-		{
-
-		}
-		break;
+			;
 
 	}
 
@@ -1164,14 +587,6 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 		case YWPANEL_READ_INSTR_SCANKEY:  //scan key
 		{
 			data->data.ScanKeyData.keyValue= I2CData->readBuff[2];
-			data->ack = true;
-		}
-		break;
-
-		case YWPANEL_READ_INSTR_IRKEY:
-		{
-			data->data.IrkeyData.customCode = ((I2CData->readBuff[3] <<8)&0xff00)|(I2CData->readBuff[2]);
-			data->data.IrkeyData.dataCode = ((I2CData->readBuff[5] <<8)&0xff00)|(I2CData->readBuff[4]);
 			data->ack = true;
 		}
 		break;
@@ -1244,48 +659,10 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 		}
 		break;
 
-		case YWPANEL_INIT_INSTR_GETSTBYKEY1: /*get standby key*/
-		case YWPANEL_INIT_INSTR_GETSTBYKEY2: /*get standby key*/
-		case YWPANEL_INIT_INSTR_GETSTBYKEY3: /*get standby key*/
-		case YWPANEL_INIT_INSTR_GETSTBYKEY4: /*get standby key*/
-		case YWPANEL_INIT_INSTR_GETSTBYKEY5: /*get standby key*/
+		case YWPANEL_INIT_INSTR_GETLOOPSTATE: /*get vfd state*/
 		{
-			data->data.stbyKey.key = ((I2CData->readBuff[2]<<24)&0xff000000)
-												|((I2CData->readBuff[3]<<16)&0xff0000)
-												|((I2CData->readBuff[4]<<8)&0xff00)
-												|((I2CData->readBuff[5])&0xff);
-			data->ack = true;
-		}
-		break;
-		case YWPANEL_INIT_INSTR_GETBLUEKEY1: /*get blue key*/
-		case YWPANEL_INIT_INSTR_GETBLUEKEY2: /*get blue key*/
-		case YWPANEL_INIT_INSTR_GETBLUEKEY3: /*get blue key*/
-		case YWPANEL_INIT_INSTR_GETBLUEKEY4: /*get blue key*/
-		case YWPANEL_INIT_INSTR_GETBLUEKEY5: /*get blue key*/
-		{
-			data->data.stbyKey.key = ((I2CData->readBuff[2]<<24)&0xff000000)
-												|((I2CData->readBuff[3]<<16)&0xff0000)
-												|((I2CData->readBuff[4]<<8)&0xff00)
-												|((I2CData->readBuff[5])&0xff);
-			data->ack = true;
-		}
-		break;
-		case YWPANEL_INIT_INSTR_GETIRCODE: /*get ir protocoll*/
-		{
-			data->data.irCode.code = I2CData->readBuff[2];
-		}
-		break;
-
-		case YWPANEL_INIT_INSTR_GETENCRYPTMODE: /*get encrypt mode */
-		{
-			data->data.EncryptMode.mode = I2CData->readBuff[2];
-		}
-		break;
-
-		case YWPANEL_INIT_INSTR_GETENCRYPTKEY: /*get encrypt key */
-		{
-			data->data.EncryptKey.key = (u32)I2CData->readBuff[2] |(u32) I2CData->readBuff[3]<<8
-												 |(u32)I2CData->readBuff[4]<<16 |(u32)I2CData->readBuff[5]<<24;
+			   data->data.LoopState.state = I2CData->readBuff[2];
+			   data->ack = true;
 		}
 		break;
 
@@ -1317,32 +694,28 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 
 #ifdef CONFIG_CPU_SUBTYPE_STX7105
 static int YWPANEL_FPWriteDataToI2c(	struct i2c_adapter* I2CHandle,
-										u8 * writeBufer,
+										u8 * writeBuffer,
 										u32 writeBufLen,
 										u8 *readBuffer,
 										u32 readBufLen)
 {
 
-	if (!isofti2c_write(writeBufer, writeBufLen))
-	{
+	if (!isofti2c_write(writeBuffer, writeBufLen))
 		return false;
-	}
 	msleep(1);
 	if (!isofti2c_read(readBuffer, readBufLen))
-	{
 		return false;
-	}
 	return true;
 }
 #else
 static int YWPANEL_FPWriteDataToI2c(	struct i2c_adapter* I2CHandle,
-										u8 * writeBufer,
+										u8 * writeBuffer,
 										u32 writeBufLen,
 										u8 *readBuffer,
 										u32 readBufLen)
 {
 	int		ret	 = 0;
-	struct i2c_msg i2c_msg[] = {{ .addr = I2C_BUS_ADD, .flags = 0, .buf = writeBufer, .len = writeBufLen},
+	struct i2c_msg i2c_msg[] = {{ .addr = I2C_BUS_ADD, .flags = 0, .buf = writeBuffer, .len = writeBufLen},
 								{ .addr = I2C_BUS_ADD, .flags = I2C_M_RD, .buf = readBuffer, .len = readBufLen}};
 
 	if(NULL == panel_i2c_adapter)
@@ -1478,6 +851,43 @@ YWPANEL_POWERONSTATE_t YWPANEL_FP_GetPowerOnStatus(void)
 	return data.data.PowerOnState.state;
 }
 
+int YWPANEL_FP_SetLoopState(YWPANEL_LOOPSTATE_t state)
+{
+	YWPANEL_FPData_t   data;
+
+	memset(&data, 0, sizeof(YWPANEL_FPData_t));
+	data.dataType = YWPANEL_DATATYPE_SETLOOPSTATE;
+	data.data.LoopState.state = state;
+
+	if(YWPANEL_FP_SendData(&data) != true)
+	{
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		return false;
+	}
+	return true;
+}
+
+int YWPANEL_FP_GetLoopState(YWPANEL_LOOPSTATE_t *state)
+{
+	YWPANEL_FPData_t   data;
+
+	memset(&data, 0, sizeof(YWPANEL_FPData_t));
+	data.dataType = YWPANEL_DATATYPE_GETLOOPSTATE;
+
+	if(YWPANEL_FP_SendData(&data) != true)
+	{
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		return false;
+	}
+	if((data.data.LoopState.state < YWPANEL_LOOPSTATE_UNKNOWN) || (data.data.LoopState.state > YWPANEL_LOOPSTATE_LOOPON) )
+	{
+		return false;
+	}
+
+	*state = data.data.LoopState.state;
+	return true;
+}
+
 int  YWPANEL_FP_SetPowerOnStatus(YWPANEL_POWERONSTATE_t state)
 {
 	YWPANEL_FPData_t   data;
@@ -1566,105 +976,6 @@ int  YWPANEL_FP_GetVersion(YWPANEL_Version_t *version)
 	//printk("%s:%d\n", __FUNCTION__, __LINE__);
 	memcpy(version, &(data.data.version), sizeof(YWPANEL_Version_t));
 
-	return true;
-}
-
-#if 0
-u32  YWPANEL_FP_GetIRKey(void)
-{
-	YWPANEL_FPData_t   data;
-
-	memset(&data, 0, sizeof(YWPANEL_FPData_t));
-	data.dataType = YWPANEL_DATATYPE_IRKEY;
-	if(YWPANEL_FP_SendData(&data) != true)
-	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
-		return false;
-	}
-	return (data.data.IrkeyData.dataCode|data.data.IrkeyData.customCode);
-}
-#endif
-
-u32  YWPANEL_FP_GetStandByKey(u8 index)
-{
-	YWPANEL_FPData_t   data;
-	u8 key;
-
-	memset(&data, 0, sizeof(YWPANEL_FPData_t));
-	data.dataType = YWPANEL_DATATYPE_GETSTBYKEY1+index;
-
-	if(YWPANEL_FP_SendData(&data) != true)
-	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
-		return false;
-	}
-	key = (u8)(data.data.stbyKey.key>>8);
-
-	return YWPANEL_TranslateKeyCode(key);
-}
-
-int  YWPANEL_FP_SetStandByKey(u8 index,u8 key)
-{
-	YWPANEL_FPData_t   data;
-	u32 value;
-
-	if(!to_primitive_key(key, &value))
-	{
-		ywtrace_print(TRACE_INFO,"to_primitive_key is failed!![%d]\n",__LINE__);
-		return false;
-	}
-
-	memset(&data, 0, sizeof(YWPANEL_FPData_t));
-
-	data.dataType = YWPANEL_DATATYPE_SETSTBYKEY1+index;
-	data.data.stbyKey.key = value;
-
-	if(YWPANEL_FP_SendData(&data) != true)
-	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
-		return false;
-	}
-	return true;
-}
-
-u32  YWPANEL_FP_GetBlueKey(u8 index)
-{
-	YWPANEL_FPData_t   data;
-	u8 key;
-
-	memset(&data, 0, sizeof(YWPANEL_FPData_t));
-	data.dataType = YWPANEL_DATATYPE_GETBLUEKEY1+index;
-
-	if(YWPANEL_FP_SendData(&data) != true)
-	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
-		return false;
-	}
-	key = (u8)(data.data.stbyKey.key>>8);
-	return YWPANEL_TranslateKeyCode(key);
-}
-
-int  YWPANEL_FP_SetBlueKey(u8 index,u8 key)
-{
-	YWPANEL_FPData_t   data;
-	u32 value;
-
-	if(!to_primitive_key(key, &value))
-	{
-		ywtrace_print(TRACE_INFO,"to_primitive_key is failed!![%d]\n",__LINE__);
-		return false;
-	}
-
-	memset(&data, 0, sizeof(YWPANEL_FPData_t));
-
-	data.dataType = YWPANEL_DATATYPE_SETBLUEKEY1+index;
-	data.data.stbyKey.key = value;
-
-	if(YWPANEL_FP_SendData(&data) != true)
-	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
-		return false;
-	}
 	return true;
 }
 
@@ -2190,11 +1501,8 @@ static int YWPANEL_VFD_ShowTimeOff_Unknown(void)
 	return -ENODEV;
 }
 
-int YWPANEL_VFD_SetBrightness_StandBy(int level)
+static int YWPANEL_VFD_SetBrightness_StandBy(int level)
 {
-#if 1 // Doesn't work currently. Disabled to avoid side effects. --martii
-	return 0;
-#else
 	int 		ST_ErrCode = 0;
 	YWPANEL_FPData_t	data;
 	if (down_interruptible(&vfd_sem))
@@ -2216,14 +1524,10 @@ int YWPANEL_VFD_SetBrightness_StandBy(int level)
 	}
 	up(&vfd_sem);
 	return ST_ErrCode;
-#endif
 }
 
 static int YWPANEL_VFD_SetBrightness_Common(int level)
 {
-#if 1 // Doesn't work currently. Disabled to avoid side effects. --martii
-	return 0;
-#else
 	int 		ST_ErrCode = 0;
 	if(level < 0)
 		level = 0;
@@ -2234,7 +1538,6 @@ static int YWPANEL_VFD_SetBrightness_Common(int level)
 	YWPANEL_VFD_WR(0x78 | level);
 	VFD_CS_SET();
 	return ST_ErrCode;
-#endif
 }
 
 static int YWPANEL_VFD_SetBrightness_Unknown(int level)
@@ -2340,33 +1643,33 @@ int YWPANEL_VFD_GetKeyValue(void)
 
 	switch(byte) {
 		case 0x01:
-			key_val = EXIT_KEY;
+			key_val = KEY_EXIT;
 			break;
 		case 0x02:
-			key_val = LEFT_KEY;
+			key_val = KEY_LEFT;
 			break;
 		case 0x04:
-			key_val = UP_KEY;
+			key_val = KEY_UP;
 			break;
 		case 0x08:
-			key_val = SELECT_KEY;
+			key_val = KEY_OK;
 			break;
 		case 0x10:
-			key_val = RIGHT_KEY;
+			key_val = KEY_RIGHT;
 			break;
 		case 0x20:
-			key_val = DOWN_KEY;
+			key_val = KEY_DOWN;
 			break;
 		case 0x40:
-			key_val = POWER_KEY;
+			key_val = KEY_POWER;
 			break;
 		case 0x80:
-			key_val = MENU_KEY;
+			key_val = KEY_MENU;
 			break;
 		default:
 			PANEL_PRINT((TRACE_ERROR,"Key 0x%s is INVALID\n",byte));
 		case 0x00:
-			key_val = INVALID_KEY;
+			key_val = KEY_UNKNOWN;
 			break;
 	}
 	up(&vfd_sem);
@@ -2388,19 +1691,7 @@ int YWPANEL_VFD_GetKeyValue(void)
 // 0x80 0x40 0x20 0x10 0x08 0x04 0x02 0x01
 //
 // LED segments: 88.88
-#if 0
-u8 YWPANEL_LedCharArray[]=
-{
-	0xfc, 0x60, 0xda, 0xf2, 0x66, 0xb6, 0xbe, 0xe0, 0xfe, 0xf6,  /*0~9*/
-	0xee, 0x3e, 0x1a, 0x7a, 0xde, 0x8e, 0xf6, 0x2e, 0x60, 0x70, /*a~j*/
-	0x0e, 0x1c, 0xec, 0x2a, 0x3a, 0xce, 0xe6, 0x0a, 0xb6, 0x1e,  /*k~t*/
-	0x38, 0x46, 0x56, 0x6e, 0x76, 0xda,  /*u-z*/
-	0xee, 0x3e, 0x9c, 0x7a, 0x9e, 0x8e, 0xf6, 0x2e, 0x60, 0x70, /*A-J*/
-	0x0e, 0x1c, 0xec, 0x2a, 0x3a, 0xce, 0xe6, 0x0a, 0xb6, 0x1e, /*K-T*/
-	0x38, 0x46, 0x56, 0x6e, 0x76, 0xda/*U-Z*/
-};	//d48zm modify
-#else
-// ... and about the same, ordered sequentially by ASCII code:
+
 static u8 ywpanel_led_map[0x80] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2412,7 +1703,6 @@ static u8 ywpanel_led_map[0x80] =
 	0x00, 0xee, 0x3e, 0x1a, 0x7a, 0xde, 0x8e, 0xf6, 0x2e, 0x20, 0x70, 0x0e, 0x1c, 0xec, 0x2a, 0x3a,
 	0xce, 0xe6, 0x0a, 0xb6, 0x1e, 0x38, 0x46, 0x56, 0x6e, 0x76, 0xda, 0x9c, 0x0c, 0xf0, 0x00, 0x00
 };
-#endif
 
 #define YWPANEL_MAX_LED_LENGTH 4
 static u8  YWPANEL_LedDisplayData[YWPANEL_MAX_LED_LENGTH];
@@ -2529,7 +1819,7 @@ static int YWPANEL_VFD_ShowString_Unknown(char* str)
 	return -ENODEV;
 }
 
-static int YWPANEL_VFD_ShowIco_StandBy(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -2573,7 +1863,7 @@ static int YWPANEL_VFD_ShowIco_StandBy(LogNum_T log_num,int log_stat)
 		data.data.vfdData.DisplayValue[0] = VfdSegAddr[dig_num].CurrValue2 ;
 	}
 	if(YWPANEL_FP_SendData(&data) != true) {
-		ywtrace_print(TRACE_ERROR,"Show a Ico wrong!!\n");
+		ywtrace_print(TRACE_ERROR,"Show a Icon wrong!!\n");
 		ST_ErrCode = -ETIME;
 	}
 
@@ -2581,7 +1871,7 @@ static int YWPANEL_VFD_ShowIco_StandBy(LogNum_T log_num,int log_stat)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIco_Common(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -2628,7 +1918,7 @@ static int YWPANEL_VFD_ShowIco_Common(LogNum_T log_num,int log_stat)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIco_Unknown(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_Unknown(LogNum_T log_num,int log_stat)
 {
 	return -ENODEV;
 }
@@ -2680,49 +1970,6 @@ static int YWPANEL_VFD_DETECT(void)
 }
 #endif
 
-#if 0
-// Not used anyway, and dangerous due to lack of bounds checking
-// --martii
-
-int YWPANEL_VFD_GetRevision(char * version)
-{
-	int ErrorCode = 0 ;
-	char *DispType = "VFD";	// VFD default
-
-	switch (YWVFD_INFO.vfd_type)
-	{
-		case YWVFD_STAND_BY:
-		{
-			switch(panel_disp_type) {
-			case YWPANEL_FP_DISPTYPE_VFD:
-				DispType = "VFD";
-				break;
-			case YWPANEL_FP_DISPTYPE_LCD:
-				DispType = "LCD";
-				break;
-			case YWPANEL_FP_DISPTYPE_LED:
-				DispType = "LED";
-				break;
-			case YWPANEL_FP_DISPTYPE_LBD:
-				DispType = "LBD";
-				break;
-			default:
-				break;
-			}
-			sprintf(version, "%s Type:StandBy-%s", Revision, DispType);
-			break;
-		}
-		case YWVFD_COMMON:
-			sprintf(version, "%s Type:Common", Revision);
-			break;
-		default:
-			ErrorCode = -ENODEV;
-			break;
-	}
-	return ErrorCode;
-}
-#endif
-
 static int YWPANEL_VFD_Init_Unknown(void)
 {
 	return 0;
@@ -2752,7 +1999,7 @@ static int YWPANEL_VFD_Init_Common(void)
 	pio_cs  = stpio_request_pin(3,5, "pio_cs",  STPIO_OUT);
 	if (!pio_sda || !pio_scl || !pio_cs )
 	{
-	   return ErrorCode; // FIXME -- should't that return -ENODEV ?  --martii
+	   return -ENODEV;
 	}
 	stpio_set_pin(pio_scl, 1);
 	stpio_set_pin(pio_cs,  1);
@@ -2776,7 +2023,7 @@ static int  YWPANEL_VFD_Term_Common(void);
 
 int (*YWPANEL_VFD_Term)(void);
 int (*YWPANEL_VFD_Initialize)(void);
-int (*YWPANEL_VFD_ShowIco)(LogNum_T, int);
+int (*YWPANEL_VFD_ShowIcon)(LogNum_T, int);
 int (*YWPANEL_VFD_ShowTime)(u8 hh,u8 mm);
 int (*YWPANEL_VFD_ShowTimeOff)(void);
 int (*YWPANEL_VFD_SetBrightness)(int);
@@ -2793,7 +2040,7 @@ int YWPANEL_VFD_Init(void)
 
 	YWPANEL_VFD_Initialize = YWPANEL_VFD_Init_Unknown;
 	YWPANEL_VFD_Term = YWPANEL_VFD_Term_Unknown;
-	YWPANEL_VFD_ShowIco = YWPANEL_VFD_ShowIco_Unknown;
+	YWPANEL_VFD_ShowIcon = YWPANEL_VFD_ShowIcon_Unknown;
 	YWPANEL_VFD_ShowTime = YWPANEL_VFD_ShowTime_Unknown;
 	YWPANEL_VFD_ShowTimeOff = YWPANEL_VFD_ShowTimeOff_Unknown;
 	YWPANEL_VFD_SetBrightness = YWPANEL_VFD_SetBrightness_Unknown;
@@ -2811,7 +2058,7 @@ int YWPANEL_VFD_Init(void)
 		case YWVFD_STAND_BY:
 			YWPANEL_VFD_Initialize = YWPANEL_VFD_Init_StandBy;
 			YWPANEL_VFD_Term = YWPANEL_VFD_Term_StandBy;
-			YWPANEL_VFD_ShowIco = YWPANEL_VFD_ShowIco_StandBy;
+			YWPANEL_VFD_ShowIcon = YWPANEL_VFD_ShowIcon_StandBy;
 			YWPANEL_VFD_ShowTime = YWPANEL_VFD_ShowTime_StandBy;
 			YWPANEL_VFD_ShowTimeOff = YWPANEL_VFD_ShowTimeOff_StandBy;
 			YWPANEL_VFD_SetBrightness = YWPANEL_VFD_SetBrightness_StandBy;
@@ -2821,7 +2068,7 @@ int YWPANEL_VFD_Init(void)
 		case YWVFD_COMMON:
 			YWPANEL_VFD_Initialize = YWPANEL_VFD_Init_Common;
 			YWPANEL_VFD_Term = YWPANEL_VFD_Term_Common;
-			YWPANEL_VFD_ShowIco = YWPANEL_VFD_ShowIco_Common;
+			YWPANEL_VFD_ShowIcon = YWPANEL_VFD_ShowIcon_Common;
 			YWPANEL_VFD_ShowTime = YWPANEL_VFD_ShowTime_Common;
 			YWPANEL_VFD_ShowTimeOff = YWPANEL_VFD_ShowTimeOff_Common;
 			YWPANEL_VFD_SetBrightness = YWPANEL_VFD_SetBrightness_Common;
