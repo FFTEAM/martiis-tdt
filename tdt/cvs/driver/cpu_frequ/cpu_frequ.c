@@ -129,6 +129,7 @@ static struct proc_dir_entry
 *sysaclkout, 
 #endif
 *m_hz; 
+static char *initial_pll0_ndiv_mdiv = NULL;
 
 unsigned long get_pll0_frequ(void)
 {
@@ -1082,6 +1083,9 @@ int __init cpu_frequ_init(void)
   m_hz->read_proc=read_ratio;
   m_hz->write_proc=write_m_hz;
 
+  if (initial_pll0_ndiv_mdiv)
+    write_pll0_ndiv_mdiv(NULL, initial_pll0_ndiv_mdiv, (unsigned long)strlen(initial_pll0_ndiv_mdiv), NULL);
+
  return 0;
 }
 
@@ -1106,6 +1110,8 @@ void __exit cpu_frequ_exit(void)
 module_init(cpu_frequ_init);
 module_exit(cpu_frequ_exit);
 
+module_param(initial_pll0_ndiv_mdiv, charp, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(initial_pll0_ndiv_mdiv, "pll0_ndiv_mdiv value (default: unset)");
 MODULE_DESCRIPTION("Set CPU Frequenze on STb710x");
 MODULE_AUTHOR("nit");
 MODULE_LICENSE("GPL");
