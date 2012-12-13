@@ -2539,6 +2539,7 @@ static int stv090x_start_search(struct stv090x_state *state)
 			freq_abs /= (state->mclk / 1000);
 			freq      = (s16) freq_abs;
 		}
+		freq <<= 1; // martii: double CFR -- FIXME?!?
 
 		if (STV090x_WRITE_DEMOD(state, CFRUP1, MSB(freq)) < 0)
 			goto err;
@@ -2565,8 +2566,8 @@ static int stv090x_start_search(struct stv090x_state *state)
 		if (STV090x_WRITE_DEMOD(state, FFECFG, 0x41) < 0)
 			goto err;
 
-		if ((state->search_mode == STV090x_DVBS1)	||
-			(state->search_mode == STV090x_DSS)	||
+		if ((state->search_mode == STV090x_SEARCH_DVBS1)	||
+			(state->search_mode == STV090x_SEARCH_DSS)	||
 			(state->search_mode == STV090x_SEARCH_AUTO)) {
 
 			if (STV090x_WRITE_DEMOD(state, VITSCALE, 0x82) < 0)
@@ -3807,7 +3808,7 @@ static enum stv090x_signal_state stv090x_get_sig_params(struct stv090x_state *st
 		}
 		else
 		{
-			dprintk(10, "%s: out of range %d > %d\n", __func__, abs(offst_freq), car_width);
+			dprintk(10, "%s: out of range %ld > %d\n", __func__, abs(offst_freq), car_width);
 			return STV090x_OUTOFRANGE; /* Out of Range */
 		}
 	} else {
@@ -3820,7 +3821,7 @@ static enum stv090x_signal_state stv090x_get_sig_params(struct stv090x_state *st
 		}
 		else
 		{
-			dprintk(100, "%s: out of range %d > %d\n", __func__, abs(offst_freq), (state->search_range / 2000) + 500);
+			dprintk(100, "%s: out of range %ld > %d\n", __func__, abs(offst_freq), (state->search_range / 2000) + 500);
 		
 			return STV090x_OUTOFRANGE;
 		}
@@ -4042,7 +4043,11 @@ static int stv090x_optimize_track(struct stv090x_state *state)
 	case STV090x_DSS:
                 
 		dprintk(50, "STV090x_DVBS1\n");
+#if 1
+		if (state->search_mode == STV090x_SEARCH_AUTO) {
+#else
 		if (state->algo == STV090x_SEARCH_AUTO) {
+#endif
 			reg = STV090x_READ_DEMOD(state, DMDCFGMD);
 			STV090x_SETFIELD_Px(reg, DVBS1_ENABLE_FIELD, 1);
 			STV090x_SETFIELD_Px(reg, DVBS2_ENABLE_FIELD, 0);
@@ -4168,7 +4173,7 @@ static int stv090x_optimize_track(struct stv090x_state *state)
 	
 		break;
 
-	case STV090x_UNKNOWN:
+	//case STV090x_UNKNOWN:
 	default:
         dprintk(50, "STV090x_UNKNOWN\n");
 		reg = STV090x_READ_DEMOD(state, DMDCFGMD);
@@ -6030,6 +6035,7 @@ static int stv090x_get_property(struct dvb_frontend *fe, struct dtv_property* tv
 
 #endif
 
+#if 0
     static int hdbox_set_voltage(struct dvb_frontend *fe, enum fe_sec_voltage voltage)
     {
        struct stv090x_state *state = fe->demodulator_priv;
@@ -6089,6 +6095,7 @@ static int stv090x_get_property(struct dvb_frontend *fe, struct dtv_property* tv
        dprintk(10, "%s <out:0x%x\n", __func__,res);
        return 0;
     }
+#endif
 
 static int	spark_set_voltage(struct dvb_frontend *fe, enum fe_sec_voltage voltage)
 {
@@ -6211,7 +6218,8 @@ struct dvb_frontend *stv090x_attach(const struct stv090x_config *config,
 		{
 			stpio_free_pin(fe_lnb_on_off);
 		}
-		return -1;
+		kfree(state);
+		return NULL;
 	}
 #endif
 	
