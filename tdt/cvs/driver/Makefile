@@ -27,10 +27,6 @@ ifdef OCTAGON1008
 CCFLAGSY+=-DOCTAGON1008
 endif
 
-ifdef FLASH_UFS910
-CCFLAGSY += -DUFS910 -DFLASH_UFS910
-endif
-
 ifdef UFS910
 CCFLAGSY += -DUFS910
 endif
@@ -132,10 +128,10 @@ obj-y	+= frontends/
 obj-y	+= frontcontroller/
 obj-y	+= wireless/
 
-ifneq (,$(findstring pti_np,$(shell ls $(DRIVER_TOPDIR))))
-obj-y	+= pti_np/
+ifeq (,$(wildcard $(DRIVER_TOPDIR)/pti_np ))
+obj-y += pti/
 else
-obj-y	+= pti/
+obj-y += pti_np/
 endif
 
 obj-y	+= compcache/
@@ -168,11 +164,6 @@ endif
 
 # Button and Led Driver only needed for old 14W Kathrein Ufs 910 boxes
 ifdef UFS910
-obj-y	+= button/
-obj-y	+= led/
-endif
-
-ifdef FLASH_UFS910
 obj-y	+= button/
 obj-y	+= led/
 endif
