@@ -50,6 +50,7 @@
 
 static unsigned char cancelStart = 0;
 int activemode = 0;
+int debug = 0;
 char *deviceName = "DUCKBOX";
 unsigned char deviceType = DEVICE_TYPE_DVD;
 
@@ -57,7 +58,7 @@ unsigned char deviceType = DEVICE_TYPE_DVD;
 
 int __init cec_init(void)
 {
-    printk("[CEC] init - starting\n");
+    dprintk(0,"init - starting\n");
 
     cec_internal_init();
 
@@ -68,7 +69,7 @@ int __init cec_init(void)
     /* ********* */
     /* irq setup */
 
-   printk("[CEC] init - starting intterrupt (%d)\n", CEC_IRQ);
+    dprintk(2, "init - starting intterrupt (%d)\n", CEC_IRQ);
 
 #if defined (CONFIG_KERNELVERSION) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,32)
     if (!request_irq(CEC_IRQ, (void*)cec_interrupt, IRQF_DISABLED, "cec", NULL))
@@ -77,20 +78,15 @@ int __init cec_init(void)
 #endif
     {
 
-    }
-    else 
-    {
-       printk("[CEC] Can't get irq\n");
+    } else {
+	dprintk(0,"Can't get irq\n");
     }
 
-    if(activemode)
-    {
+    if (activemode) {
         init_e2_proc();
 
         input_init();
-    }
-    else
-    {
+    } else {
         init_dev();
     }
 
@@ -105,21 +101,18 @@ int __init cec_init(void)
 
 static void __exit cec_exit(void)
 {  
-    printk("[CEC] unloaded\n");
+    dprintk(0,"unloaded\n");
 
     cancelStart = 1;
     udelay(20000);
 
     endTask();
 
-    if(activemode)
-    {
+    if (activemode) {
         cleanup_e2_proc();
 
         input_cleanup();
-    }
-    else
-    {
+    } else {
         cleanup_dev();
     }
 
