@@ -3,6 +3,16 @@ kernelpath=linux
 else
 kernelpath=linux-sh4
 endif
+
+$(targetprefix)/var/etc/.version:
+	echo "imagename=Neutrino" > $@
+	echo "homepage=http://gitorious.org/open-duckbox-project-sh4" >> $@
+	echo "creator=`id -un`" >> $@
+	echo "docs=http://gitorious.org/open-duckbox-project-sh4/pages/Home" >> $@
+	echo "forum=http://gitorious.org/open-duckbox-project-sh4" >> $@
+	echo "version=0100`date +%Y%m%d%H%M`" >> $@
+	echo "git=`git describe`" >> $@
+
 #Trick ALPHA-Version ;)
 $(DEPDIR)/min-release_neutrino $(DEPDIR)/std-release_neutrino $(DEPDIR)/max-release_neutrino $(DEPDIR)/release_neutrino: \
 $(DEPDIR)/%release_neutrino:
@@ -37,6 +47,11 @@ $(DEPDIR)/%release_neutrino:
 	export CROSS_COMPILE=$(target)- && \
 		$(MAKE) install -C @DIR_busybox@ CONFIG_PREFIX=$(prefix)/release_neutrino && \
 	touch $(prefix)/release_neutrino/var/etc/.firstboot && \
+	mkdir -p $(prefix)/release_neutrino/var/plugins && \
+	mkdir -p $(prefix)/release_neutrino/var/tuxbox/config && \
+	mkdir -p $(prefix)/release_neutrino/usr/local/share && \
+	ln -sf /var/tuxbox/config $(prefix)/release_neutrino/usr/local/share/config && \
+	mkdir -p $(prefix)/release_neutrino/var/share/icons && \
 	cp -a $(targetprefix)/bin/* $(prefix)/release_neutrino/bin/ && \
 	ln -s /bin/showiframe $(prefix)/release_neutrino/usr/bin/showiframe && \
 	cp -dp $(targetprefix)/bin/hotplug $(prefix)/release_neutrino/sbin/ && \
@@ -66,11 +81,11 @@ $(DEPDIR)/%release_neutrino:
 	cp -dp $(targetprefix)/sbin/blkid $(prefix)/release_neutrino/sbin/ && \
 	cp -dp $(targetprefix)/etc/init.d/portmap $(prefix)/release_neutrino/etc/init.d/ && \
 	cp -dp $(buildprefix)/root/etc/init.d/udhcpc $(prefix)/release_neutrino/etc/init.d/ && \
-	cp -dp $(buildprefix)/root/var/etc/.version $(prefix)/release_neutrino/var/etc/ && \
+	make $(targetprefix)/var/etc/.version && \
+	mv $(targetprefix)/var/etc/.version $(prefix)/release_neutrino/ && \
+	ln -sf /.version $(prefix)/release_neutrino/var/etc/.version && \
 	cp -dp $(targetprefix)/sbin/MAKEDEV $(prefix)/release_neutrino/sbin/MAKEDEV && \
 	cp -f $(buildprefix)/root/release/makedev $(prefix)/release_neutrino/etc/init.d/ && \
-	cp -dp $(targetprefix)/usr/bin/grep $(prefix)/release_neutrino/bin/ && \
-	cp -dp $(targetprefix)/usr/bin/egrep $(prefix)/release_neutrino/bin/ && \
 	cp -dp $(targetprefix)/usr/bin/ffmpeg $(prefix)/release_neutrino/sbin/ && \
 \
 	cp $(targetprefix)/boot/video_7100.elf $(prefix)/release_neutrino/boot/video.elf && \
@@ -155,8 +170,8 @@ $(DEPDIR)/%release_neutrino:
 	cp -dp $(targetprefix)/etc/init.d/umountfs $(prefix)/release_neutrino/etc/init.d/ && \
 	cp -dp $(targetprefix)/etc/init.d/sendsigs $(prefix)/release_neutrino/etc/init.d/ && \
 	cp -dp $(targetprefix)/etc/init.d/halt $(prefix)/release_neutrino/etc/init.d/ && \
-	mkdir -p $(prefix)/release_neutrino/usr/local/share/config/tuxtxt/ && \
-	cp $(buildprefix)/root/etc/tuxbox/tuxtxt2.conf $(prefix)/release_neutrino/usr/local/share/config/tuxtxt/ && \
+	mkdir -p $(prefix)/release_neutrino/var/tuxbox/config/tuxtxt/ && \
+	cp $(buildprefix)/root/etc/tuxbox/tuxtxt2.conf $(prefix)/release_neutrino/var/tuxbox/config/tuxtxt/ && \
 	cp $(buildprefix)/root/release/reboot $(prefix)/release_neutrino/etc/init.d/ && \
 	cp $(buildprefix)/root/bin/autologin $(prefix)/release_neutrino/bin/ && \
 	echo "576i50" > $(prefix)/release_neutrino/etc/videomode && \
@@ -1570,54 +1585,20 @@ if !ENABLE_UFS913
 endif
 
 #######################################################################################
-	mkdir -p $(prefix)/release_neutrino/tuxbox/config
-	mkdir -p $(prefix)/release_neutrino/var/plugins
-	mkdir -p $(prefix)/release_neutrino/lib/tuxbox
-	mkdir -p $(prefix)/release_neutrino/usr/lib/tuxbox
-#	mkdir -p $(prefix)/release_neutrino/var/tuxbox/config
-	mkdir -p $(prefix)/release_neutrino/var/tuxbox
-	ln -s /usr/local/share/config $(prefix)/release_neutrino/var/tuxbox/config
-	mkdir -p $(prefix)/release_neutrino/share/tuxbox
-	mkdir -p $(prefix)/release_neutrino/var/share/icons
-	( cd $(prefix)/release_neutrino/share/tuxbox && ln -s /usr/local/share/neutrino )
+
 	( cd $(prefix)/release_neutrino/var/share/icons/ && ln -s /usr/local/share/neutrino/icons/logo )
 	( cd $(prefix)/release_neutrino/ && ln -s /usr/local/share/neutrino/icons/logo logos )
 	( cd $(prefix)/release_neutrino/lib && ln -s libcrypto.so.0.9.7 libcrypto.so.0.9.8 )
-	( cd $(prefix)/release_neutrino/lib/tuxbox && ln -s /var/plugins )
 	( cd $(prefix)/release_neutrino/var/tuxbox && ln -s /var/plugins )
-	( cd $(prefix)/release_neutrino/usr/lib/tuxbox && ln -s /var/plugins )
-
-#######################################################################################
-#######################################################################################
-#######################################################################################
 
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/share
-
-#######################################################################################
-
-
-#######################################################################################
-
-#######################################################################################
-
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/share/zoneinfo
 	cp -aR $(buildprefix)/root/usr/share/zoneinfo/* $(prefix)/release_neutrino/usr/share/zoneinfo/
-
-#######################################################################################
 
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/share/udhcpc
 	cp -aR $(buildprefix)/root/usr/share/udhcpc/* $(prefix)/release_neutrino/usr/share/udhcpc/
 
-
-#######################################################################################
-#######################################################################################
-#######################################################################################
-#######################################################################################
-
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/local
-
-#######################################################################################
-
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/local/bin
 	cp $(targetprefix)/usr/local/bin/neutrino $(prefix)/release_neutrino/usr/local/bin/
 	cp $(targetprefix)/usr/local/bin/pzapit $(prefix)/release_neutrino/usr/local/bin/
@@ -1626,15 +1607,12 @@ endif
 	find $(prefix)/release_neutrino/usr/local/bin/ -name  pzapit -exec sh4-linux-strip --strip-unneeded {} \;
 	find $(prefix)/release_neutrino/usr/local/bin/ -name  sectionsdcontrol -exec sh4-linux-strip --strip-unneeded {} \;
 
-#######################################################################################
-
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/local/share
 	cp -aR $(targetprefix)/usr/local/share/iso-codes $(prefix)/release_neutrino/usr/local/share/
 #	TODO: Channellist ....
-	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/local/share/config
-	cp -aR $(buildprefix)/root/usr/local/share/config/* $(prefix)/release_neutrino/usr/local/share/config/
+	cp -aR $(buildprefix)/root/usr/local/share/config/* $(prefix)/release_neutrino/var/tuxbox/config/
 if ENABLE_SPARK7162
-	rm -f $(prefix)/release_neutrino/usr/local/share/config/neutrino.conf
+	rm -f $(prefix)/release_neutrino/var/tuxbox/config/neutrino.conf
 endif
 	cp -aR $(targetprefix)/usr/local/share/neutrino $(prefix)/release_neutrino/usr/local/share/
 #	TODO: HACK (without *.locale are missing!) --- should be not longer needed since path fix
@@ -1644,15 +1622,14 @@ endif
 	mkdir -p $(prefix)/release_neutrino/usr/local/share/fonts
 	cp $(buildprefix)/root/usr/share/fonts/tuxtxt.ttf $(prefix)/release_neutrino/usr/local/share/fonts/
 
-#       Font libass
+# Font libass
 	mkdir -p $(prefix)/release_neutrino/usr/share/fonts
 	cp $(buildprefix)/root/usr/share/fonts/FreeSans.ttf $(prefix)/release_neutrino/usr/share/fonts/
-
 	cp -aR $(targetprefix)/usr/local/share/fonts/micron.ttf $(prefix)/release_neutrino/usr/local/share/fonts/neutrino.ttf
+
 #######################################################################################
 	echo "duckbox-rev#: " > $(prefix)/release_neutrino/etc/imageinfo
 	git describe >> $(prefix)/release_neutrino/etc/imageinfo
-	$(buildprefix)/root/release/neutrino_version.sh
 #######################################################################################
 
 	$(INSTALL_DIR) $(prefix)/release_neutrino/usr/lib
@@ -1671,18 +1648,18 @@ endif
 	rm -f $(prefix)/release_neutrino/usr/lib/*.a
 	rm -f $(prefix)/release_neutrino/usr/lib/*.o
 	rm -f $(prefix)/release_neutrino/usr/lib/*.la
+
 	mkdir -p $(prefix)/release_neutrino/usr/local/share/neutrino/icons/logo
-#
-#######################################################################################
 	( cd $(prefix)/release_neutrino/usr/local/share/neutrino && ln -s /usr/local/share/neutrino/httpd httpd-y )
 	( cd $(prefix)/release_neutrino/var && ln -s /usr/local/share/neutrino/httpd httpd )
 	cp $(appsdir)/neutrino/src/nhttpd/web/{Y_Baselib.js,Y_VLC.js} $(prefix)/release_neutrino/usr/local/share/neutrino/httpd/
 	( cd $(prefix)/release_neutrino/usr/local/share/neutrino/httpd && ln -s /usr/local/share/neutrino/icons/logo )
 	( cd $(prefix)/release_neutrino/usr/local/share/neutrino/httpd && ln -s /usr/local/share/neutrino/icons/logo logos )
+
 #######################################################################################
-#
+
 	find $(prefix)/release_neutrino/usr/lib/ -name '*.so*' -exec sh4-linux-strip --strip-unneeded {} \;
-#
+
 ######## FOR YOUR OWN CHANGES use these folder in cdk/own_build/neutrino #############
 #	rm $(prefix)/release_neutrino/bin/mount
 	cp -RP $(buildprefix)/own_build/neutrino/* $(prefix)/release_neutrino/

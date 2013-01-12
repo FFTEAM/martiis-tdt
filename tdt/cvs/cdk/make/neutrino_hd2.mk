@@ -2,15 +2,6 @@
 # Makefile to build NEUTRINO
 #
 
-$(targetprefix)/var/etc/.version:
-	echo "imagename=NeutrinoHD2" > $@
-	echo "homepage=http://gitorious.org/open-duckbox-project-sh4" >> $@
-	echo "creator=`id -un`" >> $@
-	echo "docs=http://gitorious.org/open-duckbox-project-sh4/pages/Home" >> $@
-	echo "forum=http://gitorious.org/open-duckbox-project-sh4" >> $@
-	echo "version=0100`date +%Y%m%d%H%M`" >> $@
-	echo "git =`git describe`" >> $@
-
 N_CPPFLAGS =-DNEW_LIBCURL
 
 N_CONFIG_OPTS = --enable-silent-rules
@@ -40,10 +31,10 @@ $(appsdir)/neutrino-hd2/config.status: bootstrap $(EXTERNALLCD_DEP) freetype jpe
 			--enable-libass \
 			--with-datadir=/usr/local/share \
 			--with-libdir=/usr/lib \
-			--with-plugindir=/usr/lib/tuxbox/plugins \
+			--with-plugindir=/var/plugins \
 			--with-fontdir=/usr/local/share/fonts \
-			--with-configdir=/usr/local/share/config \
-			--with-gamesdir=/usr/local/share/games \
+			--with-configdir=/var/tuxbox/config \
+			--with-gamesdir=/var/tuxbox/games \
 			PKG_CONFIG=$(hostprefix)/bin/pkg-config \
 			PKG_CONFIG_PATH=$(targetprefix)/usr/lib/pkgconfig \
 			$(PLATFORM_CPPFLAGS) \
@@ -57,7 +48,6 @@ $(DEPDIR)/neutrino-hd2.do_compile: $(appsdir)/neutrino-hd2/config.status
 
 $(DEPDIR)/neutrino-hd2: neutrino-hd2.do_prepare neutrino-hd2.do_compile
 	$(MAKE) -C $(appsdir)/neutrino-hd2 install DESTDIR=$(targetprefix) && \
-	make $(targetprefix)/var/etc/.version
 	$(target)-strip $(targetprefix)/usr/local/bin/neutrino
 	$(target)-strip $(targetprefix)/usr/local/bin/pzapit
 	$(target)-strip $(targetprefix)/usr/local/bin/sectionsdcontrol
@@ -98,10 +88,10 @@ $(appsdir)/neutrino-hd2-exp/config.status: bootstrap $(EXTERNALLCD_DEP) freetype
 			--enable-libass \
 			--with-datadir=/usr/local/share \
 			--with-libdir=/usr/lib \
-			--with-plugindir=/usr/lib/tuxbox/plugins \
+			--with-plugindir=/var/plugins \
 			--with-fontdir=/usr/local/share/fonts \
-			--with-configdir=/usr/local/share/config \
-			--with-gamesdir=/usr/local/share/games \
+			--with-configdir=/var/tuxbox/config \
+			--with-gamesdir=/var/tuxbox/games \
 			PKG_CONFIG=$(hostprefix)/bin/pkg-config \
 			PKG_CONFIG_PATH=$(targetprefix)/usr/lib/pkgconfig \
 			$(PLATFORM_CPPFLAGS) \
@@ -115,7 +105,6 @@ $(DEPDIR)/neutrino-hd2-exp.do_compile: $(appsdir)/neutrino-hd2-exp/config.status
 
 $(DEPDIR)/neutrino-hd2-exp: neutrino-hd2-exp.do_prepare neutrino-hd2-exp.do_compile
 	$(MAKE) -C $(appsdir)/neutrino-hd2-exp install DESTDIR=$(targetprefix) && \
-	make $(targetprefix)/var/etc/.version
 	$(target)-strip $(targetprefix)/usr/local/bin/neutrino
 	$(target)-strip $(targetprefix)/usr/local/bin/pzapit
 	$(target)-strip $(targetprefix)/usr/local/bin/sectionsdcontrol
