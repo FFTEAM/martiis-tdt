@@ -449,7 +449,7 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 			}
 			break;
 		default:
-		{
+		    {
 			int icon_nr = aotom_data.u.icon.icon_nr;
 			if(icon_nr & ~0xff) {
 				icon_nr >>= 8;
@@ -497,7 +497,8 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		}
 		mode = 0;
 		break;
-	}
+	    }
+	    break;
 	case VFDSTANDBY:
 	{
 		u32 uTime = 0;
