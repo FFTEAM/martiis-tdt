@@ -21,6 +21,8 @@ typedef unsigned int u32;
 #define VFDDISPLAYWRITEONOFF  0xc0425a05
 #define VFDDISPLAYCHARS       0xc0425a00
 
+#define VFDPOWEROFF			  0xc0425af5
+#define VFDSETPOWERONTIME	  0xc0425af6
 #define VFDGETVERSION         0xc0425af7
 #define VFDGETSTARTUPSTATE    0xc0425af8
 #define VFDGETWAKEUPMODE      0xc0425af9

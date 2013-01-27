@@ -44,6 +44,7 @@
 #include <linux/time.h>
 #include <linux/poll.h>
 #include <linux/workqueue.h>
+#include <linux/pm.h>
 
 #include "aotom_main.h"
 #include "utf.h"
@@ -499,6 +500,20 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		break;
 	    }
 	    break;
+	case VFDSETPOWERONTIME:
+	{
+		u32 uTime = 0;
+		get_user(uTime, (int *) arg);
+		YWPANEL_FP_SetPowerOnTime(uTime);
+		res = 0;
+		break;
+	}
+	case VFDPOWEROFF:
+		clear_display();
+		YWPANEL_FP_ControlTimer(true);
+		YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
+		res = 0;
+		break;
 	case VFDSTANDBY:
 	{
 		u32 uTime = 0;
@@ -731,6 +746,17 @@ static void button_dev_exit(void)
 	input_unregister_device(button_dev);
 }
 
+static void aotom_standby(void)
+{
+	while(down_interruptible (&write_sem))
+		msleep(10);
+	printk(KERN_EMERG "Initiating standby with pm_power_off hook.\n");
+	clear_display();
+	YWPANEL_FP_ControlTimer(true);
+	YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
+	// not reached
+}
+
 static int __init aotom_init_module(void)
 {
 	int i;
@@ -751,6 +777,11 @@ static int __init aotom_init_module(void)
 
 	if (register_chrdev(VFD_MAJOR,"VFD",&vfd_fops))
 		printk("unable to get major %d for VFD\n",VFD_MAJOR);
+
+	if (pm_power_off)
+		printk("pm_power_off hook already applied! Do not register anything\n");
+	else
+		pm_power_off = 	aotom_standby;
 
 	sema_init(&write_sem, 1);
 	sema_init(&draw_thread_sem, 1);
@@ -781,6 +812,9 @@ static int led_thread_active(void) {
 static void __exit aotom_cleanup_module(void)
 {
 	int i;
+
+	if (aotom_standby == pm_power_off)
+		pm_power_off = NULL;
 
 	if(!draw_thread_stop && draw_task)
 		kthread_stop(draw_task);
