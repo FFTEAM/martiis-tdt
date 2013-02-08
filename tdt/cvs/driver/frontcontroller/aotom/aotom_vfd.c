@@ -332,6 +332,34 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 		case YWPANEL_DATATYPE_SETPOWERONSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETPOWERONSTATE;
 			break;
+		case YWPANEL_DATATYPE_GETSTBYKEY1:
+		case YWPANEL_DATATYPE_GETSTBYKEY2:
+		case YWPANEL_DATATYPE_GETSTBYKEY3:
+		case YWPANEL_DATATYPE_GETSTBYKEY4:
+		case YWPANEL_DATATYPE_GETSTBYKEY5:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETSTBYKEY1 + (data->dataType - YWPANEL_DATATYPE_GETSTBYKEY1);
+			break;
+		case YWPANEL_DATATYPE_SETSTBYKEY1:
+		case YWPANEL_DATATYPE_SETSTBYKEY2:
+		case YWPANEL_DATATYPE_SETSTBYKEY3:
+		case YWPANEL_DATATYPE_SETSTBYKEY4:
+		case YWPANEL_DATATYPE_SETSTBYKEY5:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETSTBYKEY1 + (data->dataType - YWPANEL_DATATYPE_SETSTBYKEY1);
+			break;
+		case YWPANEL_DATATYPE_GETBLUEKEY1:
+		case YWPANEL_DATATYPE_GETBLUEKEY2:
+		case YWPANEL_DATATYPE_GETBLUEKEY3:
+		case YWPANEL_DATATYPE_GETBLUEKEY4:
+		case YWPANEL_DATATYPE_GETBLUEKEY5:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETBLUEKEY1 + (data->dataType - YWPANEL_DATATYPE_GETBLUEKEY1);
+			break;
+		case YWPANEL_DATATYPE_SETBLUEKEY1:
+		case YWPANEL_DATATYPE_SETBLUEKEY2:
+		case YWPANEL_DATATYPE_SETBLUEKEY3:
+		case YWPANEL_DATATYPE_SETBLUEKEY4:
+		case YWPANEL_DATATYPE_SETBLUEKEY5:
+			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETBLUEKEY1 + (data->dataType - YWPANEL_DATATYPE_SETBLUEKEY1);
+			break;
 		case YWPANEL_DATATYPE_GETVERIFYSTATE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETVERIFYSTATE;
 			break;
@@ -444,6 +472,21 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 		case YWPANEL_DATATYPE_CONTROLTIMER:
 			I2CData->writeBuff[2] = data->data.TimeState.startFlag;
 			break;
+		case YWPANEL_DATATYPE_SETSTBYKEY1:
+		case YWPANEL_DATATYPE_SETSTBYKEY2:
+		case YWPANEL_DATATYPE_SETSTBYKEY3:
+		case YWPANEL_DATATYPE_SETSTBYKEY4:
+		case YWPANEL_DATATYPE_SETSTBYKEY5:
+		case YWPANEL_DATATYPE_SETBLUEKEY1:
+		case YWPANEL_DATATYPE_SETBLUEKEY2:
+		case YWPANEL_DATATYPE_SETBLUEKEY3:
+		case YWPANEL_DATATYPE_SETBLUEKEY4:
+		case YWPANEL_DATATYPE_SETBLUEKEY5:
+			I2CData->writeBuff[2] = (u8) ((data->data.stbyKey.key>>24)&0xff);
+			I2CData->writeBuff[3] = (u8) ((data->data.stbyKey.key >>16)&0xff);
+			I2CData->writeBuff[4] = (u8) ((data->data.stbyKey.key >>8)&0xff);
+			I2CData->writeBuff[5] = (u8) (data->data.stbyKey.key&0xff);
+			break;
 		default:
 			break;
 	}
@@ -506,6 +549,16 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 		case YWPANEL_DATATYPE_SETVFDSTANDBYSTATE:
 		case YWPANEL_DATATYPE_SETPOWERONSTATE:
 		case YWPANEL_DATATYPE_SETLOOPSTATE:
+		case YWPANEL_DATATYPE_SETSTBYKEY1:
+		case YWPANEL_DATATYPE_SETSTBYKEY2:
+		case YWPANEL_DATATYPE_SETSTBYKEY3:
+		case YWPANEL_DATATYPE_SETSTBYKEY4:
+		case YWPANEL_DATATYPE_SETSTBYKEY5:
+		case YWPANEL_DATATYPE_SETBLUEKEY1:
+		case YWPANEL_DATATYPE_SETBLUEKEY2:
+		case YWPANEL_DATATYPE_SETBLUEKEY3:
+		case YWPANEL_DATATYPE_SETBLUEKEY4:
+		case YWPANEL_DATATYPE_SETBLUEKEY5:
 			if(dataType != YWPANEL_READ_INSTR_ACK)
 			{
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
@@ -550,23 +603,36 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 				return false;
 			break;
 		case YWPANEL_DATATYPE_GETLOOPSTATE:
-		{
-	printk("%s:%d: dataType == %d\n", __FUNCTION__, __LINE__, dataType);
+			printk("%s:%d: dataType == %d\n", __FUNCTION__, __LINE__, dataType);
 			if(dataType != YWPANEL_INIT_INSTR_GETLOOPSTATE)
 				return false;
-		}
 		break;
-
 		case YWPANEL_DATATYPE_GETTIME:
-	{
-			if(dataType != YWPANEL_INIT_INSTR_GETTIME)
-			{
+			if(dataType != YWPANEL_INIT_INSTR_GETTIME) {
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
 				return false;
 			}
-		}
-		break;
-
+			break;
+		case YWPANEL_DATATYPE_GETSTBYKEY1:
+		case YWPANEL_DATATYPE_GETSTBYKEY2:
+		case YWPANEL_DATATYPE_GETSTBYKEY3:
+		case YWPANEL_DATATYPE_GETSTBYKEY4:
+		case YWPANEL_DATATYPE_GETSTBYKEY5:
+			if(dataType != (YWPANEL_INIT_INSTR_GETSTBYKEY1 + data->dataType - YWPANEL_DATATYPE_GETSTBYKEY1)){
+				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
+				return false;
+			}
+			break;
+		case YWPANEL_DATATYPE_GETBLUEKEY1:
+		case YWPANEL_DATATYPE_GETBLUEKEY2:
+		case YWPANEL_DATATYPE_GETBLUEKEY3:
+		case YWPANEL_DATATYPE_GETBLUEKEY4:
+		case YWPANEL_DATATYPE_GETBLUEKEY5:
+			if(dataType != (YWPANEL_INIT_INSTR_GETBLUEKEY1 + data->dataType - YWPANEL_DATATYPE_GETBLUEKEY1)) {
+				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
+				return false;
+			}
+			break;
 		case YWPANEL_DATATYPE_GETVERSION:
 		case YWPANEL_DATATYPE_GETCPUSTATE:
 		case YWPANEL_DATATYPE_GETVERIFYSTATE:
@@ -575,33 +641,23 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 
 	}
 
-
-	switch(dataType)
-	{
+	switch(dataType) {
 		case YWPANEL_READ_INSTR_ACK:  //ACK
-		{
 			data->ack = true;
-		}
-		break;
+			break;
 
 		case YWPANEL_READ_INSTR_SCANKEY:  //scan key
-		{
 			data->data.ScanKeyData.keyValue= I2CData->readBuff[2];
 			data->ack = true;
-		}
-		break;
+			break;
 
 		case YWPANEL_READ_INSTR_VFDKEY:
-		{
 			data->data.vfdData.key = I2CData->readBuff[2];
 			data->ack = true;
-		}
-		break;
+			break;
 
 		case YWPANEL_INIT_INSTR_GETVERSION: /*get version */
-		{
-			if(data->dataType != YWPANEL_DATATYPE_GETVERSION)
-			{
+			if(data->dataType != YWPANEL_DATATYPE_GETVERSION) {
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
 				return false;
 			}
@@ -610,78 +666,71 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 			data->data.version.scankeyNum = I2CData->readBuff[3]&0x0f;
 			data->data.version.swMajorVersion = I2CData->readBuff[4];
 			data->data.version.swSubVersion = I2CData->readBuff[5];
-
 			data->ack = true;
-		}
-		break;
+			break;
 
 		case YWPANEL_INIT_INSTR_GETCPUSTATE: /*get cpu state*/
-		{
-			if(data->dataType == YWPANEL_DATATYPE_GETCPUSTATE)
-			{
+			if(data->dataType == YWPANEL_DATATYPE_GETCPUSTATE) {
 				data->data.CpuState.state= I2CData->readBuff[2];
 				data->ack = true;
-			}
-			else
-			{
+			} else {
 				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
 				return false;
 			}
-		}
-		break;
+			break;
 
 		case YWPANEL_INIT_INSTR_GETVFDSTANDBYSTATE: /*get vfd state*/
-		{
-			   data->data.VfdStandbyState.On = I2CData->readBuff[2];
-			   data->ack = true;
-		}
-		break;
+			data->data.VfdStandbyState.On = I2CData->readBuff[2];
+			data->ack = true;
+			break;
 
 		case YWPANEL_INIT_INSTR_GETPOWERONSTATE: /*get power on  state*/
-		{
-		   if(data->dataType == YWPANEL_DATATYPE_GETPOWERONSTATE)
-		   {
-			   data->data.PowerOnState.state= I2CData->readBuff[2];
-			   data->ack = true;
-		   }
-		   else
-		   {
-			   ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
-			   return false;
-		   }
-		}
-		break;
+			if(data->dataType == YWPANEL_DATATYPE_GETPOWERONSTATE) {
+				data->data.PowerOnState.state= I2CData->readBuff[2];
+				data->ack = true;
+			} else {
+				ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
+				return false;
+			}
+			break;
 
+		case YWPANEL_INIT_INSTR_GETBLUEKEY1:
+		case YWPANEL_INIT_INSTR_GETBLUEKEY2:
+		case YWPANEL_INIT_INSTR_GETBLUEKEY3:
+		case YWPANEL_INIT_INSTR_GETBLUEKEY4:
+		case YWPANEL_INIT_INSTR_GETBLUEKEY5:
+		case YWPANEL_INIT_INSTR_GETSTBYKEY1:
+		case YWPANEL_INIT_INSTR_GETSTBYKEY2:
+		case YWPANEL_INIT_INSTR_GETSTBYKEY3:
+		case YWPANEL_INIT_INSTR_GETSTBYKEY4:
+		case YWPANEL_INIT_INSTR_GETSTBYKEY5:
+			data->data.stbyKey.key = ((I2CData->readBuff[2]<<24)&0xff000000)
+									|((I2CData->readBuff[3]<<16)&0xff0000)
+									|((I2CData->readBuff[4]<<8)&0xff00)
+									|((I2CData->readBuff[5])&0xff);
+			data->ack = true;
+			break;
 		case YWPANEL_INIT_INSTR_GETSTARTUPSTATE: /*get vfd state*/
-		{
-			   data->data.StartUpState.State = I2CData->readBuff[2];
-			   data->ack = true;
-		}
-		break;
+			data->data.StartUpState.State = I2CData->readBuff[2];
+			data->ack = true;
+				break;
 
 		case YWPANEL_INIT_INSTR_GETLOOPSTATE: /*get vfd state*/
-		{
-			   data->data.LoopState.state = I2CData->readBuff[2];
-			   data->ack = true;
-		}
+			data->data.LoopState.state = I2CData->readBuff[2];
+			data->ack = true;
 		break;
 
 		case YWPANEL_INIT_INSTR_GETVERIFYSTATE: /*get verify state */
-		{
 			data->data.verifyState.state = I2CData->readBuff[2];
-		}
-		break;
+			break;
 		case YWPANEL_INIT_INSTR_GETPOWERONTIME:
 		case YWPANEL_INIT_INSTR_GETTIME:
-		{
 			data->data.time.second = ((I2CData->readBuff[2]<<24)&0xff000000)
 									|((I2CData->readBuff[3]<<16)&0xff0000)
 									|((I2CData->readBuff[4]<<8)&0xff00)
 									|((I2CData->readBuff[5])&0xff);
 			data->ack = true;
-		}
-		break;
-
+			break;
 		default:
 		{
 			ywtrace_print(TRACE_ERROR,"%s::error @%d\n",__FUNCTION__,__LINE__);
@@ -1038,6 +1087,34 @@ u32  YWPANEL_FP_GetPowerOnTime(void)
 		return 0;
 	}
 	return data.data.time.second;
+}
+
+int YWPANEL_FP_GetKey(int blue, int key_nr, u32 *k) {
+	if (key_nr > -1 && key_nr < 5) {
+		YWPANEL_FPData_t	data;
+		memset(&data, 0, sizeof(YWPANEL_FPData_t));
+		data.dataType = (blue ? YWPANEL_DATATYPE_GETBLUEKEY1 : YWPANEL_DATATYPE_GETSTBYKEY1) + key_nr;
+		if(YWPANEL_FP_SendData(&data)) {
+			*k = data.data.stbyKey.key;
+			return true;
+		}
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
+	}
+	return false;
+}
+
+int YWPANEL_FP_SetKey(int blue, int key_nr, u32 k) {
+	if (key_nr > -1 && key_nr < 5) {
+		YWPANEL_FPData_t	data;
+		memset(&data, 0, sizeof(YWPANEL_FPData_t));
+		data.dataType = (blue ? YWPANEL_DATATYPE_SETBLUEKEY1 : YWPANEL_DATATYPE_SETSTBYKEY1) + key_nr;
+		data.data.stbyKey.key = k;
+		if(YWPANEL_FP_SendData(&data))
+			return true;
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
+	}
+	msleep(80); // Looks like the controller is returning junk data. Wait a couple of milliseconds, or the next i2c response will be messed up --martii
+	return false;
 }
 
 int  YWPANEL_FP_ControlTimer(int on)
@@ -2084,6 +2161,9 @@ int YWPANEL_VFD_Init(void)
 	memset(&panel_version, 0, sizeof(YWPANEL_Version_t));
 
 	if(YWPANEL_FP_GetVersion(&panel_version)) {
+		int i;
+		u32 k;
+
 		panel_disp_type = panel_version.DisplayInfo;
 		if(panel_disp_type<YWPANEL_FP_DISPTYPE_UNKNOWN || panel_disp_type>YWPANEL_FP_DISPTYPE_LBD)
 			panel_disp_type = YWPANEL_FP_DISPTYPE_VFD;
@@ -2105,6 +2185,13 @@ int YWPANEL_VFD_Init(void)
 		printk("scankeyNum = %d\n", panel_version.scankeyNum);
 		printk("swMajorVersion = %d\n", panel_version.swMajorVersion);
 		printk("swSubVersion = %d\n", panel_version.swSubVersion);
+
+		for (i = 0; i < 5; i++)
+			if (YWPANEL_FP_GetKey(0, i, &k))
+				printk ("blue key %d = %.8x\n", i, k);
+		for (i = 0; i < 5; i++)
+			if (YWPANEL_FP_GetKey(1, i, &k))
+				printk ("stby key %d = %.8x\n", i, k);
 	} else
 		ErrorCode = -ENODEV;
 

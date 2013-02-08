@@ -400,6 +400,10 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 	case VFDICONDISPLAYONOFF:
 	case VFDSETTIME:
 	case VFDBRIGHTNESS:
+	case VFDGETSTBYKEY:
+	case VFDSETSTBYKEY:
+	case VFDGETBLUEKEY:
+	case VFDSETBLUEKEY:
 		if (copy_from_user(&aotom_data, (void *) arg, sizeof(aotom_data)))
 			return -EFAULT;
 	}
@@ -598,6 +602,17 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 			res = put_user (panel_version.DisplayInfo, (int *)arg);
 		break;
 	}
+	case VFDGETBLUEKEY:
+	case VFDGETSTBYKEY:
+	{
+		if (YWPANEL_FP_GetKey(cmd == VFDGETBLUEKEY, aotom_data.u.key.key_nr, &aotom_data.u.key.key))
+			res = copy_to_user((void *) arg, &aotom_data, sizeof(aotom_data));
+		break;
+	}
+	case VFDSETBLUEKEY:
+	case VFDSETSTBYKEY:
+		res = !YWPANEL_FP_SetKey(cmd == VFDSETBLUEKEY, aotom_data.u.key.key_nr, aotom_data.u.key.key);
+		break;
 	default:
 		printk("VFD/AOTOM: unknown IOCTL 0x%x\n", cmd);
 	case 0x5305:

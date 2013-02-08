@@ -21,6 +21,11 @@ typedef unsigned int u32;
 #define VFDDISPLAYWRITEONOFF  0xc0425a05
 #define VFDDISPLAYCHARS       0xc0425a00
 
+#define VFDGETBLUEKEY		  0xc0425af1
+#define VFDSETBLUEKEY		  0xc0425af2
+#define VFDGETSTBYKEY		  0xc0425af3
+#define VFDSETSTBYKEY		  0xc0425af4
+#define VFDPOWEROFF			  0xc0425af5
 #define VFDPOWEROFF			  0xc0425af5
 #define VFDSETPOWERONTIME	  0xc0425af6
 #define VFDGETVERSION         0xc0425af7
@@ -84,6 +89,11 @@ struct set_time_s {
 	char time[5];
 };
 
+struct set_key_s {
+	int key_nr;
+	u32 key;
+};
+
 /* this changes the mode temporarily (for one ioctl)
  * to the desired mode. currently the "normal" mode
  * is the compatible vfd mode
@@ -101,6 +111,7 @@ struct aotom_ioctl_data {
 		struct set_mode_s mode;
 		struct set_standby_s standby;
 		struct set_time_s time;
+		struct set_key_s key;
 	} u;
 };
 
@@ -123,61 +134,6 @@ enum
 	KEY_DIGIT8 = 9,
 	KEY_DIGIT9 = 10
 };
-
-#if 0
-enum
-{
-	POWER_KEY 		 = 88,
-
-    TIME_SET_KEY 	 = 87,
-	UHF_KEY 		 = 68,
-	VFormat_KEY 	 = 67,
-    MUTE_KEY 		 = 66,
-
-    TVSAT_KEY 		 = 65,
-    MUSIC_KEY 		 = 64,
-    FIND_KEY 		 = 63,
-    FAV_KEY 		 = 62,
-
-    MENU_KEY 		 = 102,	// HOME
-    i_KEY 			 = 61,
-    EPG_KEY 		 = 18,
-    EXIT_KEY 		 = 48,	// B
-    RECALL_KEY 		 = 30,
-    RECORD_KEY 		 = 19,
-
-	UP_KEY 			 = 103,	// UP
-	DOWN_KEY		 = 108,	// DOWN
-	LEFT_KEY 		 = 105,	// LEFT
-	RIGHT_KEY		 = 106,	// RIGTHT
-	SELECT_KEY 		 = 28,	// ENTER
-
-    PLAY_KEY 		 = 25,
-    PAGE_UP_KEY 	 = 104,	// P_UP
-    PAUSE_KEY 		 = 22,
-    PAGE_DOWN_KEY 	 = 109,	// P_DOWN
-
-    STOP_KEY 		 = 20,
-	SLOW_MOTION_KEY  = 50,
-	FAST_REWIND_KEY  = 33,
-	FAST_FORWARD_KEY = 49,
-
-    DOCMENT_KEY 	 = 32,
-    SWITCH_PIC_KEY 	 = 17,
-    PALY_MODE_KEY 	 = 24,
-    USB_KEY 		 = 111,
-
-    RADIO_KEY 		 = 110,
-    SAT_KEY		 	 = 15,
-    F1_KEY 			 = 59,
-	F2_KEY 			 = 60,
-
-	RED_KEY 		 = 44,	// Z
-	GREEN_KEY 		 = 45,	// X
-	YELLOW_KEY 		 = 46,	// C
-	BLUE_KEY 		 = 47	// V
-};
-#endif
 
 typedef enum LogNum_e
 {
@@ -687,6 +643,8 @@ int  YWPANEL_FP_SetTime(u32 value);
 //int  YWPANEL_FP_SetStandByKey(u8 index,u8 key);
 //u32  YWPANEL_FP_GetBlueKey(u8 index);
 //int  YWPANEL_FP_SetBlueKey(u8 index,u8 key);
+int YWPANEL_FP_GetKey(int blue, int key_nr, u32 *k);
+int YWPANEL_FP_SetKey(int blue, int key_nr, u32 k);
 int  YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus );
 int  YWPANEL_FP_GetStartUpState(YWPANEL_STARTUPSTATE_t *State);
 int  YWPANEL_FP_GetVersion(YWPANEL_Version_t *version);
