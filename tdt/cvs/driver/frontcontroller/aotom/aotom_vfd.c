@@ -1113,7 +1113,7 @@ int YWPANEL_FP_SetKey(int blue, int key_nr, u32 k) {
 			return true;
 		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
 	}
-	msleep(80); // Looks like the controller is returning junk data. Wait a couple of milliseconds, or the next i2c response will be messed up --martii
+	msleep(100); // Looks like the controller is returning junk data. Wait a couple of milliseconds, or the next i2c response will be messed up --martii
 	return false;
 }
 
