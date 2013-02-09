@@ -2188,10 +2188,10 @@ int YWPANEL_VFD_Init(void)
 
 		for (i = 0; i < 5; i++)
 			if (YWPANEL_FP_GetKey(0, i, &k))
-				printk ("blue key %d = %.8x\n", i, k);
+				printk ("stby key %d = %.8x\n", i, k);
 		for (i = 0; i < 5; i++)
 			if (YWPANEL_FP_GetKey(1, i, &k))
-				printk ("stby key %d = %.8x\n", i, k);
+				printk ("blue key %d = %.8x\n", i, k);
 	} else
 		ErrorCode = -ENODEV;
 
