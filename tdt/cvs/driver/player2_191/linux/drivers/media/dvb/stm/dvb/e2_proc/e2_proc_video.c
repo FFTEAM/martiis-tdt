@@ -557,9 +557,11 @@ int proc_video_aspect_write(struct file *file, const char __user *buf, unsigned 
 		//printk("%s\n", myString);
 
 		aspect_e2 = VIDEO_FORMAT_16_9;
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		if (strncmp("4:3", myString, count - 1) == 0)
 		{
 			aspect_e2 = VIDEO_FORMAT_4_3;
@@ -624,6 +626,7 @@ int proc_video_aspect_choices_read (char *page, char **start, off_t off, int cou
 #ifdef VERY_VERBOSE
 	printk("%s\n", __FUNCTION__);
 #endif
+
 	//we dont support any, whatever this is
 	//len = sprintf(page, "4:3 16:9 any\n");
 	len = sprintf(page, "4:3 16:9\n");
@@ -656,6 +659,7 @@ int proc_video_policy_write(struct file *file, const char __user *buf, unsigned 
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		if (strncmp("letterbox", myString, count - 1) == 0)
 		{
 			policy_e2 = VIDEO_POL_LETTER_BOX;
@@ -717,6 +721,7 @@ int proc_video_policy_read (char *page, char **start, off_t off, int count, int 
 #ifdef VERY_VERBOSE
 	printk("%s\n", __FUNCTION__);
 #endif
+
 	if (policy_e2 == VIDEO_POL_LETTER_BOX)
 	{
 		len = sprintf(page, "letterbox\n");
@@ -743,6 +748,7 @@ int proc_video_policy_choices_read (char *page, char **start, off_t off, int cou
 #ifdef VERY_VERBOSE
 	printk("%s\n", __FUNCTION__);
 #endif
+
 	len = sprintf(page, "letterbox panscan non bestfit\n");
 
 	return len;
@@ -758,9 +764,11 @@ int proc_video_videomode_write(struct file *file, const char __user *buf, unsign
 	int new_count;
 
 	char* myString = kmalloc(count + 1, GFP_KERNEL);
+
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
+
 	mutex_lock (&(ProcDeviceContext->DvbContext->Lock));
 
 	void* fb = stmfb_get_fbinfo_ptr();
@@ -784,9 +792,11 @@ int proc_video_videomode_write(struct file *file, const char __user *buf, unsign
 
 		strncpy(myString, page, new_count);
 		myString[new_count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		//whithout -1 write a unsupportet string hangs the driver
 		for (vLoop = 0; vLoop < (sizeof(Options) / sizeof(struct Modes)) - 1; vLoop++)
 		{
@@ -888,8 +898,8 @@ int proc_video_videomode_write(struct file *file, const char __user *buf, unsign
 #ifdef VERY_VERBOSE
 					else
 						printk("set output window to %d, %d ok\n",  Options[modeToSet].xres,  Options[modeToSet].yres);
-				}
 #endif
+				}
 			}
 			else
 			{
@@ -975,6 +985,7 @@ int proc_video_pal_h_start_write(struct file *file, const char __user *buf, unsi
 	int value;
 
 	char* myString = kmalloc(count + 1, GFP_KERNEL);
+
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
@@ -995,9 +1006,11 @@ int proc_video_pal_h_start_write(struct file *file, const char __user *buf, unsi
 
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		sscanf(myString, "%x", &value);
 
 		fb =  stmfb_get_fbinfo_ptr();
@@ -1081,6 +1094,7 @@ int proc_video_pal_h_end_write(struct file *file, const char __user *buf, unsign
 	int value;
 
 	char* myString = kmalloc(count + 1, GFP_KERNEL);
+
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
@@ -1101,9 +1115,11 @@ int proc_video_pal_h_end_write(struct file *file, const char __user *buf, unsign
 
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		sscanf(myString, "%x", &value);
 
 		fb =  stmfb_get_fbinfo_ptr();
@@ -1187,6 +1203,7 @@ int proc_video_pal_v_start_write(struct file *file, const char __user *buf, unsi
 	int value;
 
 	char* myString = kmalloc(count + 1, GFP_KERNEL);
+
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
@@ -1207,9 +1224,11 @@ int proc_video_pal_v_start_write(struct file *file, const char __user *buf, unsi
 
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		sscanf(myString, "%x", &value);
 
 		fb =  stmfb_get_fbinfo_ptr();
@@ -1293,6 +1312,7 @@ int proc_video_pal_v_end_write(struct file *file, const char __user *buf, unsign
 	int value;
 
 	char* myString = kmalloc(count + 1, GFP_KERNEL);
+
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
@@ -1313,9 +1333,11 @@ int proc_video_pal_v_end_write(struct file *file, const char __user *buf, unsign
 
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		sscanf(myString, "%x", &value);
 
 		fb =  stmfb_get_fbinfo_ptr();
@@ -1545,6 +1567,7 @@ int proc_video_videomode_preferred_write(struct file *file, const char __user *b
 		myString = (char *) kmalloc(count + 1, GFP_KERNEL);
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
@@ -1563,6 +1586,7 @@ int proc_video_videomode_preferred_read (char *page, char **start, off_t off, in
 #ifdef VERY_VERBOSE
 	printk("%s\n", __FUNCTION__);
 #endif
+
 	len = sprintf(page, "HDMI\n");
 
 	return len;
@@ -1578,6 +1602,7 @@ int proc_video_alpha_write(struct file *file, const char __user *buf, unsigned l
 #ifdef VERY_VERBOSE
 	printk("%s %ld - ", __FUNCTION__, count);
 #endif
+
 	page = (char *)__get_free_page(GFP_KERNEL);
 	if (page)
 	{
@@ -1594,9 +1619,11 @@ int proc_video_alpha_write(struct file *file, const char __user *buf, unsigned l
 		myString = (char *) kmalloc(count + 1, GFP_KERNEL);
 		strncpy(myString, page, count);
 		myString[count] = '\0';
+
 #ifdef VERY_VERBOSE
 		printk("%s\n", myString);
 #endif
+
 		sscanf(myString, "%d", &alpha);
 
 		varEx.layerid  = 0;
