@@ -234,7 +234,6 @@ YW_ErrorType_T  ChipSetRegisters_0367qam(TUNER_IOREG_DeviceMap_t *DeviceMap, IOA
 	else
 		return YWHAL_ERROR_INVALID_HANDLE;
    
-_DEBUG
 	if (DeviceMap->Error != 0)
 	{
         printk("d0367ter DeviceMap->Error=%d,FirstRegAddr=%x\n",DeviceMap->Error,FirstRegAddr);//for test
