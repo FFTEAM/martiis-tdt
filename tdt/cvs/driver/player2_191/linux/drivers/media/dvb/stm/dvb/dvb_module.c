@@ -250,6 +250,19 @@ long DvbGenericUnlockedIoctl(struct file *file, unsigned int foo, unsigned long 
                              DVB_DEVICE_AUDIO);
 
 #ifdef __TDT__
+#if defined(VIP2_V1) || defined(SPARK) || defined(SPARK7162) || defined(ADB_BOX)
+// These don't support CIMAX. Register the first device twice to keep the minor
+// numbers consistent.
+// Not sure about VIP2_V1. The "if(i < 3)" below looks misplaced.
+// --martii
+	if (i == 0)
+	       dvb_register_device (&DvbContext->DvbAdapter,
+			            &DeviceContext->CaDevice,
+			            CaInit (DeviceContext),
+			            DeviceContext,
+			            DVB_DEVICE_CA);
+#endif
+
         /* register the CA device (e.g. CIMAX) */
         if(i < 3)
 #ifndef VIP2_V1
