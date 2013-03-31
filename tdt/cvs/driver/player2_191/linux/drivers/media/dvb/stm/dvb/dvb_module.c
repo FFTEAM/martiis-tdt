@@ -264,7 +264,7 @@ long DvbGenericUnlockedIoctl(struct file *file, unsigned int foo, unsigned long 
 #endif
 
         /* register the CA device (e.g. CIMAX) */
-        if(i < 3)
+//        if(i < 3)
 #ifndef VIP2_V1
 	       dvb_register_device (&DvbContext->DvbAdapter,
 			            &DeviceContext->CaDevice,
