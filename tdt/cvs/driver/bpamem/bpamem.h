@@ -24,12 +24,14 @@ typedef struct
 #define BPAMEMIO_MAPMEM     _IOWR(BPAMEM_MAJOR, 2, BPAMemMapMemData)
 #define BPAMEMIO_UNMAPMEM   _IO  (BPAMEM_MAJOR, 3)
 
-#define DEBUG
+#if __KERNEL__
+#define DEBUG_BPAMEM
 
-#ifdef  DEBUG 
+#ifdef  DEBUG_BPAMEM
 #define DEBUG_PRINTK(format, ...) printk("(%s): " format "\n", __func__, ## __VA_ARGS__) 
 #else 
 #define DEBUG_PRINTK(format,...)
 #endif
 
+#endif
 #endif
