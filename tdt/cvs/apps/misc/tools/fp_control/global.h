@@ -7,10 +7,6 @@
 #define false 0
 #endif
 
-<<<<<<< HEAD
-#ifndef SPARK
-=======
->>>>>>> 8bc3738... fix
 #define VFDGETTIME		0xc0425afa
 #define VFDSETTIME		0xc0425afb
 #define VFDSTANDBY		0xc0425afc
@@ -24,11 +20,8 @@
 #define VFDDISPLAYCLR		0xc0425b00
 /* ufs912, 922, hdbox ->unset compat mode */
 #define VFDSETMODE		0xc0425aff
-<<<<<<< HEAD
-=======
 /*spark*/
 #define VFDGETSTARTUPSTATE	0xc0425af8
->>>>>>> 8bc3738... fix
 
 /* ufs912 */
 #define VFDGETVERSION	        0xc0425af7
@@ -41,17 +34,9 @@ struct vfd_ioctl_data {
 	unsigned char length;
 };
 
-<<<<<<< HEAD
-#endif
-
-typedef enum {NONE, TIMER} eWakeupReason;
-
-typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Tf7700, Hl101, Vip2, HdBox, Hs5101, Ufs912, Spark, Cuberevo, Adb_Box} eBoxType;
-=======
 typedef enum {NONE, TIMER} eWakeupReason;
 
 typedef enum {Unknown, Ufs910_1W, Ufs910_14W, Ufs922, Ufc960, Tf7700, Hl101, Vip2, HdBox, Hs5101, Ufs912, Spark, Cuberevo, Adb_Box, CNBox} eBoxType;
->>>>>>> 8bc3738... fix
 
 typedef struct Context_s {
 	void* /* Model_t */  *m; /* instance data */
@@ -90,40 +75,21 @@ typedef struct Model_s {
     void* private;
 } Model_t;
 
-<<<<<<< HEAD
-#if 0
-=======
->>>>>>> 8bc3738... fix
 extern Model_t Ufs910_1W_model;
 extern Model_t Ufs910_14W_model;
 extern Model_t UFS912_model;
 extern Model_t UFS922_model;
-<<<<<<< HEAD
-=======
 extern Model_t UFC960_model;
->>>>>>> 8bc3738... fix
 extern Model_t HDBOX_model;
 extern Model_t HL101_model;
 extern Model_t VIP2_model;
 extern Model_t Hs5101_model;
-<<<<<<< HEAD
-#endif
-extern Model_t Spark_model;
-#if 0
-extern Model_t Adb_Box_model;
-extern Model_t Cuberevo_model;
-#endif
-
-static Model_t * AvailableModels[] = {
-#if 0
-=======
 extern Model_t Spark_model;
 extern Model_t Adb_Box_model;
 extern Model_t Cuberevo_model;
 extern Model_t CNBOX_model;
 
 static Model_t * AvailableModels[] = {
->>>>>>> 8bc3738... fix
 	&Ufs910_1W_model,
 	&Ufs910_14W_model,
 	&UFS922_model,
@@ -132,20 +98,11 @@ static Model_t * AvailableModels[] = {
 	&VIP2_model,
 	&Hs5101_model,
 	&UFS912_model,
-<<<<<<< HEAD
-#endif
-	&Spark_model,
-#if 0
-	&Adb_Box_model,
-	&Cuberevo_model,
-#endif
-=======
 	&UFC960_model,
 	&Spark_model,
 	&Adb_Box_model,
 	&Cuberevo_model,
 	&CNBOX_model,
->>>>>>> 8bc3738... fix
 	NULL
 };
 
