@@ -90,6 +90,12 @@ MODULE_PARM_DESC(highSR, "Start Driver with support for Symbol Rates 30000.\nIf 
 
 module_param(swts, int, 0444);
 MODULE_PARM_DESC(swts, "Do not route injected data through the tsm/pti.\n");
+
+#if defined(VIP2_V1) || defined(SPARK) || defined(SPARK7162) || defined(ADB_BOX)
+int duckbox = 1;
+module_param(duckbox, int, 0444);
+MODULE_PARM_DESC(duckbox, "Let ca device enumeration start with 1 (enabled by default).\n");
+#endif
 #endif
 
 #if defined(UFS910) || defined(ADB_BOX)
@@ -255,7 +261,7 @@ long DvbGenericUnlockedIoctl(struct file *file, unsigned int foo, unsigned long 
 // numbers consistent.
 // Not sure about VIP2_V1. The "if(i < 3)" below looks misplaced.
 // --martii
-	if (i == 0)
+	if (!i && duckbox)
 	       dvb_register_device (&DvbContext->DvbAdapter,
 			            &DeviceContext->CaDevice,
 			            CaInit (DeviceContext),
