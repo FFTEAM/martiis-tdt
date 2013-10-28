@@ -938,7 +938,7 @@ static int __init aotom_init_module(void)
 	}
 
 	VFD_clr();
-	
+
 	if(button_dev_init() != 0)
 		return -1;
 
