@@ -445,15 +445,15 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		switch (panel_version.DisplayInfo) {
 		case YWPANEL_FP_DISPTYPE_LED:
 			switch (aotom_data.u.icon.icon_nr) {
-			case 0:
+			case 0: // ?!?
 				res = YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
 				led_state[LED_RED].state = aotom_data.u.icon.on;
 				break;
-			case 35:
+			case AOTOM_DOT2:
 				res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
 				led_state[LED_GREEN].state = aotom_data.u.icon.on;
 				break;
-			case 46:
+			case AOTOM_ALL:
 				led_state[LED_RED].state = aotom_data.u.icon.on;
 				led_state[LED_GREEN].state = aotom_data.u.icon.on;
 				YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
@@ -467,31 +467,35 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 			if(icon_nr & ~0xff) {
 				icon_nr >>= 8;
 				switch(icon_nr) {
-				case 0x11:
-					icon_nr = 0x0E; //widescreen
-					break;
+					case 0x11:
+						icon_nr = AOTOM_DOUBLESCREEN;
+						break;
 					case 0x13:
-						icon_nr = 0x0B; //CA
+						icon_nr = AOTOM_CA;
 						break;
 					case 0x15:
-						icon_nr = 0x19; //mp3
+						icon_nr = AOTOM_MP3;
 						break;
 					case 0x17:
-						icon_nr = 0x1A; //ac3
+						icon_nr = AOTOM_AC3;
 						break;
 					case 0x1A:
-						icon_nr = 0x03; //play
+						icon_nr = AOTOM_PLAY_LOG;
 						break;
 					case 0x1e:
-						icon_nr = 0x07; //record
+						icon_nr = AOTOM_REC1;
 						break;
 					case 38:
+						// AOTOM_DISK_S3
 						break; //cd part1
 					case 39:
+						// AOTOM_DISK_S2
 						break; //cd part2
 					case 40:
+						// AOTOM_DISK_S1
 						break; //cd part3
 					case 41:
+						// AOTOM_DISK_S0
 						break; //cd part4
 					default:
 						icon_nr = -1; //no additional symbols at the moment
@@ -499,7 +503,7 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				}
 			}
 			switch (icon_nr) {
-			case 46:
+			case AOTOM_ALL:
 				VFD_set_all_icons(aotom_data.u.icon.on);
 				res = 0;
 			case -1:

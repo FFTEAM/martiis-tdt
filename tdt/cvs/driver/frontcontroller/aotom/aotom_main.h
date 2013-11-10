@@ -189,6 +189,60 @@ typedef enum LogNum_e
     LogNum_Max
 } LogNum_T;
 
+enum aotom_icon_enum
+{
+/*----------------------------------11G-------------------------------------*/
+	AOTOM_PLAY_FASTBACKWARD = 1,
+	AOTOM_PLAY_HEAD,
+	AOTOM_PLAY_LOG,
+	AOTOM_PLAY_TAIL,
+	AOTOM_PLAY_FASTFORWARD,
+	AOTOM_PLAY_PAUSE,
+    AOTOM_REC1,
+    AOTOM_MUTE,
+    AOTOM_CYCLE,
+    AOTOM_DUBI,
+    AOTOM_CA,
+    AOTOM_CI,
+    AOTOM_USB,
+    AOTOM_DOUBLESCREEN,
+    AOTOM_REC2,
+/*----------------------------------12G-------------------------------------*/
+    AOTOM_HDD_A8,
+    AOTOM_HDD_A7,
+    AOTOM_HDD_A6,
+    AOTOM_HDD_A5,
+    AOTOM_HDD_A4,
+    AOTOM_HDD_A3,
+    AOTOM_HDD_FULL,
+    AOTOM_HDD_A2,
+    AOTOM_HDD_A1,
+    AOTOM_MP3,
+    AOTOM_AC3,
+    AOTOM_TVMODE_LOG,
+    AOTOM_AUDIO,
+    AOTOM_ALERT,
+    AOTOM_HDD_A9,
+/*----------------------------------13G-------------------------------------*/
+    AOTOM_CLOCK_PM,
+    AOTOM_CLOCK_AM,
+    AOTOM_CLOCK,
+    AOTOM_TIME_SECOND,
+    AOTOM_DOT2,
+    AOTOM_STANDBY,
+    AOTOM_TER,
+    AOTOM_DISK_S3,
+    AOTOM_DISK_S2,
+    AOTOM_DISK_S1,
+    AOTOM_DISK_S0,
+    AOTOM_SAT,
+    AOTOM_TIMESHIFT,
+    AOTOM_DOT1,
+    AOTOM_CAB,
+  /*----------------------------------end-------------------------------------*/
+    AOTOM_ALL
+};
+
 #if 0
 typedef enum
 {
