@@ -1185,7 +1185,7 @@ int YWPANEL_VFD_SetLed(int which, int on)
 		{
 			if (panel_disp_type == YWPANEL_FP_DISPTYPE_VFD) {
 				// green LED not available
-				return YWPANEL_VFD_ShowIcon(AOTOM_DOT2, on == YWPANEL_LBD_STATUS_ON);
+				return YWPANEL_VFD_ShowIcon(DOT2, on == YWPANEL_LBD_STATUS_ON);
 			}
 			if(on == YWPANEL_LBD_STATUS_ON)
 			{
