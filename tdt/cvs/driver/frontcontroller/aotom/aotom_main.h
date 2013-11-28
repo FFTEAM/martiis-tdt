@@ -13,7 +13,7 @@ typedef unsigned int u32;
 #define LOG_ON      	1
 #define LED_RED		0
 #define LED_GREEN	1
-#define LASTLED		2
+#define LEDCOUNT		2
 
 #define VFDBRIGHTNESS         0xc0425a03
 #define VFDDRIVERINIT         0xc0425a08

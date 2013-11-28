@@ -3,7 +3,8 @@
  *
  * (c) 2010 Spider-Team
  * (c) 2011 oSaoYa
- * (c) 2012-1012 Stefan Seyfried
+ * (c) 2012-2013 Stefan Seyfried
+ * (c) 2012-2013 martii
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +82,8 @@ typedef struct {
 	struct semaphore led_sem;
 } tLedState;
 
-static tLedState led_state[LASTLED];
+static tLedState led_state[LEDCOUNT + 1];
+static int led_count = LEDCOUNT;
 
 static struct semaphore 	   write_sem;
 static struct semaphore 	   draw_thread_sem;
@@ -214,6 +216,45 @@ static int led_thread(void *arg)
 			}
 			// switch LED back to manually set state
 			YWPANEL_VFD_SetLed(led, led_state[led].state);
+		}
+	}
+	led_state[led].stop = 1;
+    	led_state[led].led_task = 0;
+	return 0;
+}
+
+// This is untested and may blow up. Try "spark_fp -p 20 -l 2" for testing ... --marti
+static int spinner_thread(void *arg)
+{
+	int led = (int) arg;
+	// enable DISK_S0, periodically enable S1, S2, S3 until stopped
+
+	led_state[led].stop = 0;
+
+	while(!kthread_should_stop()) {
+		if (!down_interruptible(&led_state[led].led_sem)) {
+			int period, i = 0;
+			if (kthread_should_stop())
+				break;
+			while (!down_trylock(&led_state[led].led_sem));
+			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_ON);
+			period = led_state[led].period;
+			while ((led_state[led].period > 0) && !kthread_should_stop()) {
+				YWPANEL_VFD_ShowIcon(DISK_S0, i == 0);
+				YWPANEL_VFD_ShowIcon(DISK_S1, i == 1);
+				YWPANEL_VFD_ShowIcon(DISK_S2, i == 2);
+				i++;
+				i %= 3;
+				period = led_state[led].period;
+				while ((period > 0) && !kthread_should_stop()) {
+					msleep(10);
+					period -= 10;
+				}
+			}
+			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S1, LOG_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S2, LOG_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S3, LOG_OFF);
 		}
 	}
 	led_state[led].stop = 1;
@@ -421,16 +462,22 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 		mode = aotom_data.u.mode.compat;
 		break;
 	case VFDSETLED:
-		if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < LED_MAX) {
+		if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < led_count) {
 			switch (aotom_data.u.led.on) {
 			case LOG_OFF:
 			case LOG_ON:
-				res = YWPANEL_VFD_SetLed(aotom_data.u.led.led_nr, aotom_data.u.led.on);
-				led_state[aotom_data.u.led.led_nr].state = aotom_data.u.led.on;
-				break;
-			default: // toggle for aotom_data.u.led.on * 10 ms
-				flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
-				res = 0;
+				if (aotom_data.u.led.led_nr < LEDCOUNT) {
+					res = YWPANEL_VFD_SetLed(aotom_data.u.led.led_nr, aotom_data.u.led.on);
+					led_state[aotom_data.u.led.led_nr].state = aotom_data.u.led.on;
+					break;
+				}
+			default:
+				// led 0-1: toggle LED for aotom_data.u.led.on * 10 ms
+				// led 2:   set spinner segement time to  aotom_data.u.led.on * 10 ms and enable spinner
+				if (aotom_data.u.led.led_nr < led_count) {
+					flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
+					res = 0;
+				}
 			}
 		}
 		break;
@@ -667,8 +714,6 @@ static void button_bad_polling(struct work_struct *work)
 		if (button_value != KEY_UNKNOWN) {
 			dprintk(5, "got button: %X\n", button_value);
 			flashLED(LED_GREEN, 100);
-			//VFD_Show_Ico(DOT2,LOG_ON);
-			//YWPANEL_VFD_SetLed(1, LOG_ON);
 			if (1 == btn_pressed) {
 				if (report_key == button_value)
 					continue;
@@ -696,9 +741,6 @@ static void button_bad_polling(struct work_struct *work)
 		else {
 			if(btn_pressed) {
 				btn_pressed = 0;
-				//msleep(80);
-				//VFD_Show_Ico(DOT2,LOG_OFF);
-				//YWPANEL_VFD_SetLed(1, LOG_OFF);
 				input_report_key(button_dev, report_key, 0);
 				input_sync(button_dev);
 			}
@@ -901,12 +943,20 @@ static int __init aotom_init_module(void)
 	sema_init(&write_sem, 1);
 	sema_init(&draw_thread_sem, 1);
 
-	for (i = 0; i < LASTLED; i++) {
+	for (i = 0; i < LEDCOUNT; i++) {
 		led_state[i].state = LOG_OFF;
 		led_state[i].period = 0;
 		led_state[i].stop = 1;
 		sema_init(&led_state[i].led_sem, 0);
 		led_state[i].led_task = kthread_run(led_thread, (void *) i, "led thread");
+	}
+	if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_VFD) {
+		led_state[led_count].state = LOG_OFF;
+		led_state[led_count].period = 0;
+		led_state[led_count].stop = 1;
+		sema_init(&led_state[led_count].led_sem, 0);
+		led_state[led_count].led_task = kthread_run(spinner_thread, (void *) led_count, "spinner thread");
+		led_count++;
 	}
 
 	register_reboot_notifier(&aotom_reboot_block);
@@ -928,7 +978,7 @@ static int __init aotom_init_module(void)
 static int led_thread_active(void) {
 	int i;
 
-	for (i = 0; i < LASTLED; i++)
+	for (i = 0; i < led_count; i++)
 		if(!led_state[i].stop && led_state[i].led_task)
 			return -1;
 	return 0;
@@ -946,7 +996,7 @@ static void __exit aotom_cleanup_module(void)
 	if(!draw_thread_stop && draw_task)
 		kthread_stop(draw_task);
 
-	for (i = 0; i < LASTLED; i++)
+	for (i = 0; i < led_count; i++)
 		if(!led_state[i].stop && led_state[i].led_task) {
 			up(&led_state[i].led_sem);
 			kthread_stop(led_state[i].led_task);
