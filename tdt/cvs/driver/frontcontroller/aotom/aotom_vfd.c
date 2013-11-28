@@ -1134,6 +1134,7 @@ int  YWPANEL_FP_ControlTimer(int on)
 	return true;
 }
 
+#if 0
 int YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus )
 {
 	YWPANEL_FPData_t	data;
@@ -1159,6 +1160,7 @@ int YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus )
 	}
 	return ErrorCode;
 }
+#endif
 
 int YWPANEL_VFD_SetLed(int which, int on)
 {
@@ -1172,30 +1174,20 @@ int YWPANEL_VFD_SetLed(int which, int on)
 	{
 		case 0:
 		{
-			if(on == YWPANEL_LBD_STATUS_ON)
-			{
+			if(on)
 				lbdValue |= YWPANEL_LBD_TYPE_POWER;
-			}
 			else
-			{
 				lbdValue &= ~(YWPANEL_LBD_TYPE_POWER);
-			}
 			break;
 		}
 		case 1:
 		{
-			if (panel_disp_type == YWPANEL_FP_DISPTYPE_VFD) {
-				// green LED not available
-				return YWPANEL_VFD_ShowIcon(DOT2, on == YWPANEL_LBD_STATUS_ON);
-			}
-			if(on == YWPANEL_LBD_STATUS_ON)
-			{
+			if (panel_disp_type == YWPANEL_FP_DISPTYPE_VFD)
+				return YWPANEL_VFD_ShowIcon(DOT2, on); // green LED not available
+			if(on)
 				lbdValue |= YWPANEL_LBD_TYPE_SIGNAL;
-			}
 			else
-			{
 				lbdValue &= ~(YWPANEL_LBD_TYPE_SIGNAL);
-			}
 			break;
 		}
 
@@ -1901,7 +1893,7 @@ static int YWPANEL_VFD_ShowString_Unknown(char* str)
 	return -ENODEV;
 }
 
-static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T which, int on)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -1914,14 +1906,14 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 	if (down_interruptible(&vfd_sem))
 	   return -EBUSY;
 
-	if(log_num >= LogNum_Max) {
+	if(which >= LogNum_Max) {
 		PANEL_DEBUG(ST_ErrCode);
 		up(&vfd_sem);
 		return -EINVAL;
 	}
 
-	dig_num = log_num/16;
-	seg_num = log_num%16;
+	dig_num = which/16;
+	seg_num = which%16;
 	seg_part = seg_num/9;
 
 	data.data.vfdData.type = YWPANEL_VFD_DISPLAY;
@@ -1929,7 +1921,7 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 	if(seg_part == SEGNUM1) {
 		seg_offset = 0x01 << ((seg_num%9) - 1);
 		data.data.vfdData.address[0] = VfdSegAddr[dig_num].Segaddr1;
-		if(log_stat)
+		if(on)
 		   VfdSegAddr[dig_num].CurrValue1 |= seg_offset;
 		else
 		   VfdSegAddr[dig_num].CurrValue1 &= (0xFF-seg_offset);
@@ -1938,7 +1930,7 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 	else if(seg_part == SEGNUM2) {
 		seg_offset = 0x01 << ((seg_num%8) - 1);
 		data.data.vfdData.address[0] = VfdSegAddr[dig_num].Segaddr2;
-		if(log_stat)
+		if(on)
 		   VfdSegAddr[dig_num].CurrValue2 |= seg_offset;
 		else
 		   VfdSegAddr[dig_num].CurrValue2 &= (0xFF-seg_offset);
@@ -1953,7 +1945,7 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_Common(LogNum_T which, int on)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -1964,20 +1956,20 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
 	if (down_interruptible(&vfd_sem))
 		return -EBUSY;
 
-	if(log_num >= LogNum_Max) {
+	if(which >= LogNum_Max) {
 		PANEL_DEBUG(ST_ErrCode);
 		up(&vfd_sem);
 		return -EINVAL;
 	}
-	dig_num = log_num/16;
-	seg_num = log_num%16;
+	dig_num = which/16;
+	seg_num = which%16;
 	seg_part = seg_num/9;
 
 	VFD_CS_CLR();
 	if(seg_part == SEGNUM1) {
 		seg_offset = 0x01 << ((seg_num%9) - 1);
 		addr = VfdSegAddr[dig_num].Segaddr1;
-		if(log_stat)
+		if(on)
 		   VfdSegAddr[dig_num].CurrValue1 |= seg_offset;
 		else
 		   VfdSegAddr[dig_num].CurrValue1 &= (0xFF-seg_offset);
@@ -1986,7 +1978,7 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
 	else if(seg_part == SEGNUM2) {
 		seg_offset = 0x01 << ((seg_num%8) - 1);
 		addr = VfdSegAddr[dig_num].Segaddr2;
-		if(log_stat)
+		if(on)
 		   VfdSegAddr[dig_num].CurrValue2 |= seg_offset;
 	    else
 		   VfdSegAddr[dig_num].CurrValue2 &= (0xFF-seg_offset);
@@ -2000,7 +1992,7 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIcon_Unknown(LogNum_T log_num,int log_stat)
+static int YWPANEL_VFD_ShowIcon_Unknown(LogNum_T which __attribute__((unused)), int on __attribute__((unused)))
 {
 	return -ENODEV;
 }

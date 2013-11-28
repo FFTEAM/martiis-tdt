@@ -82,8 +82,8 @@ typedef struct {
 	struct semaphore led_sem;
 } tLedState;
 
-static tLedState led_state[LEDCOUNT + 1];
-static int led_count = LEDCOUNT;
+static tLedState led_state[LED_COUNT + 1];
+static int led_count = LED_COUNT;
 
 static struct semaphore 	   write_sem;
 static struct semaphore 	   draw_thread_sem;
@@ -104,9 +104,9 @@ static int VFD_Show_Time(u8 hh, u8 mm)
     return YWPANEL_FP_SetTime(hh*3600 + mm*60);
 }
 
-static int VFD_Show_Icon(LogNum_T log_num, int log_stat)
+static int VFD_Show_Icon(LogNum_T which, int on)
 {
-	return YWPANEL_VFD_ShowIcon(log_num, log_stat);
+	return YWPANEL_VFD_ShowIcon(which, on);
 }
 
 static struct task_struct *draw_task = 0;
@@ -131,7 +131,7 @@ static void VFD_clr(void)
 {
 	YWPANEL_VFD_ShowTimeOff();
 	clear_display();
-	VFD_set_all_icons(LOG_OFF);
+	VFD_set_all_icons(LED_OFF);
 }
 
 static int draw_thread(void *arg)
@@ -237,7 +237,7 @@ static int spinner_thread(void *arg)
 			if (kthread_should_stop())
 				break;
 			while (!down_trylock(&led_state[led].led_sem));
-			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_ON);
+			YWPANEL_VFD_ShowIcon(DISK_S0, LED_ON);
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
 				int period = led_state[led].period;
 				YWPANEL_VFD_ShowIcon(DISK_S1, i == 0);
@@ -250,10 +250,10 @@ static int spinner_thread(void *arg)
 					period -= 10;
 				}
 			}
-			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S1, LOG_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S2, LOG_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S3, LOG_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S0, LED_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S1, LED_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S2, LED_OFF);
+			YWPANEL_VFD_ShowIcon(DISK_S3, LED_OFF);
 		}
 	}
 	led_state[led].stop = 1;
@@ -388,7 +388,7 @@ static ssize_t AOTOMdev_write(struct file *filp, const char *buff, size_t len, l
 }
 
 static void flashLED(int led, int ms) {
-	if (!led_state[led].led_task || (ms < 1 && led < LEDCOUNT - 1))
+	if (!led_state[led].led_task || (ms < 1 && led < LED_COUNT - 1))
 		return;
 	led_state[led].period = ms;
 	up(&led_state[led].led_sem);
@@ -463,9 +463,9 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 	case VFDSETLED:
 		if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < led_count) {
 			switch (aotom_data.u.led.on) {
-			case LOG_OFF:
-			case LOG_ON:
-				if (aotom_data.u.led.led_nr < LEDCOUNT) {
+			case LED_OFF:
+			case LED_ON:
+				if (aotom_data.u.led.led_nr < LED_COUNT) {
 					res = YWPANEL_VFD_SetLed(aotom_data.u.led.led_nr, aotom_data.u.led.on);
 					led_state[aotom_data.u.led.led_nr].state = aotom_data.u.led.on;
 					break;
@@ -942,15 +942,15 @@ static int __init aotom_init_module(void)
 	sema_init(&write_sem, 1);
 	sema_init(&draw_thread_sem, 1);
 
-	for (i = 0; i < LEDCOUNT; i++) {
-		led_state[i].state = LOG_OFF;
+	for (i = 0; i < LED_COUNT; i++) {
+		led_state[i].state = LED_OFF;
 		led_state[i].period = 0;
 		led_state[i].stop = 1;
 		sema_init(&led_state[i].led_sem, 0);
 		led_state[i].led_task = kthread_run(led_thread, (void *) i, "led thread");
 	}
 	if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_VFD) {
-		led_state[led_count].state = LOG_OFF;
+		led_state[led_count].state = LED_OFF;
 		led_state[led_count].period = 0;
 		led_state[led_count].stop = 1;
 		sema_init(&led_state[led_count].led_sem, 0);
