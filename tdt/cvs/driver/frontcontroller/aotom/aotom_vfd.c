@@ -1186,7 +1186,7 @@ int YWPANEL_VFD_SetLed(int which, int on)
 		{
 			if (panel_disp_type == YWPANEL_FP_DISPTYPE_VFD) {
 				// green LED not available
-				return YWPANEL_VFD_ShowIcon(DOT2, (on == YWPANEL_LBD_STATUS_ON ? LOG_ON : LOG_OFF));
+				return YWPANEL_VFD_ShowIcon(DOT2, on == YWPANEL_LBD_STATUS_ON);
 			}
 			if(on == YWPANEL_LBD_STATUS_ON)
 			{
@@ -1929,18 +1929,18 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T log_num,int log_stat)
 	if(seg_part == SEGNUM1) {
 		seg_offset = 0x01 << ((seg_num%9) - 1);
 		data.data.vfdData.address[0] = VfdSegAddr[dig_num].Segaddr1;
-		if(log_stat == LOG_ON)
+		if(log_stat)
 		   VfdSegAddr[dig_num].CurrValue1 |= seg_offset;
-		if(log_stat == LOG_OFF)
+		else
 		   VfdSegAddr[dig_num].CurrValue1 &= (0xFF-seg_offset);
 		data.data.vfdData.DisplayValue[0] = VfdSegAddr[dig_num].CurrValue1 ;
 	}
 	else if(seg_part == SEGNUM2) {
 		seg_offset = 0x01 << ((seg_num%8) - 1);
 		data.data.vfdData.address[0] = VfdSegAddr[dig_num].Segaddr2;
-		if(log_stat == LOG_ON)
+		if(log_stat)
 		   VfdSegAddr[dig_num].CurrValue2 |= seg_offset;
-		if(log_stat == LOG_OFF)
+		else
 		   VfdSegAddr[dig_num].CurrValue2 &= (0xFF-seg_offset);
 		data.data.vfdData.DisplayValue[0] = VfdSegAddr[dig_num].CurrValue2 ;
 	}
@@ -1977,18 +1977,18 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T log_num,int log_stat)
 	if(seg_part == SEGNUM1) {
 		seg_offset = 0x01 << ((seg_num%9) - 1);
 		addr = VfdSegAddr[dig_num].Segaddr1;
-		if(log_stat == LOG_ON)
+		if(log_stat)
 		   VfdSegAddr[dig_num].CurrValue1 |= seg_offset;
-		if(log_stat == LOG_OFF)
+		else
 		   VfdSegAddr[dig_num].CurrValue1 &= (0xFF-seg_offset);
 		val = VfdSegAddr[dig_num].CurrValue1 ;
 	}
 	else if(seg_part == SEGNUM2) {
 		seg_offset = 0x01 << ((seg_num%8) - 1);
 		addr = VfdSegAddr[dig_num].Segaddr2;
-		if(log_stat == LOG_ON)
+		if(log_stat)
 		   VfdSegAddr[dig_num].CurrValue2 |= seg_offset;
-		if(log_stat == LOG_OFF)
+	    else
 		   VfdSegAddr[dig_num].CurrValue2 &= (0xFF-seg_offset);
 		val = VfdSegAddr[dig_num].CurrValue2 ;
 	}

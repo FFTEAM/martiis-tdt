@@ -209,7 +209,7 @@ static int led_thread(void *arg)
 			if (kthread_should_stop())
 				break;
 			while (!down_trylock(&led_state[led].led_sem)); // make sure semaphore is at 0
-			YWPANEL_VFD_SetLed(led, led_state[led].state ? LOG_OFF : LOG_ON);
+			YWPANEL_VFD_SetLed(led, led_state[led].state);
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
 				msleep(10);
 				led_state[led].period -= 10;
@@ -233,20 +233,19 @@ static int spinner_thread(void *arg)
 
 	while(!kthread_should_stop()) {
 		if (!down_interruptible(&led_state[led].led_sem)) {
-			int period, i = 0;
+			int i = 0;
 			if (kthread_should_stop())
 				break;
 			while (!down_trylock(&led_state[led].led_sem));
 			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_ON);
-			period = led_state[led].period;
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
+				int period = led_state[led].period;
 				YWPANEL_VFD_ShowIcon(DISK_S0, i == 0);
 				YWPANEL_VFD_ShowIcon(DISK_S1, i == 1);
 				YWPANEL_VFD_ShowIcon(DISK_S2, i == 2);
 				i++;
 				i %= 3;
-				period = led_state[led].period;
-				while ((period > 0) && !kthread_should_stop()) {
+				while ((period > 0) && (led_state[led].period > 0) && !kthread_should_stop()) {
 					msleep(10);
 					period -= 10;
 				}
