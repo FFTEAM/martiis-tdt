@@ -11,9 +11,10 @@ typedef unsigned int u32;
 
 #define LOG_OFF     	0
 #define LOG_ON      	1
-#define LED_RED		0
-#define LED_GREEN	1
+#define LED_RED			0
+#define LED_GREEN		1
 #define LEDCOUNT		2
+#define LED_SPINNER		2
 
 #define VFDBRIGHTNESS         0xc0425a03
 #define VFDDRIVERINIT         0xc0425a08
@@ -41,13 +42,6 @@ typedef unsigned int u32;
 #define VFDDISPLAYCLR		  0xc0425b00
 #define VFDGETLOOPSTATE		  0xc0425b01
 #define VFDSETLOOPSTATE		  0xc0425b02
-
-#define	REMOTE_SLAVE_ADDRESS			0x40bd0000	/* slave address is 5 */
-#define	REMOTE_SLAVE_ADDRESS_NEW		0xc03f0000	/* sz 2008-06-26 add new remote*/
-#define	REMOTE_SLAVE_ADDRESS_EDISION1	0x22dd0000
-#define	REMOTE_SLAVE_ADDRESS_EDISION2	0XCC330000
-#define	REMOTE_SLAVE_ADDRESS_GOLDEN 	0x48b70000	/* slave address is 5 */
-#define REMOTE_TOPFIELD_MASK			0x4fb0000
 
 #define YW_VFD_ENABLE
 #define  INVALID_KEY	-1
@@ -240,19 +234,6 @@ enum aotom_icon_enum
   /*----------------------------------end-------------------------------------*/
     AOTOM_ALL
 };
-
-#if 0
-typedef enum
-{
-	REMOTE_OLD,
-	REMOTE_NEW,
-	REMOTE_TOPFIELD,
-	REMOTE_EDISION1,
-	REMOTE_EDISION2,
-	REMOTE_GOLDEN,
-	REMOTE_UNKNOWN
-} REMOTE_TYPE;
-#endif
 
 typedef enum VFDMode_e
 {
