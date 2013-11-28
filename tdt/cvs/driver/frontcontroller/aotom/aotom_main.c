@@ -240,9 +240,9 @@ static int spinner_thread(void *arg)
 			YWPANEL_VFD_ShowIcon(DISK_S0, LOG_ON);
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
 				int period = led_state[led].period;
-				YWPANEL_VFD_ShowIcon(DISK_S0, i == 0);
-				YWPANEL_VFD_ShowIcon(DISK_S1, i == 1);
-				YWPANEL_VFD_ShowIcon(DISK_S2, i == 2);
+				YWPANEL_VFD_ShowIcon(DISK_S1, i == 0);
+				YWPANEL_VFD_ShowIcon(DISK_S2, i == 1);
+				YWPANEL_VFD_ShowIcon(DISK_S3, i == 2);
 				i++;
 				i %= 3;
 				while ((period > 0) && (led_state[led].period > 0) && !kthread_should_stop()) {
