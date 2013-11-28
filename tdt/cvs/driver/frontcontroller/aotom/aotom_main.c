@@ -388,7 +388,7 @@ static ssize_t AOTOMdev_write(struct file *filp, const char *buff, size_t len, l
 }
 
 static void flashLED(int led, int ms) {
-	if (!led_state[led].led_task || ms < 1)
+	if (!led_state[led].led_task || (ms < 1 && led < LEDCOUNT - 1))
 		return;
 	led_state[led].period = ms;
 	up(&led_state[led].led_sem);

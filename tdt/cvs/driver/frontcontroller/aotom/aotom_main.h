@@ -57,8 +57,6 @@ typedef unsigned int u32;
 
 typedef unsigned int	YWOS_ClockMsec;
 
-#define LOG_OFF     0
-#define LOG_ON      1
 #define YWPANEL_KEYBOARD
 
 struct set_brightness_s {
