@@ -208,7 +208,7 @@ static int led_thread(void *arg)
 			if (kthread_should_stop())
 				break;
 			while (!down_trylock(&led_state[led].led_sem)); // make sure semaphore is at 0
-			YWPANEL_VFD_SetLed(led, led_state[led].state);
+			YWPANEL_VFD_SetLed(led, !led_state[led].state);
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
 				msleep(10);
 				led_state[led].period -= 10;
