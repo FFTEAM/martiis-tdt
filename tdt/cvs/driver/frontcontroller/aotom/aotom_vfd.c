@@ -853,7 +853,7 @@ YWPANEL_VFDSTATE_t YWPANEL_FP_GetVFDStatus(void)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d] \n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d] \n",__LINE__);
 		return false;
 	}
 	if((data.data.VfdStandbyState.On < YWPANEL_VFDSTATE_STANDBYOFF) ||(data.data.VfdStandbyState.On > YWPANEL_VFDSTATE_STANDBYON) )
@@ -875,7 +875,7 @@ int  YWPANEL_FP_SetVFDStatus(YWPANEL_VFDSTATE_t On)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return true;
@@ -890,7 +890,7 @@ YWPANEL_POWERONSTATE_t YWPANEL_FP_GetPowerOnStatus(void)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	if((data.data.PowerOnState.state < YWPANEL_POWERONSTATE_RUNNING) ||(data.data.PowerOnState.state > YWPANEL_POWERONSTATE_CHECKPOWERBIT) )
@@ -911,7 +911,7 @@ int YWPANEL_FP_SetLoopState(YWPANEL_LOOPSTATE_t state)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return true;
@@ -926,7 +926,7 @@ int YWPANEL_FP_GetLoopState(YWPANEL_LOOPSTATE_t *state)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	if((data.data.LoopState.state < YWPANEL_LOOPSTATE_UNKNOWN) || (data.data.LoopState.state > YWPANEL_LOOPSTATE_LOOPON) )
@@ -949,7 +949,7 @@ int  YWPANEL_FP_SetPowerOnStatus(YWPANEL_POWERONSTATE_t state)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return true;
@@ -964,7 +964,7 @@ int YWPANEL_FP_GetStartUpState(YWPANEL_STARTUPSTATE_t *State)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-	  ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+	  ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 	  return false;
 	}
 
@@ -981,7 +981,7 @@ YWPANEL_CPUSTATE_t YWPANEL_FP_GetCpuStatus(void)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	if((data.data.CpuState.state <YWPANEL_CPUSTATE_RUNNING) ||(data.data.CpuState.state> YWPANEL_CPUSTATE_STANDBY) )
@@ -1003,7 +1003,7 @@ int  YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_t state)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return true;
@@ -1020,7 +1020,7 @@ int  YWPANEL_FP_GetVersion(YWPANEL_Version_t *version)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	//printk("%s:%d\n", __FUNCTION__, __LINE__);
@@ -1038,7 +1038,7 @@ u32  YWPANEL_FP_GetTime(void)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return data.data.time.second;
@@ -1054,7 +1054,7 @@ int  YWPANEL_FP_SetTime(u32 value)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return false;
 	}
 	return true;
@@ -1070,7 +1070,7 @@ int  YWPANEL_FP_SetPowerOnTime(u32 Value)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 	}
 	return true;
 }
@@ -1084,7 +1084,7 @@ u32  YWPANEL_FP_GetPowerOnTime(void)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		return 0;
 	}
 	return data.data.time.second;
@@ -1099,7 +1099,7 @@ int YWPANEL_FP_GetKey(int blue, int key_nr, u32 *k) {
 			*k = data.data.stbyKey.key;
 			return true;
 		}
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]",__LINE__);
 	}
 	return false;
 }
@@ -1112,7 +1112,7 @@ int YWPANEL_FP_SetKey(int blue, int key_nr, u32 k) {
 		data.data.stbyKey.key = k;
 		if(YWPANEL_FP_SendData(&data))
 			return true;
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]",__LINE__);
 	}
 	msleep(100); // Looks like the controller is returning junk data. Wait a couple of milliseconds, or the next i2c response will be messed up --martii
 	return false;
@@ -1128,7 +1128,7 @@ int  YWPANEL_FP_ControlTimer(int on)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]",__LINE__);
 		return false;
 	}
 	return true;
@@ -1155,7 +1155,7 @@ int YWPANEL_LBD_SetStatus(YWPANEL_LBDStatus_T  LBDStatus )
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		ErrorCode = -ETIME;
 	}
 	return ErrorCode;
@@ -1183,7 +1183,7 @@ int YWPANEL_VFD_SetLed(int which, int on)
 		case 1:
 		{
 			if (panel_disp_type == YWPANEL_FP_DISPTYPE_VFD)
-				return YWPANEL_VFD_ShowIcon(DOT2, on); // green LED not available
+				return YWPANEL_VFD_ShowIcon(AOTOM_DOT2, on); // green LED not available
 			if(on)
 				lbdValue |= YWPANEL_LBD_TYPE_SIGNAL;
 			else
@@ -1197,7 +1197,7 @@ int YWPANEL_VFD_SetLed(int which, int on)
 
 	if(YWPANEL_FP_SendData(&data) != true)
 	{
-		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+		ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 		ErrorCode = -ETIME;
 	}
 	return ErrorCode;
@@ -1470,7 +1470,7 @@ static int YWPANEL_VFD_ShowTime_StandBy(u8 hh,u8 mm)
 
 		if(YWPANEL_FP_SendData(&data) != true)
 		{
-			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 			ErrorCode = -ETIME;
 		}
 
@@ -1481,7 +1481,7 @@ static int YWPANEL_VFD_ShowTime_StandBy(u8 hh,u8 mm)
 
 		if(YWPANEL_FP_SendData(&data) != true)
 		{
-			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 			ErrorCode = -ETIME;
 		}
 	}
@@ -1504,7 +1504,7 @@ static int YWPANEL_VFD_ShowTime_StandBy(u8 hh,u8 mm)
 
 		if(YWPANEL_FP_SendData(&data) != true)
 		{
-			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 			ErrorCode = -ETIME;
 		}
 
@@ -1515,7 +1515,7 @@ static int YWPANEL_VFD_ShowTime_StandBy(u8 hh,u8 mm)
 
 		if(YWPANEL_FP_SendData(&data) != true)
 		{
-			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData not successfully!![%d]\n",__LINE__);
+			ywtrace_print(TRACE_ERROR,"YWPANEL_FP_SendData failed [%d]\n",__LINE__);
 			ErrorCode = -ETIME;
 		}
 	}
@@ -1893,7 +1893,7 @@ static int YWPANEL_VFD_ShowString_Unknown(char* str)
 	return -ENODEV;
 }
 
-static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T which, int on)
+static int YWPANEL_VFD_ShowIcon_StandBy(int which, int on)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -1906,7 +1906,7 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T which, int on)
 	if (down_interruptible(&vfd_sem))
 	   return -EBUSY;
 
-	if(which >= LogNum_Max) {
+	if(which < AOTOM_FIRST || which > AOTOM_LAST) {
 		PANEL_DEBUG(ST_ErrCode);
 		up(&vfd_sem);
 		return -EINVAL;
@@ -1945,7 +1945,7 @@ static int YWPANEL_VFD_ShowIcon_StandBy(LogNum_T which, int on)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIcon_Common(LogNum_T which, int on)
+static int YWPANEL_VFD_ShowIcon_Common(int which, int on)
 {
 	int ST_ErrCode = 0 ;
 	int dig_num = 0,seg_num = 0;
@@ -1956,7 +1956,7 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T which, int on)
 	if (down_interruptible(&vfd_sem))
 		return -EBUSY;
 
-	if(which >= LogNum_Max) {
+	if(which < AOTOM_FIRST || which > AOTOM_LAST) {
 		PANEL_DEBUG(ST_ErrCode);
 		up(&vfd_sem);
 		return -EINVAL;
@@ -1992,7 +1992,7 @@ static int YWPANEL_VFD_ShowIcon_Common(LogNum_T which, int on)
 	return ST_ErrCode ;
 }
 
-static int YWPANEL_VFD_ShowIcon_Unknown(LogNum_T which __attribute__((unused)), int on __attribute__((unused)))
+static int YWPANEL_VFD_ShowIcon_Unknown(int which __attribute__((unused)), int on __attribute__((unused)))
 {
 	return -ENODEV;
 }
@@ -2097,7 +2097,7 @@ static int  YWPANEL_VFD_Term_Common(void);
 
 int (*YWPANEL_VFD_Term)(void);
 int (*YWPANEL_VFD_Initialize)(void);
-int (*YWPANEL_VFD_ShowIcon)(LogNum_T, int);
+int (*YWPANEL_VFD_ShowIcon)(int, int);
 int (*YWPANEL_VFD_ShowTime)(u8 hh,u8 mm);
 int (*YWPANEL_VFD_ShowTimeOff)(void);
 int (*YWPANEL_VFD_SetBrightness)(int);

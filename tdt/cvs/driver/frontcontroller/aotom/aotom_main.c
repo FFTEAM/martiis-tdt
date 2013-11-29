@@ -53,7 +53,6 @@
 #include <linux/platform_device.h>
 
 #include "aotom_main.h"
-#include "utf.h"
 
 static short paramDebug = 0;
 #define TAGDEBUG "[aotom] "
@@ -104,7 +103,7 @@ static int VFD_Show_Time(u8 hh, u8 mm)
     return YWPANEL_FP_SetTime(hh*3600 + mm*60);
 }
 
-static int VFD_Show_Icon(LogNum_T which, int on)
+static int VFD_Show_Icon(int which, int on)
 {
 	return YWPANEL_VFD_ShowIcon(which, on);
 }
@@ -237,12 +236,12 @@ static int spinner_thread(void *arg)
 			if (kthread_should_stop())
 				break;
 			while (!down_trylock(&led_state[led].led_sem));
-			YWPANEL_VFD_ShowIcon(DISK_S0, LED_ON);
+			YWPANEL_VFD_ShowIcon(AOTOM_DISK_S0, LED_ON);
 			while ((led_state[led].period > 0) && !kthread_should_stop()) {
 				int period = led_state[led].period;
-				YWPANEL_VFD_ShowIcon(DISK_S1, i == 0);
-				YWPANEL_VFD_ShowIcon(DISK_S2, i == 1);
-				YWPANEL_VFD_ShowIcon(DISK_S3, i == 2);
+				YWPANEL_VFD_ShowIcon(AOTOM_DISK_S1, i == 0);
+				YWPANEL_VFD_ShowIcon(AOTOM_DISK_S2, i == 1);
+				YWPANEL_VFD_ShowIcon(AOTOM_DISK_S3, i == 2);
 				i++;
 				i %= 3;
 				while ((period > 0) && (led_state[led].period > 0) && !kthread_should_stop()) {
@@ -250,10 +249,10 @@ static int spinner_thread(void *arg)
 					period -= 10;
 				}
 			}
-			YWPANEL_VFD_ShowIcon(DISK_S0, LED_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S1, LED_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S2, LED_OFF);
-			YWPANEL_VFD_ShowIcon(DISK_S3, LED_OFF);
+			YWPANEL_VFD_ShowIcon(AOTOM_DISK_S0, LED_OFF);
+			YWPANEL_VFD_ShowIcon(AOTOM_DISK_S1, LED_OFF);
+			YWPANEL_VFD_ShowIcon(AOTOM_DISK_S2, LED_OFF);
+			YWPANEL_VFD_ShowIcon(AOTOM_DISK_S3, LED_OFF);
 		}
 	}
 	led_state[led].stop = 1;
@@ -330,14 +329,19 @@ static int aotomSetIcon(int which, int on)
 	int  res = 0;
 
 	dprintk(5, "%s > %d, %d\n", __func__, which, on);
-	if (which < 1 || which > 45)
+
+	if (which < AOTOM_FIRST) { // sequential enumeration, starting at 1
+		which -= 1;
+		which = ((which/15)+11)*16+(which%15)+1;
+	}
+
+	if (which < AOTOM_FIRST || which > AOTOM_LAST)
 	{
 		printk("VFD/AOTOM icon number out of range %d\n", which);
 		return -EINVAL;
 	}
 
-	which-=1;
-	res = VFD_Show_Icon(((which/15)+11)*16+(which%15)+1, on);
+	res = VFD_Show_Icon(which, on);
 
 	dprintk(10, "%s <\n", __func__);
 

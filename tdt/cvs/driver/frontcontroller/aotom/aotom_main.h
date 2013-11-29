@@ -99,10 +99,10 @@ struct vfd_ioctl_data {
 	unsigned char length;
 };
 
-enum aotom_icon_enum
-{
+enum {
 /*----------------------------------11G-------------------------------------*/
-	AOTOM_PLAY_FASTBACKWARD = 1,
+	AOTOM_PLAY_FASTBACKWARD = 11 * 16 + 1,
+	AOTOM_FIRST = AOTOM_PLAY_FASTBACKWARD,
 	AOTOM_PLAY_PREV,
 	AOTOM_PLAY_HEAD = AOTOM_PLAY_PREV,	// deprecated
 	AOTOM_PLAY,
@@ -123,7 +123,7 @@ enum aotom_icon_enum
 	AOTOM_DOUBLESCREEN,
 	AOTOM_REC2,
 /*----------------------------------12G-------------------------------------*/
-	AOTOM_HDD_A8,
+	AOTOM_HDD_A8 = 12 * 16 + 1,
 	AOTOM_HDD_A7,
 	AOTOM_HDD_A6,
 	AOTOM_HDD_A5,
@@ -141,7 +141,7 @@ enum aotom_icon_enum
 	AOTOM_HDD_FRAME,
 	AOTOM_HDD_A9 = AOTOM_HDD_FRAME,		// deprecated
 /*----------------------------------13G-------------------------------------*/
-	AOTOM_CLOCK_PM,
+	AOTOM_CLOCK_PM = 13 * 16 + 1,
 	AOTOM_CLOCK_AM,
 	AOTOM_CLOCK,
 	AOTOM_TIME_SECOND,
@@ -160,6 +160,7 @@ enum aotom_icon_enum
 	AOTOM_DOT1,
 	AOTOM_CABLE,
 	AOTOM_CAB = AOTOM_CABLE,			// deprecated
+	AOTOM_LAST = AOTOM_CABLE,
   /*----------------------------------end-------------------------------------*/
 	AOTOM_ALL
 };
@@ -170,60 +171,6 @@ enum aotom_icon_enum
 #define	I2C_BUS_NUM		1
 #define	I2C_BUS_ADD		(0x50>>1)  //this is important not 0x50
 typedef unsigned int	YWOS_ClockMsec;
-
-typedef enum LogNum_e
-{
-/*----------------------------------11G-------------------------------------*/
-	PLAY_FASTBACKWARD = 11*16+1,
-	PLAY_PREV,
-	PLAY,
-	PLAY_NEXT,
-	PLAY_FASTFORWARD,
-	PLAY_PAUSE,
-	REC1,
-	MUTE,
-	LOOP,
-	DOLBYDIGITAL,
-	CA,
-	CI,
-	USB,
-	DOUBLESCREEN,
-	REC2,
-/*----------------------------------12G-------------------------------------*/
-	HDD_A8 = 12*16+1,
-	HDD_A7,
-	HDD_A6,
-	HDD_A5,
-	HDD_A4,
-	HDD_A3,
-	HDD_FULL,
-	HDD_A2,
-	HDD_A1,
-	MP3,
-	AC3,
-	TVMODE_LOG,
-	AUDIO,
-	ALERT,
-	HDD_FRAME,
-/*----------------------------------13G-------------------------------------*/
-	CLOCK_PM = 13*16+1,
-	CLOCK_AM,
-	CLOCK,
-	TIME_SECOND,
-	DOT2,
-	STANDBY,
-	TERRESTRIAL,
-	DISK_S3,
-	DISK_S2,
-	DISK_S1,
-	DISK_S0,
-	SATELLITE,
-	TIMESHIFT,
-	DOT1,
-	CABLE,
-  /*----------------------------------end-------------------------------------*/
-	LogNum_Max
-} LogNum_T;
 
 typedef enum VFDMode_e
 {
@@ -245,11 +192,13 @@ typedef struct SegAddrVal_s
 	u8 CurrValue2;
 } SegAddrVal_T;
 
+#if 0
 typedef struct VFD_Format_s
 {
 	unsigned char LogNum;
 	unsigned char LogSta;
 } VFD_Format_T;
+#endif
 
 typedef struct VFD_Time_s
 {
@@ -453,11 +402,13 @@ typedef struct YWPANEL_BlueKey_s
 	u32 	key;
 } YWPANEL_BlueKey_t;
 
+#if 0
 typedef struct YWVFD_Format_s
 {
   u8 LogNum;
   u8 LogSta;
 } YWVFD_Format_T;
+#endif
 
 typedef struct YWVFD_Time_s
 {
@@ -617,7 +568,7 @@ typedef struct YWPANEL_FPData_s
 #define BASE_VFD_PRIVATE 0x00
 
 // #define VFD_GetRevision	_IOWR('s',(BASE_VFD_PRIVATE+0),char*)
-#define VFD_ShowLog			_IOWR('s',(BASE_VFD_PRIVATE+1),YWVFD_Format_T)
+// #define VFD_ShowLog			_IOWR('s',(BASE_VFD_PRIVATE+1),YWVFD_Format_T)
 #define VFD_ShowTime		_IOWR('s',(BASE_VFD_PRIVATE+2),YWVFD_Time_T)
 #define VFD_ShowStr			_IOWR('s',(BASE_VFD_PRIVATE+3),char*)
 #define VFD_ClearTime		_IOWR('s',(BASE_VFD_PRIVATE+4),int)
@@ -643,7 +594,7 @@ typedef struct YWPANEL_FPData_s
 int YWPANEL_VFD_Init(void);
 extern int (*YWPANEL_VFD_Term)(void);
 extern int (*YWPANEL_VFD_Initialize)(void);
-extern int (*YWPANEL_VFD_ShowIcon)(LogNum_T, int);
+extern int (*YWPANEL_VFD_ShowIcon)(int, int);
 extern int (*YWPANEL_VFD_ShowTime)(u8 hh,u8 mm);
 extern int (*YWPANEL_VFD_ShowTimeOff)(void);
 extern int (*YWPANEL_VFD_SetBrightness)(int);
