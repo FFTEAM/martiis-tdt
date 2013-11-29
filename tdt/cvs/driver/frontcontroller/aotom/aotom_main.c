@@ -222,7 +222,7 @@ static int led_thread(void *arg)
 	return 0;
 }
 
-// This is untested and may blow up. Try "spark_fp -p 20 -l 2" for testing ... --marti
+// Try "spark_fp -p 20 -l 2" ... --marti
 static int spinner_thread(void *arg)
 {
 	int led = (int) arg;
