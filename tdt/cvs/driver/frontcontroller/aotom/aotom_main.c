@@ -122,7 +122,7 @@ static void VFD_set_all_icons(int onoff)
 {
 	int i;
 
-	for(i=1; i <= 45; i++)
+	for(i=1; i < 46; i++)
 		aotomSetIcon(i, onoff);
 }
 
@@ -222,7 +222,7 @@ static int led_thread(void *arg)
 	return 0;
 }
 
-// Try "spark_fp -p 20 -l 2" ... --marti
+// Try "spark_fp -p 20 -l 2" ... --martii
 static int spinner_thread(void *arg)
 {
 	int led = (int) arg;
@@ -475,8 +475,8 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 					break;
 				}
 			default:
-				// led 0-1: toggle LED for aotom_data.u.led.on * 10 ms
-				// led 2:   set spinner segement time to  aotom_data.u.led.on * 10 ms and enable spinner
+				// led 0-1: toggle LED for <aotom_data.u.led.on * 10 ms>
+				// led 2:   set spinner segment time to <aotom_data.u.led.on * 10 ms> and enable spinner
 				if (aotom_data.u.led.led_nr < led_count) {
 					flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
 					res = 0;
@@ -503,6 +503,7 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
 				led_state[LED_GREEN].state = aotom_data.u.icon.on;
 				break;
+			case 46:
 			case AOTOM_ALL:
 				led_state[LED_RED].state = aotom_data.u.icon.on;
 				led_state[LED_GREEN].state = aotom_data.u.icon.on;
@@ -553,6 +554,7 @@ static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int c
 				}
 			}
 			switch (icon_nr) {
+			case 46:
 			case AOTOM_ALL:
 				VFD_set_all_icons(aotom_data.u.icon.on);
 				res = 0;
