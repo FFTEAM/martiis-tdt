@@ -261,9 +261,7 @@ irqreturn_t cec_interrupt(int irq, void *dev_id)
     if (status & CEC_STATUS_RECV_EOMSG) // End of Message
     {
       isReceiving = 0;
-      dprintk(3,"++++ CEC MESSAGE RECEIVED ++++\n");
-      parseRawMessage(indexOfRecvBuf, recvBuf);
-      dprintk(3,"---- CEC MESSAGE RECEIVED ----\n");
+      parseRawMessage(indexOfRecvBuf, recvBuf, "RX");
     }
   }
   else if (status & CEC_STATUS_SEND_BTF) // Transmitting
@@ -273,9 +271,7 @@ irqreturn_t cec_interrupt(int irq, void *dev_id)
       isSending = 0;
       cec_acknowledge();
 
-      dprintk(3,"++++ CEC MESSAGE SENT ++++\n");
-      parseRawMessage(indexOfSendBuf, sendBuf);
-      dprintk(3,"---- CEC MESSAGE SENT ----\n");
+      parseRawMessage(indexOfSendBuf, sendBuf, "TX");
     }
     else
     {

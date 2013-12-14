@@ -26,14 +26,11 @@
 #include "cec_worker.h"
 #include "cec_opcodes.h"
 #include "cec_opcodes_def.h"
+#include "cec_debug.h"
 
 /* external functions provided by the module e2_procfs */
 extern int install_e2_procs(char *name, read_proc_t *read_proc, write_proc_t *write_proc, void *data);
 extern int remove_e2_procs(char *name, read_proc_t *read_proc, write_proc_t *write_proc);
-
-#define INPUT_BUFFER_SIZE 255
-static unsigned char inputBuffer[INPUT_BUFFER_SIZE];
-static unsigned int sizeOfInputBuffer = 0;
 
 //===================================
 
@@ -118,23 +115,43 @@ int proc_event_poll_read (char *page, char **start, off_t off, int count, int *e
 
 //===================================
 
+static int toHex(char a)
+{
+	if (a >= '0' && a <= '9')
+		return a - '0';
+	if (a >= 'a' && a <= 'f')
+		return 10 + a - 'a';
+	if (a >= 'A' && a <= 'F')
+		return 10 + a - 'A';
+	return -1;
+}
+
 int proc_cec_send_write(struct file *filefile, const char __user *buf, unsigned long count, void *data)
 {
 
+    #define INPUT_BUFFER_SIZE 255
+    unsigned char inputBuffer[INPUT_BUFFER_SIZE];
+    unsigned int sizeOfInputBuffer = 0;
     int i = 0;
+
     PW_INIT(buf, count);
 
     memset(inputBuffer, 0, INPUT_BUFFER_SIZE);
     sizeOfInputBuffer = 0;
-    for(i = 0; (i+2) < pageLen; i+=3)
-    {
-        char ctmp[3];
-        ctmp[0] = page[i];
-        ctmp[1] = page[i+1];
-        ctmp[2] = '\0';
-        sscanf(ctmp, "%02hhx", &inputBuffer[sizeOfInputBuffer++]);
+    while(i < pageLen) {
+	int c0 = toHex(page[i++]), c1;
+	if (c0 < 0)
+		continue;
+	if (i < pageLen) {
+		c1 = toHex(page[i++]);
+		if (c1 > -1) {
+			c0 <<= 4;
+			c0 |= c1;
+		}
+	}
+	inputBuffer[sizeOfInputBuffer++] = (unsigned char) c0;
     }
-    printk("%s read %d bytes\n", __FUNCTION__, sizeOfInputBuffer);
+    dprintk(1, "%s read %d bytes\n", __func__, sizeOfInputBuffer);
     sendMessage(sizeOfInputBuffer, inputBuffer);
 
     PW_EXIT(count, ret, page);
@@ -150,7 +167,7 @@ int proc_cecaddress_read (char *page, char **start, off_t off, int count, int *e
     physAddr = getPhysicalAddress();
 
     len = sprintf(page, "%01x.%01x.%01x.%01x\n", (physAddr >> 12) & 0xf, (physAddr >> 8) & 0xf, 
-                                                 (physAddr >> 4)  & 0xf, (physAddr >> 0)  & 0xf );
+                                                 (physAddr >> 4)  & 0xf, (physAddr >> 0) & 0xf);
 
     PR_EXIT(len)
 }
@@ -165,7 +182,7 @@ int proc_activesource_read (char *page, char **start, off_t off, int count, int 
     physAddr = getActiveSource();
 
     len = sprintf(page, "%01x.%01x.%01x.%01x\n", (physAddr >> 12) & 0xf, (physAddr >> 8) & 0xf, 
-                                                 (physAddr >> 4)  & 0xf, (physAddr >> 0)  & 0xf );
+                                                 (physAddr >> 4)  & 0xf, (physAddr >> 0) & 0xf);
 
     RESET(eventActiveSource);
 
@@ -187,8 +204,6 @@ int proc_standby_read (char *page, char **start, off_t off, int count, int *eof,
 
 //===================================
 
-//===================================
-
 int proc_onetouchplay_write(struct file *file, const char __user *buf, unsigned long count, void *data)
 {
     PW_INIT(buf, count);
@@ -205,9 +220,11 @@ int proc_systemstandby_write(struct file *file, const char __user *buf, unsigned
     unsigned int deviceId = DEVICE_TYPE_TV;
     PW_INIT(buf, count);
 
-    if(count > 0)
-        if(page[0] >= '0' && page[0] <= 'f')
-            sscanf(page, "%1x", &deviceId);
+    if(count > 0) {
+	deviceId = toHex(page[0]);
+	if (deviceId & ~0xf)
+		deviceId = DEVICE_TYPE_TV;
+    }
 
     sendSystemStandby(deviceId);
 

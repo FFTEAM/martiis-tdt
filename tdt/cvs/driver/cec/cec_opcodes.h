@@ -36,7 +36,7 @@ void setIsFirstKiss(unsigned char kiss);
 //===============
 
 void parseMessage(unsigned char src, unsigned char dst, unsigned int len, unsigned char buf[]);
-void parseRawMessage(unsigned int len, unsigned char buf[]);
+void parseRawMessage(unsigned int len, unsigned char buf[], const char *hint);
 
 //================
 // Higher Level Functions

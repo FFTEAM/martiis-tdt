@@ -166,41 +166,43 @@ void cec_set_own_address(u32 own_address)
 //------------------------------
 
 void str_status(unsigned char status) {
-    dprintk(2, "Control Status:\n");
+    dprintk(2, "Control Status:");
     if (status & CEC_STATUS_RECV_BTF)
-	dprintk(2, "\tRECV_BTF\n");
+	dprintk(2, " RECV_BTF");
     if (status & CEC_STATUS_RECV_ERR)
-	dprintk(2, "\tRECV_ERR\n");
+	dprintk(2, " RECV_ERR");
     if (status & CEC_STATUS_RECV_EOMSG)
-	dprintk(2, "\tRECV_EOMSG\n");
+	dprintk(2, " RECV_EOMSG");
     if (status & CEC_STATUS_RECV_SOMSG)
-	dprintk(2, "\tRECV_SOMSG\n");
+	dprintk(2, " RECV_SOMSG");
     if (status & CEC_STATUS_SEND_BTF)
-	dprintk(2, "\tSEND_BTF\n");
+	dprintk(2, " SEND_BTF");
     if (status & CEC_STATUS_SEND_ERR)
-	dprintk(2, "\tSEND_ERR\n");
+	dprintk(2, " SEND_ERR");
     if (status & CEC_STATUS_SEND_EOMSG)
-	dprintk(2, "\tSEND_EOMSG\n");
+	dprintk(2, " SEND_EOMSG");
     if (status & CEC_STATUS_SEND_SOMSG)
-	dprintk(2, "\tSEND_SOMSG\n");
+	dprintk(2, " SEND_SOMSG");
+    dprintk(2, "\n");
 }
 
 void str_error(unsigned char error) {
-    dprintk(2,"Error Status:\n");
+    dprintk(2,"Error Status:");
     if (error & CEC_ERROR_SEND_BTF)
-	dprintk(2,"\tSEND_BTF\n");
+	dprintk(2," SEND_BTF");
     if (error & CEC_ERROR_ON_LINE)
-	dprintk(2,"\tON_LINE - Collision\n");
+	dprintk(2," ON_LINE - Collision");
     if (error & CEC_ERROR_ACK)
-	dprintk(2,"\tACK - No one answered\n");
+	dprintk(2," ACK - No one answered");
     if (error & CEC_ERROR_START)
-	dprintk(2,"\tSTART\n");
+	dprintk(2," START");
     if (error & CEC_ERROR_RECV_BTF)
-	dprintk(2,"\tRECV_BTF\n");
+	dprintk(2," RECV_BTF");
     if (error & CEC_ERROR_PERIOD)
-	dprintk(2,"\tPERIOD\n");
+	dprintk(2," PERIOD");
     if (error & CEC_ERROR_TIMING)
-	dprintk(2,"\tTIMING\n");
+	dprintk(2," TIMING");
+    dprintk(2, "\n");
 }
 
 int cec_internal_init(void)
