@@ -146,9 +146,9 @@ static struct alsa_backend_operations           AlsaBackendOps          =
 
 extern void SysfsInit (void);
 
-#ifndef __TDT__
+//#ifndef __TDT__
 #define CONFIG_EXPORT_PLAYER_INTERFACE
-#endif
+//#endif
 static int __init PlayerLoadModule (void)
 {
 
