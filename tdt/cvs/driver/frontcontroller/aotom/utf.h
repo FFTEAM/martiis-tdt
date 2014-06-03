@@ -1,4 +1,4 @@
-
+#if 0
 unsigned char UTF_C2[64][2] =
 {
         {0x0,0x0},
@@ -282,6 +282,7 @@ unsigned char UTF_C5[64][2] =
         {0x0,0x0},
         {0x0,0x0}
 };
+#endif
 
 unsigned char UTF_D0[64][2] =
 {
