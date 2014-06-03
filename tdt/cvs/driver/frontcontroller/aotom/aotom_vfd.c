@@ -40,6 +40,7 @@
 #include "aotom_trace.h"
 #include "aotom_main.h"
 
+#include "utf.h"
 
 YWVFD_INFO_t YWVFD_INFO;
 
@@ -2214,11 +2215,55 @@ static int YWVFD_LED_ShowString(char *str)
 
 //lwj add end
 
+static int lookup_utf8(int *pos, char *str, int len, int *v1, int *v2)
+{
+	int trailing = 0;
+
+	if (len < 1)
+		return 0;
+
+	if (*str >> 7 == 0)			// 0xxxxxxx
+		*pos += 1;
+	else if (*str >> 5 == 6)	// 110xxxxx 10xxxxxx
+		trailing = 1;
+	else if (*str >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		trailing = 2;
+	else if ((*str >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		trailing = 3;
+	else {
+		*pos += len;
+		return 0;
+	}
+
+	while (trailing) {
+		if (!len || *str >> 6 != 2)
+			return 0;
+
+		trailing--;
+		len--;
+		*pos += 1;
+	}
+
+	// Valid utf-8, see whether we can handle it.
+
+	// Currently only UTF+0400 to 047F are supported
+	switch ((unsigned char) *str) {
+		case 0xd0:
+				*v1 = UTF_D0[*(str + 1) & 0x3f][0];
+				*v2 = UTF_D0[*(str + 1) & 0x3f][1];
+				return 1;
+		case 0xd1:
+				*v1 = UTF_D1[*(str + 1) & 0x3f][0];
+				*v2 = UTF_D1[*(str + 1) & 0x3f][1];
+				return 1;
+	}
+	return 0;
+}
+
 static int YWPANEL_VFD_ShowString_StandBy(char* str)
 {
 	int ST_ErrCode = 0 ;
-	u8 length;
-	u8 i,c;
+	int length, len, i, c, pos;
 
 	YWPANEL_FPData_t	data;
 
@@ -2227,18 +2272,27 @@ static int YWPANEL_VFD_ShowString_StandBy(char* str)
 	   return ST_ErrCode;
 	}
 
-	length = strlen(str);
+	len = strlen(str);
+	length = utf8strlen(str, len);
 	data.dataType = YWPANEL_DATATYPE_VFD;
-	for(i = 0; i < 8; i++) {
-		data.data.vfdData.type = YWPANEL_VFD_DISPLAYSTRING;
-
-		if (i < length && !(str[i] & 0x80))
-			c = ywpanel_vfd_map[(int)str[i]];
-		else
-			c = 47;
-
+	for(pos = i = 0; i < 8; i++) {
+		c = 47;
 		VfdSegAddr[i+1].CurrValue1 = CharLib[c][0] ;
 		VfdSegAddr[i+1].CurrValue2 = CharLib[c][1] ;
+		data.data.vfdData.type = YWPANEL_VFD_DISPLAYSTRING;
+
+		if (i < length) {
+				int v1, v2;
+				if (!(str[pos] & 0x80)) {
+					c = ywpanel_vfd_map[(int)str[pos]];
+					VfdSegAddr[i+1].CurrValue1 = CharLib[c][0];
+					VfdSegAddr[i+1].CurrValue2 = CharLib[c][1];
+					pos++;
+				} else if (lookup_utf8(&pos, str + pos, len - pos, &v1, &v2)) {
+						VfdSegAddr[i+1].CurrValue1 = v1;
+						VfdSegAddr[i+1].CurrValue2 = v2;
+				}
+		}
 
 		data.data.vfdData.address[2*i] = VfdSegAddr[i+1].Segaddr1;
 		data.data.vfdData.DisplayValue[2*i] = VfdSegAddr[i+1].CurrValue1;

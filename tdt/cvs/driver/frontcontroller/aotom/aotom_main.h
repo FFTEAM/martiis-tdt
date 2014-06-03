@@ -657,6 +657,8 @@ u32  YWPANEL_FP_GetPowerOnTime(void);
 int YWPANEL_VFD_GetKeyValue(void);
 int YWPANEL_VFD_SetLed(int which, int on);
 
+int utf8strlen(char *s, int len);
+
 #endif /* __KERNEL__ */
 #endif /* __AOTOM_MAIN_H__ */
 

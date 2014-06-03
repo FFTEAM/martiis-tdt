@@ -133,19 +133,66 @@ static void VFD_clr(void)
 	VFD_set_all_icons(LED_OFF);
 }
 
+int utf8strlen(char *s, int len)
+{
+	int i = 0, ulen = 0;
+
+	while (i < len)
+	{
+		int trailing = 0;
+		if (s[i] >> 7 == 0)		// 0xxxxxxx
+		{
+			i++;
+			ulen++;
+			continue;
+		}
+		if (s[i] >> 5 == 6)		// 110xxxxx 10xxxxxx
+		{
+			if (++i >= len)
+				return 0;
+			trailing = 1;
+		}
+		else if (s[i] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		{
+			if (++i >= len)
+				return 0;
+			trailing = 2;
+		}
+		else if ((s[i] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		{
+			if (++i >= len)
+				return 0;
+			trailing = 3;
+		} else
+			return 0;
+
+		while (trailing) {
+			if (i >= len || s[i] >> 6 != 2)
+				return 0;
+			trailing--;
+			i++;
+		}
+		ulen++;
+	}
+	return ulen; // can be UTF8 (or pure ASCII, at least no non-UTF-8 8bit characters)
+}
+
 static int draw_thread(void *arg)
 {
   struct vfd_ioctl_data *data = (struct vfd_ioctl_data *) arg;
   char buf[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
   char buf2[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
   int len = data->length;
+  int utf8len = 0;
   int off = 0;
   int saved = 0;
+
+  utf8len = utf8strlen(data->data, data->length);
 
   if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED && len > 2 && data->data[2] == '.')
 	saved = 1;
 
-  if (len - saved > YWPANEL_width) {
+  if (utf8len - saved > YWPANEL_width) {
   	memset(buf, ' ', sizeof(buf));
 	off = YWPANEL_width - 1;
   	memcpy(buf + off, data->data, len);
@@ -165,11 +212,12 @@ static int draw_thread(void *arg)
 	buf2[i] = 0;
   }
 
-  if(len - saved > YWPANEL_width) {
+  if(utf8len - saved > YWPANEL_width) {
     char *b = saved ? buf2 : buf;
     int pos;
-    for(pos = 0; pos < len; pos++) {
-	int i;
+    for(pos = 0; pos < len;) {
+	int i, trailing = 0;
+
 	if(kthread_should_stop()) {
     	   draw_thread_stop = 1;
     	   return 0;
@@ -185,11 +233,33 @@ static int draw_thread(void *arg)
 		}
 		msleep(40);
 	}
+	if (b[pos] >> 7 == 0)		// 0xxxxxxx
+	{
+		pos++;
+		continue;
+	}
+	if (b[pos] >> 5 == 6)		// 110xxxxx 10xxxxxx
+		trailing = 1;
+	else if (b[pos] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		trailing = 2;
+	else if ((b[pos] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		trailing = 3;
+	else
+		break;
+
+	while (trailing) {
+		if (pos >= len || b[pos] >> 6 != 2) {
+			pos = len;
+			break;
+		}
+		trailing--;
+		pos++;
+	}
     }
   }
 
   clear_display();
-  if(len > 0)
+  if(utf8len > 0)
       YWPANEL_VFD_ShowString(buf + off);
 
   draw_thread_stop = 1;
