@@ -139,32 +139,26 @@ int utf8strlen(char *s, int len)
 
 	while (i < len)
 	{
-		int trailing = 0;
-		if (s[i] >> 7 == 0)		// 0xxxxxxx
-			++i;
+		int trailing;
+
+		if (!(s[i] >> 7))		// 0xxxxxxx
+			trailing = 0;
 		else if (s[i] >> 5 == 6)	// 110xxxxx 10xxxxxx
-		{
-			if (++i >= len)
-				return 0;
 			trailing = 1;
-		}
 		else if (s[i] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		{
-			if (++i >= len)
-				return 0;
 			trailing = 2;
-		}
 		else if ((s[i] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		{
-			if (++i >= len)
-				return 0;
 			trailing = 3;
-		} else
-			return 0;
+		else
+			return ulen;
+
+		i++;
+		if (trailing && (i >= len))
+			return ulen;
 
 		while (trailing) {
 			if (i >= len || s[i] >> 6 != 2)
-				return 0;
+				return ulen;
 			trailing--;
 			i++;
 		}
@@ -179,11 +173,9 @@ static int draw_thread(void *arg)
   char buf[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
   char buf2[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
   int len = data->length;
-  int utf8len = 0;
   int off = 0;
   int saved = 0;
-
-  utf8len = utf8strlen(data->data, data->length);
+  int utf8len = utf8strlen(data->data, data->length);
 
   if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED && len > 2 && data->data[2] == '.')
 	saved = 1;
@@ -193,6 +185,7 @@ static int draw_thread(void *arg)
 	off = YWPANEL_width - 1;
   	memcpy(buf + off, data->data, len);
 	len += off;
+	utf8len += off;
 	buf[len + YWPANEL_width] = 0;
   } else {
   	memcpy(buf, data->data, len);
@@ -211,15 +204,15 @@ static int draw_thread(void *arg)
   if(utf8len - saved > YWPANEL_width) {
     char *b = saved ? buf2 : buf;
     int pos;
-    for(pos = 0; pos < len;) {
-	int i, trailing = 0;
+    for(pos = 0; pos < utf8len; pos++) {
+	int i;
 
 	if(kthread_should_stop()) {
     	   draw_thread_stop = 1;
     	   return 0;
 	}
 
-	YWPANEL_VFD_ShowString(b + pos);
+	YWPANEL_VFD_ShowString(b);
 
 	// sleep 200 ms
 	for (i = 0; i < 5; i++) {
@@ -229,25 +222,16 @@ static int draw_thread(void *arg)
 		}
 		msleep(40);
 	}
-	if (b[pos] >> 7 == 0)		// 0xxxxxxx
-		pos++;
-	else if (b[pos] >> 5 == 6)	// 110xxxxx 10xxxxxx
-		trailing = 1, pos++;
-	else if (b[pos] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		trailing = 2, pos++;
-	else if ((b[pos] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		trailing = 3, pos++;
-	else
-		break;
 
-	while (trailing) {
-		if (pos >= len || b[pos] >> 6 != 2) {
-			pos = len;
-			break;
-		}
-		trailing--;
-		pos++;
-	}
+	// advance to next UTF-8 character
+	if (!(*b >> 7))			// 0xxxxxxx
+		b += 1;
+	else if ((*b >> 5) == 6)	// 110xxxxx 10xxxxxx
+		b += 2;
+	else if ((*b >> 4) == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		b += 3;
+	else if ((*b >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		b += 4;
     }
   }
 
