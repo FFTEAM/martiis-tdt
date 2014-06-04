@@ -2225,11 +2225,11 @@ static int lookup_utf8(int *pos, char *str, int len, int *v1, int *v2)
 	if (*str >> 7 == 0)			// 0xxxxxxx
 		*pos += 1;
 	else if (*str >> 5 == 6)	// 110xxxxx 10xxxxxx
-		trailing = 1;
+		trailing = 1, *pos += 1;
 	else if (*str >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		trailing = 2;
+		trailing = 2, *pos += 1;
 	else if ((*str >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		trailing = 3;
+		trailing = 3, *pos += 1;
 	else {
 		*pos += len;
 		return 0;
@@ -2263,7 +2263,7 @@ static int lookup_utf8(int *pos, char *str, int len, int *v1, int *v2)
 static int YWPANEL_VFD_ShowString_StandBy(char* str)
 {
 	int ST_ErrCode = 0 ;
-	int length, len, i, c, pos;
+	int length, len, i, pos;
 
 	YWPANEL_FPData_t	data;
 
@@ -2276,15 +2276,14 @@ static int YWPANEL_VFD_ShowString_StandBy(char* str)
 	length = utf8strlen(str, len);
 	data.dataType = YWPANEL_DATATYPE_VFD;
 	for(pos = i = 0; i < 8; i++) {
-		c = 47;
-		VfdSegAddr[i+1].CurrValue1 = CharLib[c][0] ;
-		VfdSegAddr[i+1].CurrValue2 = CharLib[c][1] ;
+		VfdSegAddr[i+1].CurrValue1 = 0;
+		VfdSegAddr[i+1].CurrValue2 = 0;
 		data.data.vfdData.type = YWPANEL_VFD_DISPLAYSTRING;
 
 		if (i < length) {
 				int v1, v2;
 				if (!(str[pos] & 0x80)) {
-					c = ywpanel_vfd_map[(int)str[pos]];
+					u8 c = ywpanel_vfd_map[(int)str[pos]];
 					VfdSegAddr[i+1].CurrValue1 = CharLib[c][0];
 					VfdSegAddr[i+1].CurrValue2 = CharLib[c][1];
 					pos++;

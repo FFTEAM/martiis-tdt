@@ -141,12 +141,8 @@ int utf8strlen(char *s, int len)
 	{
 		int trailing = 0;
 		if (s[i] >> 7 == 0)		// 0xxxxxxx
-		{
-			i++;
-			ulen++;
-			continue;
-		}
-		if (s[i] >> 5 == 6)		// 110xxxxx 10xxxxxx
+			++i;
+		else if (s[i] >> 5 == 6)	// 110xxxxx 10xxxxxx
 		{
 			if (++i >= len)
 				return 0;
@@ -234,16 +230,13 @@ static int draw_thread(void *arg)
 		msleep(40);
 	}
 	if (b[pos] >> 7 == 0)		// 0xxxxxxx
-	{
 		pos++;
-		continue;
-	}
-	if (b[pos] >> 5 == 6)		// 110xxxxx 10xxxxxx
-		trailing = 1;
+	else if (b[pos] >> 5 == 6)	// 110xxxxx 10xxxxxx
+		trailing = 1, pos++;
 	else if (b[pos] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		trailing = 2;
+		trailing = 2, pos++;
 	else if ((b[pos] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		trailing = 3;
+		trailing = 3, pos++;
 	else
 		break;
 
