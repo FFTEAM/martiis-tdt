@@ -141,13 +141,13 @@ int utf8strlen(char *s, int len)
 	{
 		int trailing;
 
-		if (!(s[i] >> 7))		// 0xxxxxxx
+		if (!((unsigned char)s[i] >> 7))		// 0xxxxxxx
 			trailing = 0;
-		else if (s[i] >> 5 == 6)	// 110xxxxx 10xxxxxx
+		else if ((unsigned char)s[i] >> 5 == 6)		// 110xxxxx 10xxxxxx
 			trailing = 1;
-		else if (s[i] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		else if ((unsigned char)s[i] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
 			trailing = 2;
-		else if ((s[i] >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		else if ((unsigned char)s[i] >> 3 == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 			trailing = 3;
 		else
 			return ulen;
@@ -157,7 +157,7 @@ int utf8strlen(char *s, int len)
 			return ulen;
 
 		while (trailing) {
-			if (i >= len || s[i] >> 6 != 2)
+			if (i >= len || (unsigned char)s[i] >> 6 != 2)
 				return ulen;
 			trailing--;
 			i++;
@@ -202,7 +202,7 @@ static int draw_thread(void *arg)
   }
 
   if(utf8len - saved > YWPANEL_width) {
-    char *b = saved ? buf2 : buf;
+    unsigned char *b = (unsigned char *) (saved ? buf2 : buf);
     int pos;
     for(pos = 0; pos < utf8len; pos++) {
 	int i;
@@ -331,20 +331,25 @@ static int run_draw_thread(struct vfd_ioctl_data *draw_data)
 	draw_task = 0;
     }
 
+#if 0
     if (draw_data->length < YWPANEL_width) {
+	// This is not UTF-8 compliant. Live with it.
 	char buf[DISPLAYWIDTH_MAX];
 	memset(buf, ' ', sizeof(buf));
 	if (draw_data->length)
 		memcpy(buf, draw_data->data, draw_data->length);
 	YWPANEL_VFD_ShowString(buf);
     } else {
+#endif
 	draw_thread_stop = 2;
 	draw_task = kthread_run(draw_thread,draw_data,"draw thread");
 
 	//wait until thread has copied the argument
 	while(draw_thread_stop == 2)
 		msleep(1);
+#if 0
     }
+#endif
 
     up(&draw_thread_sem);
 
