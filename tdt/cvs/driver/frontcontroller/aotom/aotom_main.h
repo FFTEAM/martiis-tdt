@@ -21,7 +21,6 @@
 #define VFDGETSTBYKEY			0xc0425af3
 #define VFDSETSTBYKEY			0xc0425af4
 #define VFDPOWEROFF				0xc0425af5
-#define VFDPOWEROFF				0xc0425af5
 #define VFDSETPOWERONTIME		0xc0425af6
 #define VFDGETVERSION			0xc0425af7
 #define VFDGETSTARTUPSTATE		0xc0425af8
@@ -30,7 +29,6 @@
 #define VFDSETTIME				0xc0425afb
 #define VFDSTANDBY				0xc0425afc
 #define VFDSETTIME2				0xc0425afd	// seife, set 'complete' time...
-
 #define VFDSETLED				0xc0425afe
 #define VFDSETMODE				0xc0425aff
 #define VFDDISPLAYCLR			0xc0425b00

@@ -316,48 +316,34 @@ static struct vfd_ioctl_data last_draw_data;
 
 static int run_draw_thread(struct vfd_ioctl_data *draw_data)
 {
-    if(down_interruptible (&draw_thread_sem))
-	return -ERESTARTSYS;
+	if(down_interruptible (&draw_thread_sem))
+		return -ERESTARTSYS;
 
-    // return if there's already a draw task running for the same text
-    if((draw_thread_status =! DRAW_THREAD_STATUS_STOPPED ) && draw_task && (last_draw_data.length == draw_data->length) && !memcmp(&last_draw_data.data, draw_data->data, draw_data->length)) {
-    	up(&draw_thread_sem);
-	return 0;
-    }
+	// return if there's already a draw task running for the same text
+	if((draw_thread_status != DRAW_THREAD_STATUS_STOPPED ) && draw_task && (last_draw_data.length == draw_data->length) && !memcmp(&last_draw_data.data, draw_data->data, draw_data->length)) {
+		up(&draw_thread_sem);
+		return 0;
+	}
 
-    memcpy(&last_draw_data, draw_data, sizeof(struct vfd_ioctl_data));
+	memcpy(&last_draw_data, draw_data, sizeof(struct vfd_ioctl_data));
 
-    // stop existing thread, if any
-    if((draw_thread_status =! DRAW_THREAD_STATUS_STOPPED) && draw_task) {
-	kthread_stop(draw_task);
-	while(draw_thread_status != DRAW_THREAD_STATUS_STOPPED)
-		msleep(1);
-	draw_task = 0;
-    }
+	// stop existing thread, if any
+	if((draw_thread_status != DRAW_THREAD_STATUS_STOPPED) && draw_task) {
+		kthread_stop(draw_task);
+		while(draw_thread_status != DRAW_THREAD_STATUS_STOPPED)
+			msleep(1);
+	}
 
-#if 0
-    if (draw_data->length < YWPANEL_width) {
-	// This is not UTF-8 compliant. Live with it.
-	char buf[DISPLAYWIDTH_MAX];
-	memset(buf, ' ', sizeof(buf));
-	if (draw_data->length)
-		memcpy(buf, draw_data->data, draw_data->length);
-	YWPANEL_VFD_ShowString(buf);
-    } else {
-#endif
 	draw_thread_status = DRAW_THREAD_STATUS_INIT;
 	draw_task = kthread_run(draw_thread,draw_data,"draw thread");
 
 	//wait until thread has copied the argument
 	while(draw_thread_status == DRAW_THREAD_STATUS_INIT)
 		msleep(1);
-#if 0
-    }
-#endif
 
-    up(&draw_thread_sem);
+	up(&draw_thread_sem);
 
-    return 0;
+	return 0;
 }
 
 int aotomSetTime(char* time)

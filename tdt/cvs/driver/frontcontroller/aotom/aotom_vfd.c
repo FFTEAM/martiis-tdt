@@ -2009,12 +2009,22 @@ static void YWVFDi_DVFDFillChar(u8 i, u8 c)
 		YWVFDi_DVFDCleanChar(i);
 }
 
-static void YWVFDi_DVFDFillString(char* str, u8 length)
+static void YWVFDi_DVFDFillString(char* str)
 {
-	u8 i;
+	int number_of_utf8_characters = utf8strlen(str, strlen(str));
+	int i;
 
-	for(i = 0; i < length; i++)
-		YWVFDi_DVFDFillChar(i, str[i]);
+	if (number_of_utf8_characters > 15)
+		number_of_utf8_characters = 16;
+
+	for(i = 0; i < number_of_utf8_characters; i++) {
+		int size = utf8charlen(*str);
+		if (size == 1)
+			YWVFDi_DVFDFillChar(i, *str);
+		else
+			YWVFDi_DVFDCleanChar(i);
+		str += size;
+	}
 
 	for(; i < 16; i++)
 		YWVFDi_DVFDCleanChar(i);
@@ -2084,13 +2094,10 @@ static int YWVFDi_DVFDDisplayString(void)
 static int YWVFD_STANDBY_DvfdShowString(char* str)
 {
 	int ret = 0;
-	u8 length = strlen(str);
-	if(length > 16)
-		length = 16;
 
 	YWVFD_Debug("%s:%d\n", __FUNCTION__, __LINE__);
 
-	YWVFDi_DVFDFillString(str, length);
+	YWVFDi_DVFDFillString(str);
 
 	YWVFD_Debug("%s:%d\n", __FUNCTION__, __LINE__);
 
@@ -2164,18 +2171,25 @@ static u8 ywpanel_led_map[0x80] =
 #define YWPANEL_MAX_LED_LENGTH 4
 static u8  YWPANEL_LedDisplayData[YWPANEL_MAX_LED_LENGTH];
 
-static void YWPANEL_LEDSetString(char *LEDStrBuf)
+static void YWPANEL_LEDSetString(char *str)
 {
-	int i, j, c, len = strlen(LEDStrBuf);
+	int i;
+	int number_of_utf8_characters = utf8strlen(str, strlen(str));
 
-	for(i = 0, j = 0; i < YWPANEL_MAX_LED_LENGTH; i++, j++) {
-		if (j < len) {
-			c = (int) LEDStrBuf[j];
-			YWPANEL_LedDisplayData[i] = (c & ~0x7f) ? 0 : ywpanel_led_map[c];
-			if((i == 1) && (LEDStrBuf[j + 1] == '.') && !(YWPANEL_LedDisplayData[i] & 1))
-					YWPANEL_LedDisplayData[i] |= 1, j++;
-		} else
-			YWPANEL_LedDisplayData[i] = 0;
+	for(i = 0; i < YWPANEL_MAX_LED_LENGTH; i++) {
+		YWPANEL_LedDisplayData[i] = 0;
+		if (i < number_of_utf8_characters) {
+			int size = utf8charlen(*str);
+			if (size == 1) {
+				YWPANEL_LedDisplayData[i] = ywpanel_led_map[(unsigned char) *str];
+				if((i == 1) && ((*(str + 1) == '.') || (*(str + 1) == ',')) && !(YWPANEL_LedDisplayData[i] & 1)) {
+					YWPANEL_LedDisplayData[i] |= 1;
+					str++;
+					number_of_utf8_characters--;
+				}
+			}
+			str += size;
+		}
 	}
 }
 
