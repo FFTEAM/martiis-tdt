@@ -658,6 +658,7 @@ int YWPANEL_VFD_GetKeyValue(void);
 int YWPANEL_VFD_SetLed(int which, int on);
 
 int utf8strlen(char *s, int len);
+int utf8charlen(unsigned char c);
 
 #endif /* __KERNEL__ */
 #endif /* __AOTOM_MAIN_H__ */

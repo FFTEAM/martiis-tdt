@@ -74,7 +74,7 @@ typedef enum PIO_Mode_e
 	PIO_In
 }PIO_Mode_T;
 
-u8 YWPANEL_CharArray[]=
+static u8 YWPANEL_CharArray[]=
 {
 	0x7B,0x11,0x76,0x75,0x1D,0x6D,0x6F,0x31,0xFF,0x7D/* 0~9*/
 };
@@ -93,7 +93,7 @@ u8 YWPANEL_CharArray[]=
 /*address 1 7bit   d a b f k j h */
 
 
-u8 CharLib[0x33][2] =
+static u8 CharLib[0x33][2] =
 {
 	{0xF1, 0x38},	//A	00
 	{0x74, 0x72},	//B	01
@@ -152,7 +152,7 @@ u8 CharLib[0x33][2] =
 	{0x48, 0x01},	// >}	32
 };
 
-u8 NumLib[10][2] =
+static u8 NumLib[10][2] =
 {
 	{0x77, 0x77},	//{01110111, 01110111},
 	{0x24, 0x22},	//{00100100, 00010010},
@@ -165,124 +165,124 @@ u8 NumLib[10][2] =
 	{0x7F, 0x7F},	//{01111111, 01111111},
 	{0x7D, 0x7B}	//{01111101, 01111011},
 };
-char dvfd_bitmap[95][5] = {
-		{0x00, 0x00, 0x00, 0x00, 0x00, }, //' ' 0x20 032
-		{0x10, 0x42, 0x08, 0x01, 0x04, }, //'!' 0x21 033
-		{0x68, 0xad, 0x00, 0x00, 0x00, }, //'"' 0x22 034
-		{0x28, 0xf5, 0xd5, 0x57, 0x0a, }, //'#' 0x23 035
-		{0x10, 0x5f, 0x1c, 0x7d, 0x04, }, //'$' 0x24 036
-		{0x8c, 0x89, 0x88, 0xc8, 0x18, }, //'%' 0x25 037
-		{0x88, 0x52, 0x44, 0x4d, 0x16, }, //'&' 0x26 038
-		{0x10, 0x42, 0x00, 0x00, 0x00, }, //''' 0x27 039
-		{0x40, 0x44, 0x08, 0x41, 0x10, }, //'(' 0x28 040
-		{0x04, 0x41, 0x08, 0x11, 0x01, }, //')' 0x29 041
-		{0x90, 0xea, 0x88, 0xab, 0x04, }, //'*' 0x2a 042
-		{0x00, 0x42, 0x3e, 0x21, 0x00, }, //'+' 0x2b 043
-		{0x00, 0x00, 0x00, 0x31, 0x02, }, //',' 0x2c 044
-		{0x00, 0xf0, 0x01, 0x00, 0x00, }, //'-' 0x2d 045
-		{0x00, 0x00, 0x00, 0x61, 0x00, }, //'.' 0x2e 046
-		{0x00, 0x88, 0x88, 0x08, 0x00, }, //'/' 0x2f 047
-		{0xb8, 0x18, 0x63, 0x8c, 0x0e, }, //'0' 0x30 048
-		{0x10, 0x43, 0x08, 0x21, 0x1f, }, //'1' 0x31 049
-		{0xb8, 0x08, 0x11, 0x11, 0x1f, }, //'2' 0x32 050
-		{0x38, 0xc8, 0x20, 0x84, 0x0f, }, //'3' 0x33 051
-		{0x20, 0xa6, 0xd2, 0x47, 0x1c, }, //'4' 0x34 052
-		{0xbc, 0xf0, 0x20, 0x84, 0x0f, }, //'5' 0x35 053
-		{0x30, 0x11, 0x5e, 0x8c, 0x0e, }, //'6' 0x36 054
-		{0x7c, 0x88, 0x10, 0x22, 0x04, }, //'7' 0x37 055
-		{0xb8, 0x18, 0x5d, 0x8c, 0x0e, }, //'8' 0x38 056
-		{0xb8, 0x18, 0x3d, 0x44, 0x06, }, //'9' 0x39 057
-		{0x00, 0x46, 0x00, 0x61, 0x00, }, //':' 0x3a 058
-		{0x00, 0x46, 0x00, 0x31, 0x02, }, //';' 0x3b 059
-		{0x40, 0x26, 0x06, 0x81, 0x00, }, //'<' 0x3c 060
-		{0x80, 0x0f, 0x3e, 0x00, 0x00, }, //'=' 0x3d 061
-		{0x04, 0x83, 0x30, 0x09, 0x00, }, //'>' 0x3e 062
-		{0xb8, 0x08, 0x19, 0x01, 0x04, }, //'?' 0x3f 063
-		{0xb8, 0x98, 0x6b, 0x0e, 0x1e, }, //'@' 0x40 064
-		{0x08, 0x93, 0xe2, 0x8f, 0x11, }, //'A' 0x41 065
-		{0xbc, 0x18, 0x5f, 0x8c, 0x0f, }, //'B' 0x42 066
-		{0xb8, 0x18, 0x42, 0x88, 0x0e, }, //'C' 0x43 067
-		{0xbc, 0x18, 0x63, 0x8c, 0x0f, }, //'D' 0x44 068
-		{0xfc, 0x18, 0x4e, 0x89, 0x1f, }, //'E' 0x45 069
-		{0x78, 0x21, 0x9c, 0x12, 0x06, }, //'F' 0x46 070
-		{0xf8, 0x10, 0x42, 0x8e, 0x1e, }, //'G' 0x47 071
-		{0xc4, 0x18, 0x7f, 0x8c, 0x11, }, //'H' 0x48 072
-		{0x38, 0x42, 0x08, 0x21, 0x0e, }, //'I' 0x49 073
-		{0x70, 0x08, 0x61, 0x8c, 0x0e, }, //'J' 0x4a 074
-		{0xec, 0x54, 0x4e, 0x4a, 0x13, }, //'K' 0x4b 075
-		{0x1c, 0x21, 0x84, 0x10, 0x1f, }, //'L' 0x4c 076
-		{0xc4, 0xbd, 0x6b, 0x8d, 0x1b, }, //'M' 0x4d 077
-		{0xe4, 0x39, 0x6b, 0xce, 0x13, }, //'N' 0x4e 078
-		{0xb8, 0x18, 0x63, 0x8c, 0x0e, }, //'O' 0x4f 079
-		{0xbc, 0x18, 0x5f, 0x08, 0x03, }, //'P' 0x50 080
-		{0xb8, 0x18, 0x63, 0x4d, 0x16, }, //'Q' 0x51 081
-		{0xbc, 0x18, 0x5f, 0x49, 0x13, }, //'R' 0x52 082
-		{0xb8, 0x18, 0x1c, 0x8c, 0x0e, }, //'S' 0x53 083
-		{0xfc, 0x4a, 0x08, 0x21, 0x0e, }, //'T' 0x54 084
-		{0xec, 0x18, 0x63, 0x8c, 0x0e, }, //'U' 0x55 085
-		{0xc4, 0x18, 0xa5, 0x52, 0x04, }, //'V' 0x56 086
-		{0xc4, 0x58, 0x6b, 0x55, 0x0a, }, //'W' 0x57 087
-		{0x44, 0xa9, 0x88, 0xca, 0x11, }, //'X' 0x58 088
-		{0x44, 0xa9, 0x08, 0x21, 0x0e, }, //'Y' 0x59 089
-		{0xfc, 0x88, 0x88, 0x88, 0x1f, }, //'Z' 0x5a 090
-		{0x30, 0x42, 0x08, 0x21, 0x0c, }, //'[' 0x5b 091
-		{0x80, 0x20, 0x08, 0x82, 0x00, }, //'\' 0x5c 092
-		{0x18, 0x42, 0x08, 0x21, 0x06, }, //']' 0x5d 093
-		{0x00, 0xa2, 0x22, 0x00, 0x00, }, //'^' 0x5e 094
-		{0x00, 0x00, 0x00, 0xf8, 0x00, }, //'_' 0x5f 095
-		{0x00, 0x02, 0x00, 0x00, 0x00, }, //'`' 0x60 096
-		{0x00, 0x07, 0x7d, 0xf4, 0x00, }, //'a' 0x61 097
-		{0x08, 0xe1, 0xa4, 0x74, 0x00, }, //'b' 0x62 098
-		{0x00, 0x17, 0x43, 0xf0, 0x00, }, //'c' 0x63 099
-		{0x20, 0xe4, 0x52, 0x72, 0x00, }, //'d' 0x64 100
-		{0x00, 0x17, 0x7f, 0xf0, 0x00, }, //'e' 0x65 101
-		{0x60, 0xe2, 0x09, 0x21, 0x0e, }, //'f' 0x66 102
-		{0x00, 0x26, 0x25, 0x87, 0x0e, }, //'g' 0x67 103
-		{0x08, 0xe1, 0xa4, 0x94, 0x00, }, //'h' 0x68 104
-		{0x10, 0x60, 0x08, 0x71, 0x00, }, //'i' 0x69 105
-		{0x10, 0xe0, 0x10, 0x52, 0x0c, }, //'j' 0x6a 106
-		{0x08, 0x6d, 0x8c, 0x92, 0x00, }, //'k' 0x6b 107
-		{0x18, 0x42, 0x08, 0x61, 0x00, }, //'l' 0x6c 108
-		{0x00, 0x57, 0x6b, 0xad, 0x00, }, //'m' 0x6d 109
-		{0x00, 0x26, 0xa5, 0x94, 0x00, }, //'n' 0x6e 110
-		{0x00, 0x26, 0xa5, 0x64, 0x00, }, //'o' 0x6f 111
-		{0x00, 0x27, 0xa5, 0x13, 0x02, }, //'p' 0x70 112
-		{0x00, 0x97, 0x92, 0x43, 0x08, }, //'q' 0x71 113
-		{0x80, 0x26, 0x84, 0x10, 0x00, }, //'r' 0x72 114
-		{0x00, 0x17, 0x0c, 0x3a, 0x00, }, //'s' 0x73 115
-		{0x88, 0x27, 0x84, 0x62, 0x00, }, //'t' 0x74 116
-		{0x80, 0x1c, 0x63, 0x74, 0x00, }, //'u' 0x75 117
-		{0x80, 0x18, 0x95, 0x22, 0x00, }, //'v' 0x76 118
-		{0x80, 0x58, 0xeb, 0x56, 0x00, }, //'w' 0x77 119
-		{0x80, 0xa9, 0x88, 0x9a, 0x00, }, //'x' 0x78 120
-		{0x80, 0x29, 0x15, 0x23, 0x04, }, //'y' 0x79 121
-		{0x80, 0x8f, 0x88, 0xf8, 0x00, }, //'z' 0x7a 122
-		{0x60, 0x42, 0x04, 0x21, 0x18, }, //'{' 0x7b 123
-		{0x10, 0x42, 0x08, 0x21, 0x04, }, //'|' 0x7c 124
-		{0x0c, 0x42, 0x10, 0x21, 0x03, }, //'}' 0x7d 125
-		{0x00, 0x20, 0x2a, 0x02, 0x00, }, //'~' 0x7e 126
-	};
 
+static char dvfd_bitmap[95][5] = {
+	{0x00, 0x00, 0x00, 0x00, 0x00, }, //' ' 0x20 032
+	{0x10, 0x42, 0x08, 0x01, 0x04, }, //'!' 0x21 033
+	{0x68, 0xad, 0x00, 0x00, 0x00, }, //'"' 0x22 034
+	{0x28, 0xf5, 0xd5, 0x57, 0x0a, }, //'#' 0x23 035
+	{0x10, 0x5f, 0x1c, 0x7d, 0x04, }, //'$' 0x24 036
+	{0x8c, 0x89, 0x88, 0xc8, 0x18, }, //'%' 0x25 037
+	{0x88, 0x52, 0x44, 0x4d, 0x16, }, //'&' 0x26 038
+	{0x10, 0x42, 0x00, 0x00, 0x00, }, //''' 0x27 039
+	{0x40, 0x44, 0x08, 0x41, 0x10, }, //'(' 0x28 040
+	{0x04, 0x41, 0x08, 0x11, 0x01, }, //')' 0x29 041
+	{0x90, 0xea, 0x88, 0xab, 0x04, }, //'*' 0x2a 042
+	{0x00, 0x42, 0x3e, 0x21, 0x00, }, //'+' 0x2b 043
+	{0x00, 0x00, 0x00, 0x31, 0x02, }, //',' 0x2c 044
+	{0x00, 0xf0, 0x01, 0x00, 0x00, }, //'-' 0x2d 045
+	{0x00, 0x00, 0x00, 0x61, 0x00, }, //'.' 0x2e 046
+	{0x00, 0x88, 0x88, 0x08, 0x00, }, //'/' 0x2f 047
+	{0xb8, 0x18, 0x63, 0x8c, 0x0e, }, //'0' 0x30 048
+	{0x10, 0x43, 0x08, 0x21, 0x1f, }, //'1' 0x31 049
+	{0xb8, 0x08, 0x11, 0x11, 0x1f, }, //'2' 0x32 050
+	{0x38, 0xc8, 0x20, 0x84, 0x0f, }, //'3' 0x33 051
+	{0x20, 0xa6, 0xd2, 0x47, 0x1c, }, //'4' 0x34 052
+	{0xbc, 0xf0, 0x20, 0x84, 0x0f, }, //'5' 0x35 053
+	{0x30, 0x11, 0x5e, 0x8c, 0x0e, }, //'6' 0x36 054
+	{0x7c, 0x88, 0x10, 0x22, 0x04, }, //'7' 0x37 055
+	{0xb8, 0x18, 0x5d, 0x8c, 0x0e, }, //'8' 0x38 056
+	{0xb8, 0x18, 0x3d, 0x44, 0x06, }, //'9' 0x39 057
+	{0x00, 0x46, 0x00, 0x61, 0x00, }, //':' 0x3a 058
+	{0x00, 0x46, 0x00, 0x31, 0x02, }, //';' 0x3b 059
+	{0x40, 0x26, 0x06, 0x81, 0x00, }, //'<' 0x3c 060
+	{0x80, 0x0f, 0x3e, 0x00, 0x00, }, //'=' 0x3d 061
+	{0x04, 0x83, 0x30, 0x09, 0x00, }, //'>' 0x3e 062
+	{0xb8, 0x08, 0x19, 0x01, 0x04, }, //'?' 0x3f 063
+	{0xb8, 0x98, 0x6b, 0x0e, 0x1e, }, //'@' 0x40 064
+	{0x08, 0x93, 0xe2, 0x8f, 0x11, }, //'A' 0x41 065
+	{0xbc, 0x18, 0x5f, 0x8c, 0x0f, }, //'B' 0x42 066
+	{0xb8, 0x18, 0x42, 0x88, 0x0e, }, //'C' 0x43 067
+	{0xbc, 0x18, 0x63, 0x8c, 0x0f, }, //'D' 0x44 068
+	{0xfc, 0x18, 0x4e, 0x89, 0x1f, }, //'E' 0x45 069
+	{0x78, 0x21, 0x9c, 0x12, 0x06, }, //'F' 0x46 070
+	{0xf8, 0x10, 0x42, 0x8e, 0x1e, }, //'G' 0x47 071
+	{0xc4, 0x18, 0x7f, 0x8c, 0x11, }, //'H' 0x48 072
+	{0x38, 0x42, 0x08, 0x21, 0x0e, }, //'I' 0x49 073
+	{0x70, 0x08, 0x61, 0x8c, 0x0e, }, //'J' 0x4a 074
+	{0xec, 0x54, 0x4e, 0x4a, 0x13, }, //'K' 0x4b 075
+	{0x1c, 0x21, 0x84, 0x10, 0x1f, }, //'L' 0x4c 076
+	{0xc4, 0xbd, 0x6b, 0x8d, 0x1b, }, //'M' 0x4d 077
+	{0xe4, 0x39, 0x6b, 0xce, 0x13, }, //'N' 0x4e 078
+	{0xb8, 0x18, 0x63, 0x8c, 0x0e, }, //'O' 0x4f 079
+	{0xbc, 0x18, 0x5f, 0x08, 0x03, }, //'P' 0x50 080
+	{0xb8, 0x18, 0x63, 0x4d, 0x16, }, //'Q' 0x51 081
+	{0xbc, 0x18, 0x5f, 0x49, 0x13, }, //'R' 0x52 082
+	{0xb8, 0x18, 0x1c, 0x8c, 0x0e, }, //'S' 0x53 083
+	{0xfc, 0x4a, 0x08, 0x21, 0x0e, }, //'T' 0x54 084
+	{0xec, 0x18, 0x63, 0x8c, 0x0e, }, //'U' 0x55 085
+	{0xc4, 0x18, 0xa5, 0x52, 0x04, }, //'V' 0x56 086
+	{0xc4, 0x58, 0x6b, 0x55, 0x0a, }, //'W' 0x57 087
+	{0x44, 0xa9, 0x88, 0xca, 0x11, }, //'X' 0x58 088
+	{0x44, 0xa9, 0x08, 0x21, 0x0e, }, //'Y' 0x59 089
+	{0xfc, 0x88, 0x88, 0x88, 0x1f, }, //'Z' 0x5a 090
+	{0x30, 0x42, 0x08, 0x21, 0x0c, }, //'[' 0x5b 091
+	{0x80, 0x20, 0x08, 0x82, 0x00, }, //'\' 0x5c 092
+	{0x18, 0x42, 0x08, 0x21, 0x06, }, //']' 0x5d 093
+	{0x00, 0xa2, 0x22, 0x00, 0x00, }, //'^' 0x5e 094
+	{0x00, 0x00, 0x00, 0xf8, 0x00, }, //'_' 0x5f 095
+	{0x00, 0x02, 0x00, 0x00, 0x00, }, //'`' 0x60 096
+	{0x00, 0x07, 0x7d, 0xf4, 0x00, }, //'a' 0x61 097
+	{0x08, 0xe1, 0xa4, 0x74, 0x00, }, //'b' 0x62 098
+	{0x00, 0x17, 0x43, 0xf0, 0x00, }, //'c' 0x63 099
+	{0x20, 0xe4, 0x52, 0x72, 0x00, }, //'d' 0x64 100
+	{0x00, 0x17, 0x7f, 0xf0, 0x00, }, //'e' 0x65 101
+	{0x60, 0xe2, 0x09, 0x21, 0x0e, }, //'f' 0x66 102
+	{0x00, 0x26, 0x25, 0x87, 0x0e, }, //'g' 0x67 103
+	{0x08, 0xe1, 0xa4, 0x94, 0x00, }, //'h' 0x68 104
+	{0x10, 0x60, 0x08, 0x71, 0x00, }, //'i' 0x69 105
+	{0x10, 0xe0, 0x10, 0x52, 0x0c, }, //'j' 0x6a 106
+	{0x08, 0x6d, 0x8c, 0x92, 0x00, }, //'k' 0x6b 107
+	{0x18, 0x42, 0x08, 0x61, 0x00, }, //'l' 0x6c 108
+	{0x00, 0x57, 0x6b, 0xad, 0x00, }, //'m' 0x6d 109
+	{0x00, 0x26, 0xa5, 0x94, 0x00, }, //'n' 0x6e 110
+	{0x00, 0x26, 0xa5, 0x64, 0x00, }, //'o' 0x6f 111
+	{0x00, 0x27, 0xa5, 0x13, 0x02, }, //'p' 0x70 112
+	{0x00, 0x97, 0x92, 0x43, 0x08, }, //'q' 0x71 113
+	{0x80, 0x26, 0x84, 0x10, 0x00, }, //'r' 0x72 114
+	{0x00, 0x17, 0x0c, 0x3a, 0x00, }, //'s' 0x73 115
+	{0x88, 0x27, 0x84, 0x62, 0x00, }, //'t' 0x74 116
+	{0x80, 0x1c, 0x63, 0x74, 0x00, }, //'u' 0x75 117
+	{0x80, 0x18, 0x95, 0x22, 0x00, }, //'v' 0x76 118
+	{0x80, 0x58, 0xeb, 0x56, 0x00, }, //'w' 0x77 119
+	{0x80, 0xa9, 0x88, 0x9a, 0x00, }, //'x' 0x78 120
+	{0x80, 0x29, 0x15, 0x23, 0x04, }, //'y' 0x79 121
+	{0x80, 0x8f, 0x88, 0xf8, 0x00, }, //'z' 0x7a 122
+	{0x60, 0x42, 0x04, 0x21, 0x18, }, //'{' 0x7b 123
+	{0x10, 0x42, 0x08, 0x21, 0x04, }, //'|' 0x7c 124
+	{0x0c, 0x42, 0x10, 0x21, 0x03, }, //'}' 0x7d 125
+	{0x00, 0x20, 0x2a, 0x02, 0x00, }, //'~' 0x7e 126
+};
 
 enum
 {
-	YWPANEL_INIT_INSTR_GETVERSION= 0x50,
+	YWPANEL_INIT_INSTR_GETVERSION = 0x50,
 
 
 	YWPANEL_INIT_INSTR_GETCPUSTATE = 0x52,
-	YWPANEL_INIT_INSTR_SETCPUSTATE ,
+	YWPANEL_INIT_INSTR_SETCPUSTATE,
 
-	YWPANEL_INIT_INSTR_GETSTBYKEY1 ,
-	YWPANEL_INIT_INSTR_GETSTBYKEY2 ,
-	YWPANEL_INIT_INSTR_GETSTBYKEY3 ,
-	YWPANEL_INIT_INSTR_GETSTBYKEY4 ,
-	YWPANEL_INIT_INSTR_GETSTBYKEY5 ,
+	YWPANEL_INIT_INSTR_GETSTBYKEY1,
+	YWPANEL_INIT_INSTR_GETSTBYKEY2,
+	YWPANEL_INIT_INSTR_GETSTBYKEY3,
+	YWPANEL_INIT_INSTR_GETSTBYKEY4,
+	YWPANEL_INIT_INSTR_GETSTBYKEY5,
 
-	YWPANEL_INIT_INSTR_SETSTBYKEY1 ,
-	YWPANEL_INIT_INSTR_SETSTBYKEY2 ,
-	YWPANEL_INIT_INSTR_SETSTBYKEY3 ,
-	YWPANEL_INIT_INSTR_SETSTBYKEY4 ,
-	YWPANEL_INIT_INSTR_SETSTBYKEY5 ,
+	YWPANEL_INIT_INSTR_SETSTBYKEY1,
+	YWPANEL_INIT_INSTR_SETSTBYKEY2,
+	YWPANEL_INIT_INSTR_SETSTBYKEY3,
+	YWPANEL_INIT_INSTR_SETSTBYKEY4,
+	YWPANEL_INIT_INSTR_SETSTBYKEY5,
 
 	YWPANEL_INIT_INSTR_GETIRCODE, 			/* 0x5e */
 	YWPANEL_INIT_INSTR_SETIRCODE,
@@ -295,7 +295,7 @@ enum
 	YWPANEL_INIT_INSTR_SETENCRYPTKEY,
 
 
-	YWPANEL_INIT_INSTR_GETVERIFYSTATE , 	/* 0x64 */
+	YWPANEL_INIT_INSTR_GETVERIFYSTATE,		/* 0x64 */
 	YWPANEL_INIT_INSTR_SETVERIFYSTATE,
 
 	YWPANEL_INIT_INSTR_GETTIME = 0x66, 			/* 0x66 */
@@ -307,17 +307,17 @@ enum
 	YWPANEL_INIT_INSTR_GETVFDSTANDBYSTATE,	/* 0x6b */
 	YWPANEL_INIT_INSTR_SETVFDSTANDBYSTATE,	/* 0x6c */
 
-	YWPANEL_INIT_INSTR_GETBLUEKEY1 ,		/* 0x6d */
-	YWPANEL_INIT_INSTR_GETBLUEKEY2 ,
-	YWPANEL_INIT_INSTR_GETBLUEKEY3 ,
-	YWPANEL_INIT_INSTR_GETBLUEKEY4 ,		/* 0x70 */
-	YWPANEL_INIT_INSTR_GETBLUEKEY5 ,
+	YWPANEL_INIT_INSTR_GETBLUEKEY1,		/* 0x6d */
+	YWPANEL_INIT_INSTR_GETBLUEKEY2,
+	YWPANEL_INIT_INSTR_GETBLUEKEY3,
+	YWPANEL_INIT_INSTR_GETBLUEKEY4,		/* 0x70 */
+	YWPANEL_INIT_INSTR_GETBLUEKEY5,
 
-	YWPANEL_INIT_INSTR_SETBLUEKEY1 ,		/* 0x72 */
-	YWPANEL_INIT_INSTR_SETBLUEKEY2 ,
-	YWPANEL_INIT_INSTR_SETBLUEKEY3 ,
-	YWPANEL_INIT_INSTR_SETBLUEKEY4 ,
-	YWPANEL_INIT_INSTR_SETBLUEKEY5 ,		/* 0x76 */
+	YWPANEL_INIT_INSTR_SETBLUEKEY1,		/* 0x72 */
+	YWPANEL_INIT_INSTR_SETBLUEKEY2,
+	YWPANEL_INIT_INSTR_SETBLUEKEY3,
+	YWPANEL_INIT_INSTR_SETBLUEKEY4,
+	YWPANEL_INIT_INSTR_SETBLUEKEY5,		/* 0x76 */
 
 	YWPANEL_INIT_INSTR_GETPOWERONSTATE = 0x77, 	/* 0x77 */
 	YWPANEL_INIT_INSTR_SETPOWERONSTATE, 	/* 0x78 */
@@ -345,9 +345,9 @@ enum YWPANL_WRITE_INSTR_e
 	YWPANEL_DISPLAY_INSTR_LBD = 0x30,
 	YWPANEL_DISPLAY_INSTR_LED,
 	YWPANEL_DISPLAY_INSTR_LCD,
-    YWPANEL_DISPLAY_INSTR_VFD,
-    YWPANEL_DISPLAY_INSTR_MVFD_SINGLE,
-    YWPANEL_DISPLAY_INSTR_MVFD,
+	YWPANEL_DISPLAY_INSTR_VFD,
+	YWPANEL_DISPLAY_INSTR_MVFD_SINGLE,
+	YWPANEL_DISPLAY_INSTR_MVFD,
 
 };
 
@@ -357,14 +357,14 @@ enum YWPANL_WRITE_INSTR_e
 static SegAddrVal_T VfdSegAddr[15];
 static struct i2c_adapter*	panel_i2c_adapter;
 
-const u16 cnCRC_16 = 0x8005;
+static const u16 cnCRC_16 = 0x8005;
 // CRC-16 = X16 + X15 + X2 + X0
-const u16 cnCRC_CCITT = 0x1021;
+static const u16 cnCRC_CCITT = 0x1021;
 // CRC-CCITT = X16 + X12 + X5 + X0
 
-u32 Table_CRC[256]; // CRC
+static u32 Table_CRC[256]; // CRC
 
-void YWPANEL_BuildTable16( u16 aPoly )
+static void YWPANEL_BuildTable16( u16 aPoly )
 {
 	u16 i, j;
 	u16 nData;
@@ -385,7 +385,7 @@ void YWPANEL_BuildTable16( u16 aPoly )
 	 }
 }
 
-u16 YWPANEL_GenerateCRC16( u8 * buffer, u32 bufLength )
+static u16 YWPANEL_GenerateCRC16( u8 * buffer, u32 bufLength )
 {
 	u32 i;
 	u16 nAccum = 0;
@@ -398,16 +398,16 @@ u16 YWPANEL_GenerateCRC16( u8 * buffer, u32 bufLength )
 static void YWPANEL_FP_DvfdFillCmd(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2CData)
 {
 	switch(data->data.dvfdData.type) {
-	    case YWPANEL_DVFD_DISPLAYSTRING:
+		case YWPANEL_DVFD_DISPLAYSTRING:
 			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_MVFD;
-	    	break;
-	    case YWPANEL_DVFD_DISPLAYSYNC:
+			break;
+		case YWPANEL_DVFD_DISPLAYSYNC:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETMVFDDISPLAY;
-	    	break;
-	    case YWPANEL_DVFD_SETTIMEMODE:
+			break;
+		case YWPANEL_DVFD_SETTIMEMODE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_SETMVFDTIMEMODE;
-	    	break;
-	    case YWPANEL_DVFD_GETTIMEMODE:
+			break;
+		case YWPANEL_DVFD_GETTIMEMODE:
 			I2CData->writeBuff[0] = YWPANEL_INIT_INSTR_GETMVFDTIMEMODE;
 		default:
 			break;
@@ -416,10 +416,10 @@ static void YWPANEL_FP_DvfdFillCmd(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2
 
 static void YWPANEL_FP_DvfdFillLen(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2CData)
 {
-    if(data->data.dvfdData.type == YWPANEL_DVFD_DISPLAYSTRING)
-        I2CData->writeBuff[1] = 1 + (5 + 1) * 4;
-    else
-        I2CData->writeBuff[1] = 0x4;
+		if(data->data.dvfdData.type == YWPANEL_DVFD_DISPLAYSTRING)
+				I2CData->writeBuff[1] = 1 + (5 + 1) * 4;
+		else
+				I2CData->writeBuff[1] = 0x4;
 }
 
 static void YWPANEL_FP_DvfdFillString(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2CData, u8 uMax)
@@ -438,41 +438,41 @@ static void YWPANEL_FP_DvfdFillString(YWPANEL_FPData_t *data, YWPANEL_I2CData_t 
 
 static void YWPANEL_FP_DvfdFillData(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2CData)
 {
-    switch(data->data.dvfdData.type) {
-        case YWPANEL_DVFD_DISPLAYSTRING:
-        {
+	switch(data->data.dvfdData.type) {
+		case YWPANEL_DVFD_DISPLAYSTRING:
+		{
 			u8 	uMax = data->data.dvfdData.ulen;
 			if (uMax > 4)
-			    uMax = 4;
+				uMax = 4;
 			I2CData->writeBuff[2] = uMax;
 			YWPANEL_FP_DvfdFillString(data, I2CData, uMax);
-        	break;
-        }
-        case YWPANEL_DVFD_SETTIMEMODE:
+			break;
+		}
+		case YWPANEL_DVFD_SETTIMEMODE:
 			I2CData->writeBuff[2] = data->data.dvfdData.setValue;
 		default:
 			break;
-    }
+	}
 }
 
 static void YWPANEL_FP_DvfdFillCrc(YWPANEL_FPData_t *data, YWPANEL_I2CData_t *I2CData)
 {
-    u16 usCRC16 = 0;
+	u16 usCRC16 = 0;
 
-    if(data->data.dvfdData.type == YWPANEL_DVFD_DISPLAYSTRING) {
-        usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 27);
-        I2CData->writeBuff[27] =  (usCRC16 &0xff);
-        I2CData->writeBuff[28] =  ((usCRC16>>8) &0xff);
-        I2CData->writeBuffLen = 29;
-    } else {
-        usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 6);
-        I2CData->writeBuff[6] =  (usCRC16 &0xff);
-        I2CData->writeBuff[7] =  ((usCRC16>>8) &0xff);
-        I2CData->writeBuffLen = 8;
-    }
+	if(data->data.dvfdData.type == YWPANEL_DVFD_DISPLAYSTRING) {
+		usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 27);
+		I2CData->writeBuff[27] =  (usCRC16 &0xff);
+		I2CData->writeBuff[28] =  ((usCRC16>>8) &0xff);
+		I2CData->writeBuffLen = 29;
+	} else {
+		usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 6);
+		I2CData->writeBuff[6] =  (usCRC16 &0xff);
+		I2CData->writeBuff[7] =  ((usCRC16>>8) &0xff);
+		I2CData->writeBuffLen = 8;
+	}
 }
 
-int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
+static int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 {
 	u16 			usCRC16 = 0;
 
@@ -494,12 +494,12 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LCD;
 			break;
 		case YWPANEL_DATATYPE_LED:
-            I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LED;
+			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_LED;
 			break;
 		case YWPANEL_DATATYPE_VFD:
 			I2CData->writeBuff[0] = YWPANEL_DISPLAY_INSTR_VFD;
 			break;
-        case YWPANEL_DATATYPE_DVFD:
+		case YWPANEL_DATATYPE_DVFD:
 			YWPANEL_FP_DvfdFillCmd(data, I2CData);
 			break;
 		case YWPANEL_DATATYPE_SCANKEY:
@@ -596,9 +596,9 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 			else
 				I2CData->writeBuff[1] = 0x4;
 			break;
-        case YWPANEL_DATATYPE_DVFD:
+		case YWPANEL_DATATYPE_DVFD:
 			YWPANEL_FP_DvfdFillLen(data, I2CData);
-        	break;
+			break;
 		default:
 			I2CData->writeBuff[1] = 0x4;
 			break;
@@ -646,7 +646,7 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 			break;
 		case YWPANEL_DATATYPE_DVFD:
 			YWPANEL_FP_DvfdFillData(data, I2CData);
-        	break;
+			break;
 		case YWPANEL_DATATYPE_SETCPUSTATE:
 			I2CData->writeBuff[2] = data->data.CpuState.state;
 			break;
@@ -695,9 +695,9 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 	}
 
 	switch (data->dataType) {
-        case YWPANEL_DATATYPE_DVFD:
+		case YWPANEL_DATATYPE_DVFD:
 			YWPANEL_FP_DvfdFillCrc(data, I2CData);
-        	break;
+			break;
 		case YWPANEL_DATATYPE_VFD:
 			if(data->data.vfdData.type == YWPANEL_VFD_DISPLAYSTRING) {
 				usCRC16 = YWPANEL_GenerateCRC16(I2CData->writeBuff, 36);
@@ -718,7 +718,7 @@ int YWPANEL_FP_SetI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t   *I2CData)
 	return true;
 }
 
-int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
+static int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 {
 	u16 	crc16Code = 0;
 	u16 	receiveCode = 0;
@@ -737,7 +737,7 @@ int YWPANEL_FP_ParseI2cData(YWPANEL_FPData_t  *data,YWPANEL_I2CData_t	 *I2CData)
 	if(receiveCode != crc16Code )
 	{
 		ywtrace_print(TRACE_ERROR,"check crc16 is wrong! at %d \n",__LINE__);
-	    //	return false;  //YWDRIVER_MODI lwj remove
+		//	return false;  //YWDRIVER_MODI lwj remove
 	}
 
 	//ywtrace_print(TRACE_INFO,"%s::date->dateType=[0x%x]\n",__FUNCTION__,data->dataType);
@@ -1423,7 +1423,7 @@ int YWPANEL_VFD_SetLed(int which, int on)
 	return ErrorCode;
 }
 
-int YWPANEL_VFD_SetPIOMode(PIO_Mode_T Mode_PIO)
+static int YWPANEL_VFD_SetPIOMode(PIO_Mode_T Mode_PIO)
 {
 	int ST_ErrCode = 0 ;
 
@@ -1441,7 +1441,7 @@ int YWPANEL_VFD_SetPIOMode(PIO_Mode_T Mode_PIO)
 	return ST_ErrCode;
 }
 
-int YWPANEL_VFD_WR(u8 data)
+static int YWPANEL_VFD_WR(u8 data)
 {
 	int  ErrorCode = 0;
 	int i;
@@ -1450,14 +1450,7 @@ int YWPANEL_VFD_WR(u8 data)
 	{
 		stpio_set_pin(pio_scl, 0);
 		udelay(1);
-		if(data & 0x01)
-		{
-			stpio_set_pin(pio_sda, 1);
-		}
-		else
-		{
-			stpio_set_pin(pio_sda, 0);
-		}
+		stpio_set_pin(pio_sda, data & 0x01);
 		stpio_set_pin(pio_scl, 1);
 		udelay(1);
 		data >>= 1;
@@ -1467,7 +1460,7 @@ int YWPANEL_VFD_WR(u8 data)
 	return ErrorCode;
 }
 
-u8	YWPANEL_VFD_RD(void)
+static u8	YWPANEL_VFD_RD(void)
 {
 	int ret = 0 ;
 	int i;
@@ -1496,7 +1489,7 @@ u8	YWPANEL_VFD_RD(void)
 	return val;
 }
 
-int YWPANEL_VFD_SegDigSeg(u8 dignum, SegNum_T segnum, u8 val)
+static int YWPANEL_VFD_SegDigSeg(u8 dignum, SegNum_T segnum, u8 val)
 {
 	int  ST_ErrCode = 0;
 	u8	 addr=0;
@@ -1521,7 +1514,7 @@ int YWPANEL_VFD_SegDigSeg(u8 dignum, SegNum_T segnum, u8 val)
 	return	ST_ErrCode;
 }
 
-int YWPANEL_VFD_SetMode(VFDMode_T mode)
+static int YWPANEL_VFD_SetMode(VFDMode_T mode)
 {
 
 	int 	ST_ErrCode = 0;
@@ -1552,16 +1545,18 @@ int YWPANEL_VFD_ShowContent(void)
 	return ST_ErrCode;
 }
 
-int YWPANEL_VFD_ShowContentOff(void)
+#if 0 // unused
+static int YWPANEL_VFD_ShowContentOff(void)
 {
 	int 	 ST_ErrCode = 0;
 	ST_ErrCode = YWPANEL_VFD_WR(0x87);
 
 	return ST_ErrCode;
 }
+#endif
 
 
-void YWPANEL_VFD_ClearAll(void)
+static void YWPANEL_VFD_ClearAll(void)
 {
 	int i;
 	for(i = 0; i < 13; i++)
@@ -1591,7 +1586,7 @@ static u8 ywpanel_vfd_map[0x80] =
 	0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x31, 0x30, 0x32, 0x2f, 0x2f
 };
 
-void YWPANEL_VFD_DrawChar(char c, u8 position)
+static void YWPANEL_VFD_DrawChar(char c, u8 position)
 {
 	u8 u;
 
@@ -1609,7 +1604,7 @@ void YWPANEL_VFD_DrawChar(char c, u8 position)
 
 }
 
-void YWPANEL_VFD_DrawNum(u8 c, u8 position)
+static void YWPANEL_VFD_DrawNum(u8 c, u8 position)
 {
 	int dignum;
 
@@ -1974,24 +1969,24 @@ static char strDvfd[16][5];
 static void YWVFDi_DVFDCleanChar(u8 i)
 {
 	u8	j;
+	int off = 0;
 
 	if (i >= 16)
 		return;
 	if (bTimeMode && i >= 10)
 		return;
 
+	if (bTimeMode)
+		off = 6;
+
 	for (j = 0; j < 5; j++)
-	{
-		if (bTimeMode)
-			strDvfd[i + 6][j] = 0;
-		else
-			strDvfd[i    ][j] = 0;
-	}
+		strDvfd[i + off][j] = 0;
 }
 
 static void YWVFDi_DVFDFillAsciiChar(u8 i, int iChar)
 {
 	u8	j;
+	int off = 0;
 
 	if (i >= 16)
 		return;
@@ -1999,13 +1994,11 @@ static void YWVFDi_DVFDFillAsciiChar(u8 i, int iChar)
 	if (bTimeMode  && i >= 10)
 		return;
 
+	if (bTimeMode)
+		off = 6;
+
 	for (j = 0; j < 5; j++)
-	{
-		if (bTimeMode)
-			strDvfd[i + 6][j] = dvfd_bitmap[iChar][j];
-		else
-			strDvfd[i    ][j] = dvfd_bitmap[iChar][j];
-	}
+		strDvfd[i + off][j] = dvfd_bitmap[iChar][j];
 }
 
 static void YWVFDi_DVFDFillChar(u8 i, u8 c)
@@ -2016,21 +2009,21 @@ static void YWVFDi_DVFDFillChar(u8 i, u8 c)
 		YWVFDi_DVFDCleanChar(i);
 }
 
-static void YWVFDi_DVFDFillString(char* str, u8 lenth)
+static void YWVFDi_DVFDFillString(char* str, u8 length)
 {
 	u8 i;
 
-	for(i = 0; i < 16; i++)
-		if(i < lenth)
-			YWVFDi_DVFDFillChar(i, str[i]);
-		else
-			YWVFDi_DVFDCleanChar(i);
+	for(i = 0; i < length; i++)
+		YWVFDi_DVFDFillChar(i, str[i]);
+
+	for(; i < 16; i++)
+		YWVFDi_DVFDCleanChar(i);
 }
 
 static int YWVFDi_DVFDDisplaySync(void)
 {
 	int	ret = 0 ;
-	YWPANEL_FPData_t    data;
+	YWPANEL_FPData_t data;
 
 	memset(&data, 0, sizeof(YWPANEL_FPData_t));
 
@@ -2047,9 +2040,9 @@ static int YWVFDi_DVFDSendString(void)
 {
 	int	ret = 0;
 	u8	i, j;
-	YWPANEL_FPData_t    data;
+	YWPANEL_FPData_t data;
 
-    memset(&data, 0, sizeof(YWPANEL_FPData_t));
+	memset(&data, 0, sizeof(YWPANEL_FPData_t));
 
 	data.dataType = YWPANEL_DATATYPE_DVFD;
 	data.data.dvfdData.type = YWPANEL_DVFD_DISPLAYSTRING;
@@ -2067,11 +2060,11 @@ static int YWVFDi_DVFDSendString(void)
 			data.data.dvfdData.DisplayValue[j][4] = strDvfd[address][4];
 		}
 		YWVFD_Debug("%s:%d\n", __FUNCTION__, __LINE__);
-	    if(YWPANEL_FP_SendData(&data) != true)
-	    {
-	        printk("VFD show stings is wrong!!\n");
-	        ret = -2;
-	    }
+		if(YWPANEL_FP_SendData(&data) != true)
+		{
+			printk("%s:%d: YWPANEL_FP_SendData() failed\n", __FUNCTION__, __LINE__);
+			ret = -2;
+		}
 	}
 
 	return ret;
@@ -2093,7 +2086,7 @@ static int YWVFD_STANDBY_DvfdShowString(char* str)
 	int ret = 0;
 	u8 length = strlen(str);
 	if(length > 16)
-	    length = 16;
+		length = 16;
 
 	YWVFD_Debug("%s:%d\n", __FUNCTION__, __LINE__);
 
@@ -2109,36 +2102,36 @@ static int YWVFD_STANDBY_DvfdShowString(char* str)
 #if 0 //unused
 static int YWPANEL_FP_DvfdSetTimeMode(int on)
 {
-    YWPANEL_FPData_t   Data;
+	YWPANEL_FPData_t   Data;
 
-    memset(&Data, 0, sizeof(YWPANEL_FPData_t));
-    Data.dataType = YWPANEL_DATATYPE_DVFD;
-    Data.data.dvfdData.type = YWPANEL_DVFD_SETTIMEMODE;
-    Data.data.dvfdData.setValue = on;
+	memset(&Data, 0, sizeof(YWPANEL_FPData_t));
+	Data.dataType = YWPANEL_DATATYPE_DVFD;
+	Data.data.dvfdData.type = YWPANEL_DVFD_SETTIMEMODE;
+	Data.data.dvfdData.setValue = on;
 
-    if(YWPANEL_FP_SendData(&Data) != true)
-        return false;
+	if(YWPANEL_FP_SendData(&Data) != true)
+		return false;
 
 	bTimeMode = on;
-    return true;
+	return true;
 }
 #endif
 
 static int YWPANEL_FP_DvfdGetTimeMode(int *pOn)
 {
-    YWPANEL_FPData_t   Data;
+	YWPANEL_FPData_t   Data;
 
-    memset(&Data, 0, sizeof(YWPANEL_FPData_t));
-    Data.dataType = YWPANEL_DATATYPE_DVFD;
-    Data.data.dvfdData.type = YWPANEL_DVFD_GETTIMEMODE;
+	memset(&Data, 0, sizeof(YWPANEL_FPData_t));
+	Data.dataType = YWPANEL_DATATYPE_DVFD;
+	Data.data.dvfdData.type = YWPANEL_DVFD_GETTIMEMODE;
 
-    if(YWPANEL_FP_SendData(&Data) != true)
-        return false;
+	if(YWPANEL_FP_SendData(&Data) != true)
+		return false;
 
 	(*pOn) = Data.data.dvfdData.setValue;
 	bTimeMode = Data.data.dvfdData.setValue;
 
-    return true;
+	return true;
 }
 
 //lwj add begin  for LED panel
@@ -2189,19 +2182,19 @@ static void YWPANEL_LEDSetString(char *LEDStrBuf)
 static int YWPANEL_LEDDisplayString(void)
 {
 	int ret = 0;
-	YWPANEL_FPData_t    data;
+	YWPANEL_FPData_t data;
 
 	data.dataType = YWPANEL_DATATYPE_LED;
 
-    data.data.ledData.led1 = YWPANEL_LedDisplayData[0];
-    data.data.ledData.led2 = YWPANEL_LedDisplayData[1];
-    data.data.ledData.led3 = YWPANEL_LedDisplayData[2];
-    data.data.ledData.led4 = YWPANEL_LedDisplayData[3];
+	data.data.ledData.led1 = YWPANEL_LedDisplayData[0];
+	data.data.ledData.led2 = YWPANEL_LedDisplayData[1];
+	data.data.ledData.led3 = YWPANEL_LedDisplayData[2];
+	data.data.ledData.led4 = YWPANEL_LedDisplayData[3];
 
-    if(YWPANEL_FP_SendData(&data)!= true) {
+	if(YWPANEL_FP_SendData(&data)!= true) {
 		ret = -1;
-        ywtrace_print(TRACE_ERROR, "[ERROR][YWPANEL_LEDDisplayString] TIME OUT\n");
-    }
+		ywtrace_print(TRACE_ERROR, "[ERROR][YWPANEL_LEDDisplayString] TIME OUT\n");
+	}
 
 	return ret;
 }
@@ -2219,17 +2212,8 @@ static int lookup_utf8(unsigned char *str, int *v1, int *v2)
 {
 	// str is guaranteed to start with a valid UTF-8 character, no UTF-8 validation required
 
-	int size = 0;
+	int size = utf8charlen(*str);
 	*v1 = *v2 = 0;
-
-	if (!(*str >> 7))			// 0xxxxxxx
-		size = 1;
-	else if (*str >> 5 == 6)	// 110xxxxx 10xxxxxx
-		size = 2;
-	else if (*str >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		size = 3;
-	else if ((*str >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		size = 4;
 
 	// Plain ASCII
 	if (size == 1) {
@@ -2415,7 +2399,7 @@ static int YWPANEL_VFD_ShowIcon_Common(int which, int on)
 		addr = VfdSegAddr[dig_num].Segaddr2;
 		if(on)
 		   VfdSegAddr[dig_num].CurrValue2 |= seg_offset;
-	    else
+		else
 		   VfdSegAddr[dig_num].CurrValue2 &= (0xFF-seg_offset);
 		val = VfdSegAddr[dig_num].CurrValue2 ;
 	}

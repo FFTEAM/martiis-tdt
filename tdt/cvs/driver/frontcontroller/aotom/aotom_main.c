@@ -109,7 +109,10 @@ static int VFD_Show_Icon(int which, int on)
 }
 
 static struct task_struct *draw_task = 0;
-static int draw_thread_stop  = 1;
+#define DRAW_THREAD_STATUS_RUNNING	0
+#define DRAW_THREAD_STATUS_STOPPED	1
+#define DRAW_THREAD_STATUS_INIT		2
+static int draw_thread_status = DRAW_THREAD_STATUS_STOPPED;
 
 static int aotomSetIcon(int which, int on);
 
@@ -133,26 +136,31 @@ static void VFD_clr(void)
 	VFD_set_all_icons(LED_OFF);
 }
 
+int utf8charlen(unsigned char c)
+{
+	if (!c)
+		return 0;
+	if (!(c >> 7))		// 0xxxxxxx
+		return 1;
+	if (c >> 5 == 6)	// 110xxxxx 10xxxxxx
+		return 2;
+	if (c >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
+		return 3;
+	if (c >> 3 == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		return 4;
+	return 0;
+}
+
 int utf8strlen(char *s, int len)
 {
 	int i = 0, ulen = 0;
 
 	while (i < len)
 	{
-		int trailing;
-
-		if (!((unsigned char)s[i] >> 7))		// 0xxxxxxx
-			trailing = 0;
-		else if ((unsigned char)s[i] >> 5 == 6)		// 110xxxxx 10xxxxxx
-			trailing = 1;
-		else if ((unsigned char)s[i] >> 4 == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-			trailing = 2;
-		else if ((unsigned char)s[i] >> 3 == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-			trailing = 3;
-		else
+		int trailing = utf8charlen((unsigned char)s[i]);
+		if (!trailing)
 			return ulen;
-
-		i++;
+		trailing--, i++;
 		if (trailing && (i >= len))
 			return ulen;
 
@@ -169,78 +177,75 @@ int utf8strlen(char *s, int len)
 
 static int draw_thread(void *arg)
 {
-  struct vfd_ioctl_data *data = (struct vfd_ioctl_data *) arg;
-  char buf[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
-  char buf2[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
-  int len = data->length;
-  int off = 0;
-  int saved = 0;
-  int utf8len = utf8strlen(data->data, data->length);
+	struct vfd_ioctl_data *data = (struct vfd_ioctl_data *) arg;
+	unsigned char buf[sizeof(data->data) + 2 * DISPLAYWIDTH_MAX];
+	int len = data->length;
+	int off = 0;
+	int saved = 0;
+	int utf8len = utf8strlen(data->data, data->length);
 
-  if (panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED && len > 2 && data->data[2] == '.')
-	saved = 1;
+	if ((panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED) && (len > 2) && (data->data[2] == '.' || data->data[2] == ','))
+		saved = 1;
 
-  if (utf8len - saved > YWPANEL_width) {
-  	memset(buf, ' ', sizeof(buf));
-	off = YWPANEL_width - 1;
-  	memcpy(buf + off, data->data, len);
-	len += off;
-	utf8len += off;
-	buf[len + YWPANEL_width] = 0;
-  } else {
-  	memcpy(buf, data->data, len);
-	buf[len] = 0;
-  }
-
-  draw_thread_stop = 0;
-
-  if (saved) {
-	int i;
-	for (i = 0; i < len; i++)
-		buf2[i] = (buf[i] == '.') ? ' ' : buf[i];
-	buf2[i] = 0;
-  }
-
-  if(utf8len - saved > YWPANEL_width) {
-    unsigned char *b = (unsigned char *) (saved ? buf2 : buf);
-    int pos;
-    for(pos = 0; pos < utf8len; pos++) {
-	int i;
-
-	if(kthread_should_stop()) {
-    	   draw_thread_stop = 1;
-    	   return 0;
+	if (utf8len - saved > YWPANEL_width) {
+		memset(buf, ' ', sizeof(buf));
+		off = YWPANEL_width - 1;
+		memcpy(buf + off, data->data, len);
+		len += off;
+		utf8len += off;
+		buf[len + YWPANEL_width] = 0;
+	} else {
+		memcpy(buf, data->data, len);
+		buf[len] = 0;
 	}
 
-	YWPANEL_VFD_ShowString(b);
+	draw_thread_status = DRAW_THREAD_STATUS_RUNNING;
 
-	// sleep 200 ms
-	for (i = 0; i < 5; i++) {
-		if(kthread_should_stop()) {
-			draw_thread_stop = 1;
-			return 0;
+	if(utf8len - saved > YWPANEL_width) {
+		unsigned char *b = buf;
+		int pos;
+		for(pos = 0; pos < utf8len; pos++) {
+			int i;
+			char dot = 0;
+
+			if(kthread_should_stop()) {
+				draw_thread_status = DRAW_THREAD_STATUS_STOPPED;
+				return 0;
+			}
+
+			if ((panel_version.DisplayInfo == YWPANEL_FP_DISPTYPE_LED) && (b + 2 < buf + sizeof(buf)) && (b[2] == '.' || b[2] == ','))
+				dot = b[2];
+
+			if (dot)
+				b[2] = ' ';
+
+			YWPANEL_VFD_ShowString(b);
+
+			if (dot)
+				b[2] = dot;
+
+			// sleep 200 ms
+			for (i = 0; i < 5; i++) {
+				if(kthread_should_stop()) {
+					draw_thread_status = DRAW_THREAD_STATUS_STOPPED;
+					return 0;
+				}
+				msleep(40);
+			}
+
+			// advance to next UTF-8 character
+			b += utf8charlen(*b);
 		}
-		msleep(40);
 	}
 
-	// advance to next UTF-8 character
-	if (!(*b >> 7))			// 0xxxxxxx
-		b += 1;
-	else if ((*b >> 5) == 6)	// 110xxxxx 10xxxxxx
-		b += 2;
-	else if ((*b >> 4) == 14)	// 1110xxxx 10xxxxxx 10xxxxxx
-		b += 3;
-	else if ((*b >> 3) == 30)	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		b += 4;
-    }
-  }
+	if(utf8len > 0)
+		YWPANEL_VFD_ShowString(buf + off);
+	else
+		clear_display();
 
-  clear_display();
-  if(utf8len > 0)
-      YWPANEL_VFD_ShowString(buf + off);
+	draw_thread_status = DRAW_THREAD_STATUS_STOPPED;
 
-  draw_thread_stop = 1;
-  return 0;
+	return 0;
 }
 
 static int led_thread(void *arg)
@@ -315,8 +320,7 @@ static int run_draw_thread(struct vfd_ioctl_data *draw_data)
 	return -ERESTARTSYS;
 
     // return if there's already a draw task running for the same text
-    if(!draw_thread_stop && draw_task && (last_draw_data.length == draw_data->length)
-	&& !memcmp(&last_draw_data.data, draw_data->data, draw_data->length)) {
+    if((draw_thread_status =! DRAW_THREAD_STATUS_STOPPED ) && draw_task && (last_draw_data.length == draw_data->length) && !memcmp(&last_draw_data.data, draw_data->data, draw_data->length)) {
     	up(&draw_thread_sem);
 	return 0;
     }
@@ -324,9 +328,9 @@ static int run_draw_thread(struct vfd_ioctl_data *draw_data)
     memcpy(&last_draw_data, draw_data, sizeof(struct vfd_ioctl_data));
 
     // stop existing thread, if any
-    if(!draw_thread_stop && draw_task) {
+    if((draw_thread_status =! DRAW_THREAD_STATUS_STOPPED) && draw_task) {
 	kthread_stop(draw_task);
-	while(!draw_thread_stop)
+	while(draw_thread_status != DRAW_THREAD_STATUS_STOPPED)
 		msleep(1);
 	draw_task = 0;
     }
@@ -341,11 +345,11 @@ static int run_draw_thread(struct vfd_ioctl_data *draw_data)
 	YWPANEL_VFD_ShowString(buf);
     } else {
 #endif
-	draw_thread_stop = 2;
+	draw_thread_status = DRAW_THREAD_STATUS_INIT;
 	draw_task = kthread_run(draw_thread,draw_data,"draw thread");
 
 	//wait until thread has copied the argument
-	while(draw_thread_stop == 2)
+	while(draw_thread_status == DRAW_THREAD_STATUS_INIT)
 		msleep(1);
 #if 0
     }
@@ -491,255 +495,254 @@ static struct vfd_ioctl_data vfd_data;
 
 static int AOTOMdev_ioctl(struct inode *Inode, struct file *File, unsigned int cmd, unsigned long arg)
 {
-   static int mode = 0;
-   int res = -EINVAL;
-   dprintk(5, "%s > 0x%.8x\n", __func__, cmd);
+	static int mode = 0;
+	int res = -EINVAL;
+	dprintk(5, "%s > 0x%.8x\n", __func__, cmd);
 
-   if(down_interruptible (&write_sem))
-      return -ERESTARTSYS;
+	if(down_interruptible (&write_sem))
+		return -ERESTARTSYS;
 
 	switch(cmd) {
-	case VFDSETMODE:
-	case VFDSETLED:
-	case VFDICONDISPLAYONOFF:
-	case VFDSETTIME:
-	case VFDBRIGHTNESS:
-	case VFDGETSTBYKEY:
-	case VFDSETSTBYKEY:
-	case VFDGETBLUEKEY:
-	case VFDSETBLUEKEY:
-		if (copy_from_user(&aotom_data, (void *) arg, sizeof(aotom_data)))
-			return -EFAULT;
+		case VFDSETMODE:
+		case VFDSETLED:
+		case VFDICONDISPLAYONOFF:
+		case VFDSETTIME:
+		case VFDBRIGHTNESS:
+		case VFDGETSTBYKEY:
+		case VFDSETSTBYKEY:
+		case VFDGETBLUEKEY:
+		case VFDSETBLUEKEY:
+			if (copy_from_user(&aotom_data, (void *) arg, sizeof(aotom_data)))
+				return -EFAULT;
 	}
 
 	switch(cmd) {
-	case VFDSETMODE:
-		mode = aotom_data.u.mode.compat;
-		break;
-	case VFDSETLED:
-		if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < led_count) {
-			switch (aotom_data.u.led.on) {
-			case LED_OFF:
-			case LED_ON:
-				if (aotom_data.u.led.led_nr < LED_COUNT) {
-					res = YWPANEL_VFD_SetLed(aotom_data.u.led.led_nr, aotom_data.u.led.on);
-					led_state[aotom_data.u.led.led_nr].state = aotom_data.u.led.on;
-					break;
-				}
-			default:
-				// led 0-1: toggle LED for <aotom_data.u.led.on * 10 ms>
-				// led 2:   set spinner segment time to <aotom_data.u.led.on * 10 ms> and enable spinner
-				if (aotom_data.u.led.led_nr < led_count) {
-					flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
-					res = 0;
+		case VFDSETMODE:
+			mode = aotom_data.u.mode.compat;
+			break;
+		case VFDSETLED:
+			if (aotom_data.u.led.led_nr > -1 && aotom_data.u.led.led_nr < led_count) {
+				switch (aotom_data.u.led.on) {
+				case LED_OFF:
+				case LED_ON:
+					if (aotom_data.u.led.led_nr < LED_COUNT) {
+						res = YWPANEL_VFD_SetLed(aotom_data.u.led.led_nr, aotom_data.u.led.on);
+						led_state[aotom_data.u.led.led_nr].state = aotom_data.u.led.on;
+						break;
+					}
+				default:
+					// led 0-1: toggle LED for <aotom_data.u.led.on * 10 ms>
+					// led 2:   set spinner segment time to <aotom_data.u.led.on * 10 ms> and enable spinner
+					if (aotom_data.u.led.led_nr < led_count) {
+						flashLED(aotom_data.u.led.led_nr, aotom_data.u.led.on * 10);
+						res = 0;
+					}
 				}
 			}
-		}
-		break;
-	case VFDBRIGHTNESS:
-		if (aotom_data.u.brightness.level < 0)
-			aotom_data.u.brightness.level = 0;
-		else if (aotom_data.u.brightness.level > 7)
-			aotom_data.u.brightness.level = 7;
-		res = YWPANEL_VFD_SetBrightness(aotom_data.u.brightness.level);
-		break;
-	case VFDICONDISPLAYONOFF:
-		switch (panel_version.DisplayInfo) {
-		case YWPANEL_FP_DISPTYPE_LED:
-			switch (aotom_data.u.icon.icon_nr) {
-			case 0: // ?!?
-				res = YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
-				led_state[LED_RED].state = aotom_data.u.icon.on;
-				break;
-			case AOTOM_DOT2:
-				res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
-				led_state[LED_GREEN].state = aotom_data.u.icon.on;
-				break;
-			case 46:
-			case AOTOM_ALL:
-				led_state[LED_RED].state = aotom_data.u.icon.on;
-				led_state[LED_GREEN].state = aotom_data.u.icon.on;
-				YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
-				res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
+			break;
+		case VFDBRIGHTNESS:
+			if (aotom_data.u.brightness.level < 0)
+				aotom_data.u.brightness.level = 0;
+			else if (aotom_data.u.brightness.level > 7)
+				aotom_data.u.brightness.level = 7;
+			res = YWPANEL_VFD_SetBrightness(aotom_data.u.brightness.level);
+			break;
+		case VFDICONDISPLAYONOFF:
+			switch (panel_version.DisplayInfo) {
+				case YWPANEL_FP_DISPTYPE_LED:
+					switch (aotom_data.u.icon.icon_nr) {
+					case 0: // ?!?
+						res = YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
+						led_state[LED_RED].state = aotom_data.u.icon.on;
+						break;
+					case AOTOM_DOT2:
+						res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
+						led_state[LED_GREEN].state = aotom_data.u.icon.on;
+						break;
+					case 46:
+					case AOTOM_ALL:
+						led_state[LED_RED].state = aotom_data.u.icon.on;
+						led_state[LED_GREEN].state = aotom_data.u.icon.on;
+						YWPANEL_VFD_SetLed(LED_RED, aotom_data.u.icon.on);
+						res = YWPANEL_VFD_SetLed(LED_GREEN, aotom_data.u.icon.on);
+						break;
+					}
+					break;
+				default:
+				{
+					int icon_nr = aotom_data.u.icon.icon_nr;
+					if(icon_nr & ~0xff) {
+						icon_nr >>= 8;
+						switch(icon_nr) {
+							case 0x11:
+								icon_nr = AOTOM_DOUBLESCREEN;
+								break;
+							case 0x13:
+								icon_nr = AOTOM_CA;
+								break;
+							case 0x15:
+								icon_nr = AOTOM_MP3;
+								break;
+							case 0x17:
+								icon_nr = AOTOM_AC3;
+								break;
+							case 0x1A:
+								icon_nr = AOTOM_PLAY_LOG;
+								break;
+							case 0x1e:
+								icon_nr = AOTOM_REC1;
+								break;
+							case 38:
+								// AOTOM_DISK_S3
+								break; //cd part1
+							case 39:
+								// AOTOM_DISK_S2
+								break; //cd part2
+							case 40:
+								// AOTOM_DISK_S1
+								break; //cd part3
+							case 41:
+								// AOTOM_DISK_S0
+								break; //cd part4
+							default:
+								icon_nr = -1; //no additional symbols at the moment
+								break;
+						}
+					}
+					switch (icon_nr) {
+						case 46:
+						case AOTOM_ALL:
+							VFD_set_all_icons(aotom_data.u.icon.on);
+							res = 0;
+						case -1:
+							break;
+						default:
+							res = aotomSetIcon(icon_nr, aotom_data.u.icon.on);
+					}
+				}
+				mode = 0;
 				break;
 			}
 			break;
-		default:
-		    {
-			int icon_nr = aotom_data.u.icon.icon_nr;
-			if(icon_nr & ~0xff) {
-				icon_nr >>= 8;
-				switch(icon_nr) {
-					case 0x11:
-						icon_nr = AOTOM_DOUBLESCREEN;
-						break;
-					case 0x13:
-						icon_nr = AOTOM_CA;
-						break;
-					case 0x15:
-						icon_nr = AOTOM_MP3;
-						break;
-					case 0x17:
-						icon_nr = AOTOM_AC3;
-						break;
-					case 0x1A:
-						icon_nr = AOTOM_PLAY_LOG;
-						break;
-					case 0x1e:
-						icon_nr = AOTOM_REC1;
-						break;
-					case 38:
-						// AOTOM_DISK_S3
-						break; //cd part1
-					case 39:
-						// AOTOM_DISK_S2
-						break; //cd part2
-					case 40:
-						// AOTOM_DISK_S1
-						break; //cd part3
-					case 41:
-						// AOTOM_DISK_S0
-						break; //cd part4
-					default:
-						icon_nr = -1; //no additional symbols at the moment
-						break;
-				}
-			}
-			switch (icon_nr) {
-			case 46:
-			case AOTOM_ALL:
-				VFD_set_all_icons(aotom_data.u.icon.on);
-				res = 0;
-			case -1:
-				break;
-			default:
-				res = aotomSetIcon(icon_nr, aotom_data.u.icon.on);
-			}
-		}
-		mode = 0;
-		break;
-	    }
-	    break;
-	case VFDSETPOWERONTIME:
-	{
-		u32 uTime = 0;
-		get_user(uTime, (int *) arg);
-		YWPANEL_FP_SetPowerOnTime(uTime);
-		res = 0;
-		break;
-	}
-	case VFDPOWEROFF:
-		clear_display();
-		YWPANEL_FP_ControlTimer(true);
-		YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
-		res = 0;
-		break;
-	case VFDSTANDBY:
-	{
-		u32 uTime = 0;
-		get_user(uTime, (int *) arg);
-		YWPANEL_FP_SetPowerOnTime(uTime);
-		clear_display();
-		YWPANEL_FP_ControlTimer(true);
-		YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
-		res = 0;
-		break;
-	}
-	case VFDSETTIME2:
-	{
-		u32 uTime = 0;
-		res = get_user(uTime, (int *)arg);
-		if (! res)
+		case VFDSETPOWERONTIME:
 		{
-			res = YWPANEL_FP_SetTime(uTime);
+			u32 uTime = 0;
+			get_user(uTime, (int *) arg);
+			YWPANEL_FP_SetPowerOnTime(uTime);
+			res = 0;
+			break;
+		}
+		case VFDPOWEROFF:
+			clear_display();
 			YWPANEL_FP_ControlTimer(true);
-		}
-		break;
-	}
-	case VFDSETTIME:
-		res = aotomSetTime(aotom_data.u.time.time);
-		break;
-	case VFDGETTIME:
-	{
-		u32 uTime = 0;
-		uTime = YWPANEL_FP_GetTime();
-		//printk("uTime = %d\n", uTime);
-		res = put_user(uTime, (int *) arg);
-		break;
-	}
-	case VFDDISPLAYCHARS:
-		if (mode == 0)
+			YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
+			res = 0;
+			break;
+		case VFDSTANDBY:
 		{
-		   if (copy_from_user(&vfd_data, (void *) arg, sizeof(vfd_data)))
-			return -EFAULT;
-		   if (vfd_data.length > sizeof(vfd_data.data))
-			vfd_data.length = sizeof(vfd_data.data);
-		   while ((vfd_data.length > 0) && (vfd_data.data[vfd_data.length - 1 ] == '\n'))
-			  vfd_data.length--;
-	     	   res = run_draw_thread(&vfd_data);
-		} else
+			u32 uTime = 0;
+			get_user(uTime, (int *) arg);
+			YWPANEL_FP_SetPowerOnTime(uTime);
+			clear_display();
+			YWPANEL_FP_ControlTimer(true);
+			YWPANEL_FP_SetCpuStatus(YWPANEL_CPUSTATE_STANDBY);
+			res = 0;
+			break;
+		}
+		case VFDSETTIME2:
+		{
+			u32 uTime = 0;
+			res = get_user(uTime, (int *)arg);
+			if (! res)
+			{
+				res = YWPANEL_FP_SetTime(uTime);
+				YWPANEL_FP_ControlTimer(true);
+			}
+			break;
+		}
+		case VFDSETTIME:
+			res = aotomSetTime(aotom_data.u.time.time);
+			break;
+		case VFDGETTIME:
+		{
+			u32 uTime = 0;
+			uTime = YWPANEL_FP_GetTime();
+			//printk("uTime = %d\n", uTime);
+			res = put_user(uTime, (int *) arg);
+			break;
+		}
+		case VFDDISPLAYCHARS:
+			if (mode == 0) {
+				if (copy_from_user(&vfd_data, (void *) arg, sizeof(vfd_data)))
+					return -EFAULT;
+				if (vfd_data.length > sizeof(vfd_data.data))
+					vfd_data.length = sizeof(vfd_data.data);
+				while ((vfd_data.length > 0) && (vfd_data.data[vfd_data.length - 1 ] == '\n'))
+					vfd_data.length--;
+				res = run_draw_thread(&vfd_data);
+			} else
+				mode = 0;
+			break;
+		case VFDDISPLAYCLR:
+			vfd_data.length = 0;
+			res = run_draw_thread(&vfd_data);
+			break;
+		case VFDGETWAKEUPMODE:
+		case VFDDISPLAYWRITEONOFF:
+			res = 0;
+			break;
+		case VFDGETSTARTUPSTATE:
+		{
+			YWPANEL_STARTUPSTATE_t State;
+			if (YWPANEL_FP_GetStartUpState(&State))
+				res = put_user(State, (int *) arg);
+			break;
+		}
+		case VFDSETLOOPSTATE:
+		{
+			YWPANEL_LOOPSTATE_t State = YWPANEL_LOOPSTATE_UNKNOWN;
+			res = get_user(State, (int *)arg);
+			if (!res)
+				res = YWPANEL_FP_SetLoopState(State);
+			break;
+		}
+		case VFDGETLOOPSTATE:
+		{
+			YWPANEL_LOOPSTATE_t State;
+			if (YWPANEL_FP_GetLoopState(&State))
+				res = put_user(State, (int *) arg);
+			break;
+		}
+		case VFDGETVERSION:
+		{
+			YWPANEL_Version_t panel_version;
+			memset(&panel_version, 0, sizeof(YWPANEL_Version_t));
+			if (YWPANEL_FP_GetVersion(&panel_version))
+				res = put_user (panel_version.DisplayInfo, (int *)arg);
+			break;
+		}
+		case VFDGETBLUEKEY:
+		case VFDGETSTBYKEY:
+		{
+			if (YWPANEL_FP_GetKey(cmd == VFDGETBLUEKEY, aotom_data.u.key.key_nr, &aotom_data.u.key.key))
+				res = copy_to_user((void *) arg, &aotom_data, sizeof(aotom_data));
+			break;
+		}
+		case VFDSETBLUEKEY:
+		case VFDSETSTBYKEY:
+			res = !YWPANEL_FP_SetKey(cmd == VFDSETBLUEKEY, aotom_data.u.key.key_nr, aotom_data.u.key.key);
+			break;
+		default:
+			printk("VFD/AOTOM: unknown IOCTL 0x%x\n", cmd);
+		case 0x5305:
+		case 0x5401:
 			mode = 0;
-		break;
-	case VFDDISPLAYCLR:
-		vfd_data.length = 0;
-	   	res = run_draw_thread(&vfd_data);
-		break;
-	case VFDGETWAKEUPMODE:
-	case VFDDISPLAYWRITEONOFF:
-		res = 0;
-		break;
-	case VFDGETSTARTUPSTATE:
-	{
-		YWPANEL_STARTUPSTATE_t State;
-		if (YWPANEL_FP_GetStartUpState(&State))
-			res = put_user(State, (int *) arg);
-		break;
-	}
-	case VFDSETLOOPSTATE:
-	{
-		YWPANEL_LOOPSTATE_t State = YWPANEL_LOOPSTATE_UNKNOWN;
-		res = get_user(State, (int *)arg);
-		if (!res)
-			res = YWPANEL_FP_SetLoopState(State);
-		break;
-	}
-	case VFDGETLOOPSTATE:
-	{
-		YWPANEL_LOOPSTATE_t State;
-		if (YWPANEL_FP_GetLoopState(&State))
-			res = put_user(State, (int *) arg);
-		break;
-	}
-	case VFDGETVERSION:
-	{
-		YWPANEL_Version_t panel_version;
-		memset(&panel_version, 0, sizeof(YWPANEL_Version_t));
-		if (YWPANEL_FP_GetVersion(&panel_version))
-			res = put_user (panel_version.DisplayInfo, (int *)arg);
-		break;
-	}
-	case VFDGETBLUEKEY:
-	case VFDGETSTBYKEY:
-	{
-		if (YWPANEL_FP_GetKey(cmd == VFDGETBLUEKEY, aotom_data.u.key.key_nr, &aotom_data.u.key.key))
-			res = copy_to_user((void *) arg, &aotom_data, sizeof(aotom_data));
-		break;
-	}
-	case VFDSETBLUEKEY:
-	case VFDSETSTBYKEY:
-		res = !YWPANEL_FP_SetKey(cmd == VFDSETBLUEKEY, aotom_data.u.key.key_nr, aotom_data.u.key.key);
-		break;
-	default:
-		printk("VFD/AOTOM: unknown IOCTL 0x%x\n", cmd);
-	case 0x5305:
-	case 0x5401:
-		mode = 0;
-		break;
-	}
-	up(&write_sem);
+			break;
+		}
+		up(&write_sem);
 
-   dprintk(5, "%s <\n", __func__);
-   return res;
+	dprintk(5, "%s <\n", __func__);
+	return res;
 }
 
 static struct file_operations vfd_fops =
@@ -1037,8 +1040,8 @@ static int led_thread_active(void) {
 
 	for (i = 0; i < led_count; i++)
 		if(!led_state[i].stop && led_state[i].led_task)
-			return -1;
-	return 0;
+			return 0;
+	return -1;
 }
 
 static void __exit aotom_cleanup_module(void)
@@ -1050,7 +1053,7 @@ static void __exit aotom_cleanup_module(void)
 	platform_set_drvdata(rtc_pdev, NULL);
 	platform_device_unregister(rtc_pdev);
 
-	if(!draw_thread_stop && draw_task)
+	if((draw_thread_status != DRAW_THREAD_STATUS_STOPPED) && draw_task)
 		kthread_stop(draw_task);
 
 	for (i = 0; i < led_count; i++)
@@ -1059,7 +1062,7 @@ static void __exit aotom_cleanup_module(void)
 			kthread_stop(led_state[i].led_task);
 		}
 
-	while(!draw_thread_stop && !led_thread_active())
+	while((draw_thread_status != DRAW_THREAD_STATUS_STOPPED) && led_thread_active())
 		msleep(1);
 
 	dprintk(5, "[BTN] unloading ...\n");
