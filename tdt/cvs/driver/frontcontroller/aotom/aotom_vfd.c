@@ -1536,7 +1536,8 @@ static int YWPANEL_VFD_SetMode(VFDMode_T mode)
 	return ST_ErrCode;
 }
 
-int YWPANEL_VFD_ShowContent(void)
+#if 0 // unused
+static int YWPANEL_VFD_ShowContent(void)
 {
 	int 	 ST_ErrCode = 0;
 	VFD_CS_CLR();
@@ -1545,7 +1546,6 @@ int YWPANEL_VFD_ShowContent(void)
 	return ST_ErrCode;
 }
 
-#if 0 // unused
 static int YWPANEL_VFD_ShowContentOff(void)
 {
 	int 	 ST_ErrCode = 0;
@@ -1585,24 +1585,6 @@ static u8 ywpanel_vfd_map[0x80] =
 	// p                                                          z     {     |     }     ~
 	0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x31, 0x30, 0x32, 0x2f, 0x2f
 };
-
-static void YWPANEL_VFD_DrawChar(char c, u8 position)
-{
-	u8 u;
-
-	if(position < 1 || position > 8) {
-		PANEL_PRINT((TRACE_ERROR, "char position error! %d\n", position));
-		return;
-	}
-	if (c & ~0x7F)
-		u = 47;
-	else
-		u = ywpanel_vfd_map[(int)c];
-
-	YWPANEL_VFD_SegDigSeg(position, SEGNUM1, CharLib[u][0]);
-	YWPANEL_VFD_SegDigSeg(position, SEGNUM2, CharLib[u][1]);
-
-}
 
 static void YWPANEL_VFD_DrawNum(u8 c, u8 position)
 {
@@ -2296,30 +2278,38 @@ static int YWPANEL_VFD_ShowString_StandBy(char* str)
 	}
 	up(&vfd_sem);
 	return ST_ErrCode;
- }
+}
 
 static int YWPANEL_VFD_ShowString_Common(char* str)
 {
 	int ST_ErrCode = 0 ;
-	u8 length;
-	u8 i;
+	int number_of_utf8_characters, i;
 
 	if (down_interruptible(&vfd_sem)) {
 	   ST_ErrCode =-EBUSY;
 	   return ST_ErrCode;
 	}
-	length = strlen(str);
 
-	for(i = 0; i < 8; i++) {
-		if(i < length) {
-			YWPANEL_VFD_DrawChar(*str, i + 1);
-			str++;
-		} else
-			YWPANEL_VFD_DrawChar(' ', i + 1);
+	number_of_utf8_characters = utf8strlen(str, strlen(str));
+	for (i = 1; i < 9; i++) {
+		int v1 = 0, v2 = 0;
+
+		if (number_of_utf8_characters) {
+			int usedbytes = lookup_utf8((unsigned char *)str, &v1, &v2);
+			if (usedbytes) {
+				number_of_utf8_characters--;
+				str += usedbytes;
+			} else
+				number_of_utf8_characters = 0;
+		}
+
+		YWPANEL_VFD_SegDigSeg(i, SEGNUM1, v1);
+		YWPANEL_VFD_SegDigSeg(i, SEGNUM2, v2);
 	}
+
 	up(&vfd_sem);
 	return ST_ErrCode;
- }
+}
 
 static int YWPANEL_VFD_ShowString_Unknown(char* str)
 {
@@ -2519,7 +2509,7 @@ static int YWPANEL_VFD_Init_Common(void)
 	YWPANEL_Seg_Addr_Init();
 	YWPANEL_VFD_ClearAll();
 	//YWPANEL_VFD_ShowContent();
-	YWPANEL_VFD_ShowString("welcome!");
+	//YWPANEL_VFD_ShowString("welcome!");
 
 	return ErrorCode;
  }
