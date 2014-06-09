@@ -4650,7 +4650,7 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
     dev = (struct nim_device *)&state->spark_nimdev;
 	priv = (struct nim_s3501_private *) dev->priv;
 
-	printk("p->frequency is %d\n", p->frequency);
+	//printk("p->frequency is %d\n", p->frequency);
 
     priv->bLock = FALSE;
 
@@ -4663,8 +4663,8 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
 
 	//starttime = 0;
 	////printk("    Enter Fuction nim_s3501_channel_change \n");
-	printk("    freq is %d\n", freq);
-	printk("    sym is %d\n", sym);
+	//printk("    freq is %d\n", freq);
+	//printk("    sym is %d\n", sym);
 	//printk("    fec is %d\n", fec);
 
 	priv->t_Param.t_phase_noise_detected = 0;
@@ -5007,7 +5007,7 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
 #endif*/  //lwj remove
 	if (priv->ul_status.m_s3501_type == NIM_CHIP_ID_M3501B)
 	{
-		printk("NIM_CHIP_ID_M3501B ########### d3501_Search\n");
+		//printk("NIM_CHIP_ID_M3501B ########### d3501_Search\n");
 		priv->ul_status.phase_err_check_status = 0;
 		priv->ul_status.s3501d_lock_status = NIM_LOCK_STUS_NORMAL;
 	}
@@ -5015,9 +5015,9 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
 	priv->ul_status.m_setting_freq = freq;
 
 	//reset first
-	printk("[%s][%d]\n", __FUNCTION__, __LINE__);
+	//printk("[%s][%d]\n", __FUNCTION__, __LINE__);
 	nim_s3501_demod_ctrl(dev, NIM_DEMOD_CTRL_0X91);
-	printk("[%s][%d]\n", __FUNCTION__, __LINE__);
+	//printk("[%s][%d]\n", __FUNCTION__, __LINE__);
 	msleep(5); //sleep 5ms lwj add
 
 	if ((0 == freq) || (0 == sym))
