@@ -4967,7 +4967,7 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
     dev = (struct nim_device *)&state->spark_nimdev;
 	priv = (struct nim_s3501_private *) dev->priv;
 
-	printk("p->frequency is %d\n", p->frequency);
+	//printk("p->frequency is %d\n", p->frequency);
 
     priv->bLock = FALSE;
 
@@ -4980,8 +4980,8 @@ static enum dvbfe_search d3501_Search(struct dvb_frontend *fe,
 
 	//starttime = 0;
 	////printk("    Enter Fuction nim_s3501_channel_change \n");
-	printk("    freq is %d\n", freq);
-	printk("    sym is %d\n", sym);
+	//printk("    freq is %d\n", freq);
+	//printk("    sym is %d\n", sym);
 	//printk("    fec is %d\n", fec);
 
 	priv->t_Param.t_phase_noise_detected = 0;
